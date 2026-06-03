@@ -21,11 +21,22 @@ router.use(authenticateToken);
 
 const statusValues = Object.values(MedicineRequestStatus) as [string, ...string[]];
 
+const fileUploadSchema = z.object({
+  base64: z.string().min(1),
+  fileName: z.string().min(1),
+  mimeType: z.string().regex(/^image\/(png|jpeg|jpg|webp)|application\/pdf$/),
+});
+
 const createMedicineRequestSchema = z.object({
   notes: z.string().max(1000).optional(),
+  // Prescription (required)
   prescriptionBase64: z.string().min(1, 'Prescription file is required'),
   fileName: z.string().min(1, 'File name is required'),
   mimeType: z.string().regex(/^image\/(png|jpeg|jpg|webp)|application\/pdf$/, 'Must be an image or PDF'),
+  // Additional supporting documents (optional)
+  incomeCertificate: fileUploadSchema.optional(),
+  diseaseProof: fileUploadSchema.optional(),
+  doctorRecommendation: fileUploadSchema.optional(),
 });
 
 const updateStatusSchema = z.object({
@@ -86,21 +97,49 @@ router.post(
     }
     if (!user.patient) throw new AppError('Patient profile not found', 404, 'PATIENT_NOT_FOUND');
 
-    const { notes, prescriptionBase64, fileName, mimeType } = parsed.data;
-
-    // Decode base64 and upload to file storage
-    const buffer = Buffer.from(prescriptionBase64, 'base64');
-    const ext = fileName.split('.').pop() || 'png';
-    const fileKey = `prescriptions/${userId}/${Date.now()}.${ext}`;
+    const { notes, prescriptionBase64, fileName, mimeType, incomeCertificate, diseaseProof, doctorRecommendation } = parsed.data;
 
     const services = getServices(req);
-    await services.fileStorage.upload(fileKey, buffer, mimeType);
+    const ts = Date.now();
 
-    // Create request in PENDING_OCR status (ready for OCR processing)
+    // Upload prescription (required)
+    const buffer = Buffer.from(prescriptionBase64, 'base64');
+    const ext = fileName.split('.').pop() || 'png';
+    const prescriptionFileKey = `prescriptions/${userId}/${ts}.${ext}`;
+    await services.fileStorage.upload(prescriptionFileKey, buffer, mimeType);
+
+    // Upload optional supporting documents
+    let incomeCertificateFileKey: string | undefined;
+    if (incomeCertificate) {
+      const buf = Buffer.from(incomeCertificate.base64, 'base64');
+      const e = incomeCertificate.fileName.split('.').pop() || 'pdf';
+      incomeCertificateFileKey = `income-certs/${userId}/${ts}.${e}`;
+      await services.fileStorage.upload(incomeCertificateFileKey, buf, incomeCertificate.mimeType);
+    }
+
+    let diseaseProofFileKey: string | undefined;
+    if (diseaseProof) {
+      const buf = Buffer.from(diseaseProof.base64, 'base64');
+      const e = diseaseProof.fileName.split('.').pop() || 'pdf';
+      diseaseProofFileKey = `disease-proofs/${userId}/${ts}.${e}`;
+      await services.fileStorage.upload(diseaseProofFileKey, buf, diseaseProof.mimeType);
+    }
+
+    let doctorRecommendationFileKey: string | undefined;
+    if (doctorRecommendation) {
+      const buf = Buffer.from(doctorRecommendation.base64, 'base64');
+      const e = doctorRecommendation.fileName.split('.').pop() || 'pdf';
+      doctorRecommendationFileKey = `doctor-recs/${userId}/${ts}.${e}`;
+      await services.fileStorage.upload(doctorRecommendationFileKey, buf, doctorRecommendation.mimeType);
+    }
+
     const request = await prisma.medicineRequest.create({
       data: {
         patientId: user.patient.id,
-        prescriptionFileKey: fileKey,
+        prescriptionFileKey,
+        incomeCertificateFileKey: incomeCertificateFileKey ?? null,
+        diseaseProofFileKey: diseaseProofFileKey ?? null,
+        doctorRecommendationFileKey: doctorRecommendationFileKey ?? null,
         status: MedicineRequestStatus.PENDING_OCR,
         notes,
       },
@@ -112,7 +151,7 @@ router.post(
         action: 'MEDICINE_REQUEST_CREATED',
         entityType: 'MedicineRequest',
         entityId: request.id,
-        newValue: { fileKey, status: MedicineRequestStatus.PENDING_OCR },
+        newValue: { prescriptionFileKey, status: MedicineRequestStatus.PENDING_OCR },
       },
       req,
     );
@@ -188,20 +227,31 @@ router.get(
       if (request.patientId !== patient?.id) throw new AppError('Access denied', 403, 'ACCESS_DENIED');
     }
 
-    // Generate signed URL for prescription image
-    let prescriptionUrl: string | null = null;
-    if (request.prescriptionFileKey) {
+    const services = getServices(req);
+
+    async function signedUrl(key: string | null): Promise<string | null> {
+      if (!key) return null;
       try {
-        const services = getServices(req);
-        prescriptionUrl = await services.fileStorage.getSignedUrl(request.prescriptionFileKey, 3600);
+        return await services.fileStorage.getSignedUrl(key, 3600);
       } catch {
-        // File might not be accessible; leave null
+        return null;
       }
     }
+
+    const [prescriptionUrl, incomeCertificateUrl, diseaseProofUrl, doctorRecommendationUrl] =
+      await Promise.all([
+        signedUrl(request.prescriptionFileKey),
+        signedUrl((request as any).incomeCertificateFileKey),
+        signedUrl((request as any).diseaseProofFileKey),
+        signedUrl((request as any).doctorRecommendationFileKey),
+      ]);
 
     res.status(200).json({
       request,
       prescriptionUrl,
+      incomeCertificateUrl,
+      diseaseProofUrl,
+      doctorRecommendationUrl,
     });
   }),
 );

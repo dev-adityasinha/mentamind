@@ -12,6 +12,8 @@ import { bloodRequestRoutes } from './routes/blood-request.routes.js';
 import { donorRoutes } from './routes/donor.routes.js';
 import { medicineRequestRoutes } from './routes/medicine-request.routes.js';
 import { adminRoutes, notificationRoutes } from './routes/admin.routes.js';
+import { hospitalRoutes } from './routes/hospital.routes.js';
+import { volunteerRoutes } from './routes/volunteer.routes.js';
 import {
   createServiceContainer,
   ServiceContainer,
@@ -33,7 +35,7 @@ app.use(
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(null, false);
       }
     },
     credentials: true,
@@ -43,8 +45,16 @@ app.use(
   // Logging
   app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-  // Body parsing
-  app.use(express.json({ limit: '10mb' }));
+  // Body parsing — catch malformed JSON and return a structured error instead of crashing
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    express.json({ limit: '10mb' })(req, res, (err) => {
+      if (err) {
+        res.status(400).json({ error: { message: 'Invalid JSON body', code: 'INVALID_JSON' } });
+        return;
+      }
+      next();
+    });
+  });
   app.use(express.urlencoded({ extended: true }));
 
   // Make services available on requests
@@ -60,6 +70,13 @@ app.use(
   app.use('/api/medicine-requests', medicineRequestRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/notifications', notificationRoutes);
+  app.use('/api/hospitals', hospitalRoutes);
+  app.use('/api/volunteers', volunteerRoutes);
+
+  // 404 handler — unknown routes return JSON, not Express default HTML
+  app.use((_req: express.Request, res: express.Response) => {
+    res.status(404).json({ error: { message: 'Route not found', code: 'NOT_FOUND' } });
+  });
 
   // Global error handler (must be last)
   app.use(errorHandler);

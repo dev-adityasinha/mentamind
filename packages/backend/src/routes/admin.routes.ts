@@ -86,15 +86,33 @@ router.get(
 
 // ─── GET /analytics — Demand analysis via AnalysisEngine ────────────────────
 
+const analyticsSchema = z.object({
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  days: z.coerce.number().int().min(1).max(365).default(30),
+});
+
 router.get(
   '/analytics',
   asyncHandler(async (req: Request, res: Response) => {
-    const services = getServices(req);
-    const daysBack = parseInt(req.query.days as string) || 30;
+    const parsed = analyticsSchema.safeParse(req.query);
+    if (!parsed.success) {
+      throw new AppError('Invalid query params', 400, 'VALIDATION_ERROR');
+    }
 
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysBack);
+    const services = getServices(req);
+    const { days } = parsed.data;
+
+    const endDate = parsed.data.endDate ? new Date(parsed.data.endDate) : new Date();
+    const startDate = parsed.data.startDate
+      ? new Date(parsed.data.startDate)
+      : new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new AppError('Invalid date format for startDate or endDate', 400, 'VALIDATION_ERROR');
+    }
+
+    const daysBack = Math.round((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
 
     const [demand, shortages] = await Promise.all([
       services.analysisEngine.analyzeDemand({ startDate, endDate }),
@@ -107,8 +125,10 @@ router.get(
 
 // ─── GET /users — List all users ────────────────────────────────────────────
 
+const roleValues = Object.values(Role) as [string, ...string[]];
+
 const listUsersSchema = z.object({
-  role: z.string().optional(),
+  role: z.enum(roleValues).optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),

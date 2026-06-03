@@ -56,6 +56,28 @@ enum UrgencyLevel {
   NORMAL
 }
 
+enum PriorityLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum CallStatus {
+  CONNECTED
+  NOT_REACHABLE
+  INTERESTED
+  REJECTED
+  CALLBACK_REQUESTED
+  DONATED
+}
+
 model User {
   id                String    @id @default(uuid())
   email             String    @unique
@@ -74,21 +96,25 @@ model User {
   hospital          Hospital?
   auditLogs         AuditLog[]
   notifications     Notification[]
+  callLogs          DonorCallLog[] @relation("VolunteerCallLogs")
 
   @@index([email])
   @@index([role])
 }
 
 model Patient {
-  id               String    @id @default(uuid())
-  userId           String    @unique
-  user             User      @relation(fields: [userId], references: [id])
+  id               String     @id @default(uuid())
+  userId           String     @unique
+  user             User       @relation(fields: [userId], references: [id])
   bloodGroup       BloodGroup?
+  age              Int?
+  gender           Gender?
+  city             String?
   medicalNotes     String?
   address          String?
   emergencyContact String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   bloodRequests    BloodRequest[]
   medicineRequests MedicineRequest[]
@@ -101,11 +127,15 @@ model Donor {
   bloodGroup       BloodGroup
   lastDonationDate DateTime?
   isAvailable      Boolean    @default(true)
+  city             String?
   latitude         Float?
   longitude        Float?
   totalDonations   Int        @default(0)
+  responseScore    Float      @default(0)
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
+
+  callLogs         DonorCallLog[]
 
   @@index([bloodGroup, isAvailable])
   @@index([isAvailable])
@@ -118,48 +148,87 @@ model Hospital {
   hospitalName String
   address      String
   phone        String
+  department   String?
+  isVerified   Boolean   @default(false)
+  isActive     Boolean   @default(true)
   latitude     Float?
   longitude    Float?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   bloodRequests BloodRequest[]
+
+  @@index([isVerified, isActive])
 }
 
 model BloodRequest {
-  id            String        @id @default(uuid())
-  patientId     String
-  patient       Patient       @relation(fields: [patientId], references: [id])
-  hospitalId    String?
-  hospital      Hospital?     @relation(fields: [hospitalId], references: [id])
-  bloodGroup    BloodGroup
-  unitsNeeded   Int
-  urgency       UrgencyLevel  @default(NORMAL)
-  status        RequestStatus @default(DRAFT)
-  notes         String?
-  matchedDonors Json?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                  String        @id @default(uuid())
+  patientId           String
+  patient             Patient       @relation(fields: [patientId], references: [id])
+  hospitalId          String?
+  hospital            Hospital?     @relation(fields: [hospitalId], references: [id])
+  bloodGroup          BloodGroup
+  unitsNeeded         Int
+  urgency             UrgencyLevel  @default(NORMAL)
+  priorityLevel       PriorityLevel @default(MEDIUM)
+  status              RequestStatus @default(DRAFT)
+  notes               String?
+  // Hospital details on the request
+  hospitalName        String?
+  department          String?
+  treatingDoctor      String?
+  bedNumber           String?
+  // Blood requisition document
+  requisitionFileKey  String?
+  ocrData             Json?
+  // Matching results
+  matchedDonors       Json?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  callLogs            DonorCallLog[]
 
   @@index([status])
   @@index([bloodGroup, status])
+  @@index([priorityLevel, status])
 }
 
 model MedicineRequest {
-  id                  String                @id @default(uuid())
-  patientId           String
-  patient             Patient               @relation(fields: [patientId], references: [id])
-  prescriptionFileKey String?
-  ocrSuggestions      Json?
-  adminReviewedData   Json?
-  status              MedicineRequestStatus @default(DRAFT)
-  reviewedBy          String?
-  reviewedAt          DateTime?
-  notes               String?
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
+  id                         String                @id @default(uuid())
+  patientId                  String
+  patient                    Patient               @relation(fields: [patientId], references: [id])
+  prescriptionFileKey        String?
+  incomeCertificateFileKey   String?
+  diseaseProofFileKey        String?
+  doctorRecommendationFileKey String?
+  ocrSuggestions             Json?
+  adminReviewedData          Json?
+  status                     MedicineRequestStatus @default(DRAFT)
+  reviewedBy                 String?
+  reviewedAt                 DateTime?
+  notes                      String?
+  createdAt                  DateTime              @default(now())
+  updatedAt                  DateTime              @updatedAt
 
   @@index([status])
+}
+
+model DonorCallLog {
+  id             String     @id @default(uuid())
+  bloodRequestId String
+  bloodRequest   BloodRequest @relation(fields: [bloodRequestId], references: [id])
+  donorId        String
+  donor          Donor      @relation(fields: [donorId], references: [id])
+  volunteerId    String
+  volunteer      User       @relation("VolunteerCallLogs", fields: [volunteerId], references: [id])
+  callStatus     CallStatus
+  callAttempt    Int        @default(1)
+  notes          String?
+  createdAt      DateTime   @default(now())
+
+  @@index([bloodRequestId])
+  @@index([donorId])
+  @@index([volunteerId])
 }
 
 model AuditLog {

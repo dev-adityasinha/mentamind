@@ -6,6 +6,7 @@ import {
   Role,
   RequestStatus,
   UrgencyLevel,
+  PriorityLevel,
   assertValidTransition,
   getCompatibleDonorGroups,
 } from '@mentamind/shared';
@@ -25,13 +26,25 @@ router.use(authenticateToken);
 
 const bloodGroupValues = Object.values(BloodGroup) as [string, ...string[]];
 const urgencyValues = Object.values(UrgencyLevel) as [string, ...string[]];
+const priorityValues = Object.values(PriorityLevel) as [string, ...string[]];
 const statusValues = Object.values(RequestStatus) as [string, ...string[]];
 
 const createRequestSchema = z.object({
   bloodGroup: z.enum(bloodGroupValues),
   unitsNeeded: z.number().int().min(1).max(20),
   urgency: z.enum(urgencyValues).default('NORMAL'),
+  priorityLevel: z.enum(priorityValues).default('MEDIUM'),
   notes: z.string().max(1000).optional(),
+  // Hospital details
+  hospitalId: z.string().uuid().optional(),
+  hospitalName: z.string().max(255).optional(),
+  department: z.string().max(255).optional(),
+  treatingDoctor: z.string().max(255).optional(),
+  bedNumber: z.string().max(50).optional(),
+  // Blood requisition document upload (base64)
+  requisitionBase64: z.string().optional(),
+  requisitionFileName: z.string().optional(),
+  requisitionMimeType: z.string().regex(/^image\/(png|jpeg|jpg)|application\/pdf$/).optional(),
 });
 
 const updateStatusSchema = z.object({
@@ -91,7 +104,21 @@ router.post(
       throw new AppError('Patient profile not found', 404, 'PATIENT_NOT_FOUND');
     }
 
-    const { bloodGroup, unitsNeeded, urgency, notes } = parsed.data;
+    const {
+      bloodGroup, unitsNeeded, urgency, priorityLevel, notes,
+      hospitalId, hospitalName, department, treatingDoctor, bedNumber,
+      requisitionBase64, requisitionFileName, requisitionMimeType,
+    } = parsed.data;
+
+    // Upload requisition document if provided
+    let requisitionFileKey: string | undefined;
+    if (requisitionBase64 && requisitionFileName && requisitionMimeType) {
+      const services = getServices(req);
+      const buffer = Buffer.from(requisitionBase64, 'base64');
+      const ext = requisitionFileName.split('.').pop() || 'pdf';
+      requisitionFileKey = `requisitions/${userId}/${Date.now()}.${ext}`;
+      await services.fileStorage.upload(requisitionFileKey, buffer, requisitionMimeType);
+    }
 
     const request = await prisma.bloodRequest.create({
       data: {
@@ -99,8 +126,15 @@ router.post(
         bloodGroup: bloodGroup as BloodGroup,
         unitsNeeded,
         urgency: urgency as UrgencyLevel,
+        priorityLevel: priorityLevel as PriorityLevel,
         status: RequestStatus.DRAFT,
         notes,
+        hospitalId: hospitalId ?? null,
+        hospitalName: hospitalName ?? null,
+        department: department ?? null,
+        treatingDoctor: treatingDoctor ?? null,
+        bedNumber: bedNumber ?? null,
+        requisitionFileKey: requisitionFileKey ?? null,
       },
     });
 
@@ -110,7 +144,7 @@ router.post(
         action: 'BLOOD_REQUEST_CREATED',
         entityType: 'BloodRequest',
         entityId: request.id,
-        newValue: { bloodGroup, unitsNeeded, urgency },
+        newValue: { bloodGroup, unitsNeeded, urgency, priorityLevel, hospitalName },
       },
       req,
     );
@@ -392,6 +426,46 @@ router.post(
         })),
       },
     });
+  }),
+);
+
+// POST /:id/ocr — Extract data from blood requisition document
+
+router.post(
+  '/:id/ocr',
+  requireRole(Role.ADMIN, Role.VOLUNTEER),
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+
+    const request = await prisma.bloodRequest.findUnique({ where: { id } });
+    if (!request) throw new AppError('Blood request not found', 404, 'REQUEST_NOT_FOUND');
+    if (!request.requisitionFileKey) {
+      throw new AppError('No requisition document uploaded', 400, 'NO_FILE');
+    }
+
+    const services = getServices(req);
+    const fileBuffer = await services.fileStorage.download(request.requisitionFileKey);
+    const mimeType = request.requisitionFileKey.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg';
+
+    const ocrResult = await services.ocrService.extractPrescription(fileBuffer, mimeType);
+
+    const updatedRequest = await prisma.bloodRequest.update({
+      where: { id },
+      data: { ocrData: JSON.parse(JSON.stringify(ocrResult)) },
+    });
+
+    void createAuditLog(
+      req.user!.userId,
+      {
+        action: 'BLOOD_REQUEST_OCR_COMPLETED',
+        entityType: 'BloodRequest',
+        entityId: id,
+        newValue: { medicinesFound: ocrResult.medicines.length },
+      },
+      req,
+    );
+
+    res.status(200).json({ request: updatedRequest, ocrResult });
   }),
 );
 

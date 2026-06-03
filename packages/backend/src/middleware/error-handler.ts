@@ -39,12 +39,11 @@ export function errorHandler(
     return;
   }
 
+  const message = config.NODE_ENV === 'production'
+    ? 'Internal server error'
+    : (err.message || err.constructor?.name || 'Unknown error');
+
   res.status(500).json({
-    error: {
-      message:
-        config.NODE_ENV === 'production'
-          ? 'Internal server error'
-          : err.message,
-    },
+    error: { message, code: 'INTERNAL_ERROR' },
   });
 }

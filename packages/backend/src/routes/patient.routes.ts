@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-import { BloodGroup, decrypt } from '@mentamind/shared';
+import { BloodGroup, Gender, decrypt } from '@mentamind/shared';
 import { Role } from '@mentamind/shared';
 import { authenticateToken } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
@@ -19,9 +19,13 @@ router.use(requireRole(Role.PATIENT));
 // ─── Zod Schemas ────────────────────────────────────────────────────────────
 
 const bloodGroupValues = Object.values(BloodGroup) as [string, ...string[]];
+const genderValues = Object.values(Gender) as [string, ...string[]];
 
 const updatePatientSchema = z.object({
   bloodGroup: z.enum(bloodGroupValues).optional(),
+  age: z.number().int().min(0).max(150).optional(),
+  gender: z.enum(genderValues).optional(),
+  city: z.string().max(100).optional(),
   medicalNotes: z.string().max(2000).optional(),
   address: z.string().max(500).optional(),
   emergencyContact: z.string().max(20).optional(),
@@ -83,6 +87,9 @@ router.get(
       patient: {
         id: user.patient.id,
         bloodGroup: user.patient.bloodGroup,
+        age: user.patient.age,
+        gender: user.patient.gender,
+        city: user.patient.city,
         medicalNotes: user.patient.medicalNotes,
         address: user.patient.address,
         emergencyContact: user.patient.emergencyContact,
@@ -119,9 +126,11 @@ router.put(
       throw new AppError('Patient profile not found', 404, 'PATIENT_NOT_FOUND');
     }
 
-    // Build update data — only include fields that were provided
     const updateData: Record<string, unknown> = {};
     if (data.bloodGroup !== undefined) updateData.bloodGroup = data.bloodGroup;
+    if (data.age !== undefined) updateData.age = data.age;
+    if (data.gender !== undefined) updateData.gender = data.gender;
+    if (data.city !== undefined) updateData.city = data.city;
     if (data.medicalNotes !== undefined) updateData.medicalNotes = data.medicalNotes;
     if (data.address !== undefined) updateData.address = data.address;
     if (data.emergencyContact !== undefined) updateData.emergencyContact = data.emergencyContact;
@@ -132,6 +141,9 @@ router.put(
 
     const oldValue = {
       bloodGroup: patient.bloodGroup,
+      age: patient.age,
+      gender: patient.gender,
+      city: patient.city,
       medicalNotes: patient.medicalNotes,
       address: patient.address,
       emergencyContact: patient.emergencyContact,
@@ -142,7 +154,6 @@ router.put(
       data: updateData,
     });
 
-    // Audit log
     void createAuditLog(
       userId,
       {
@@ -159,6 +170,9 @@ router.put(
       patient: {
         id: updatedPatient.id,
         bloodGroup: updatedPatient.bloodGroup,
+        age: updatedPatient.age,
+        gender: updatedPatient.gender,
+        city: updatedPatient.city,
         medicalNotes: updatedPatient.medicalNotes,
         address: updatedPatient.address,
         emergencyContact: updatedPatient.emergencyContact,

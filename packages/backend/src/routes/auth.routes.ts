@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { Role, BloodGroup, encrypt, decrypt } from '@mentamind/shared';
+import { Role, BloodGroup, Gender, encrypt, decrypt } from '@mentamind/shared';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -21,6 +21,7 @@ const BCRYPT_ROUNDS = 12;
 // ─── Zod Schemas ────────────────────────────────────────────────────────────
 
 const bloodGroupValues = Object.values(BloodGroup) as [string, ...string[]];
+const genderValues = Object.values(Gender) as [string, ...string[]];
 const roleValues = Object.values(Role) as [string, ...string[]];
 
 const registerSchema = z
@@ -30,19 +31,23 @@ const registerSchema = z
     name: z.string().min(1, 'Name is required').max(255),
     phone: z.string().min(7, 'Phone number is too short').max(20),
     role: z.enum(roleValues),
-    // Role-specific fields
+    // Shared
     bloodGroup: z.enum(bloodGroupValues).optional(),
-    // Donor-specific
-    latitude: z.number().min(-90).max(90).optional(),
-    longitude: z.number().min(-180).max(180).optional(),
     // Patient-specific
+    age: z.number().int().min(0).max(150).optional(),
+    gender: z.enum(genderValues).optional(),
+    city: z.string().max(100).optional(),
     medicalNotes: z.string().max(2000).optional(),
     address: z.string().max(500).optional(),
     emergencyContact: z.string().max(20).optional(),
+    // Donor-specific
+    latitude: z.number().min(-90).max(90).optional(),
+    longitude: z.number().min(-180).max(180).optional(),
     // Hospital-specific
     hospitalName: z.string().max(255).optional(),
     hospitalAddress: z.string().max(500).optional(),
     hospitalPhone: z.string().max(20).optional(),
+    department: z.string().max(255).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.role === Role.DONOR && !data.bloodGroup) {
@@ -182,6 +187,9 @@ router.post(
             data: {
               userId: newUser.id,
               bloodGroup: (data.bloodGroup as BloodGroup) ?? null,
+              age: data.age ?? null,
+              gender: (data.gender as Gender) ?? null,
+              city: data.city ?? null,
               medicalNotes: data.medicalNotes ?? null,
               address: data.address ?? null,
               emergencyContact: data.emergencyContact ?? null,
@@ -194,6 +202,7 @@ router.post(
             data: {
               userId: newUser.id,
               bloodGroup: data.bloodGroup as BloodGroup,
+              city: data.city ?? null,
               latitude: data.latitude ?? null,
               longitude: data.longitude ?? null,
             },
@@ -207,6 +216,7 @@ router.post(
               hospitalName: data.hospitalName!,
               address: data.hospitalAddress ?? data.address ?? '',
               phone: data.hospitalPhone ?? data.phone,
+              department: data.department ?? null,
               latitude: data.latitude ?? null,
               longitude: data.longitude ?? null,
             },

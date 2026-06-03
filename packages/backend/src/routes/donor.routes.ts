@@ -19,6 +19,7 @@ router.use(requireRole(Role.DONOR));
 
 const updateDonorSchema = z.object({
   isAvailable: z.boolean().optional(),
+  city: z.string().max(100).optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   lastDonationDate: z.string().datetime().optional(),
@@ -79,9 +80,11 @@ router.get(
         bloodGroup: user.donor.bloodGroup,
         lastDonationDate: user.donor.lastDonationDate,
         isAvailable: user.donor.isAvailable,
+        city: user.donor.city,
         latitude: user.donor.latitude,
         longitude: user.donor.longitude,
         totalDonations: user.donor.totalDonations,
+        responseScore: user.donor.responseScore,
         createdAt: user.donor.createdAt,
         updatedAt: user.donor.updatedAt,
       },
@@ -116,6 +119,7 @@ router.put(
 
     const updateData: Record<string, unknown> = {};
     if (data.isAvailable !== undefined) updateData.isAvailable = data.isAvailable;
+    if (data.city !== undefined) updateData.city = data.city;
     if (data.latitude !== undefined) updateData.latitude = data.latitude;
     if (data.longitude !== undefined) updateData.longitude = data.longitude;
     if (data.lastDonationDate !== undefined) updateData.lastDonationDate = new Date(data.lastDonationDate);
@@ -126,6 +130,7 @@ router.put(
 
     const oldValue = {
       isAvailable: donor.isAvailable,
+      city: donor.city,
       latitude: donor.latitude,
       longitude: donor.longitude,
       lastDonationDate: donor.lastDonationDate,
@@ -154,9 +159,11 @@ router.put(
         bloodGroup: updatedDonor.bloodGroup,
         lastDonationDate: updatedDonor.lastDonationDate,
         isAvailable: updatedDonor.isAvailable,
+        city: updatedDonor.city,
         latitude: updatedDonor.latitude,
         longitude: updatedDonor.longitude,
         totalDonations: updatedDonor.totalDonations,
+        responseScore: updatedDonor.responseScore,
         createdAt: updatedDonor.createdAt,
         updatedAt: updatedDonor.updatedAt,
       },
