@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { apiFetch } from '@/lib/api';
 
+/* ─── Types ────────────────────────────────────────────────────────────────── */
+
 interface RankedDonor {
   donorId: string;
   bloodGroup: string;
@@ -25,12 +27,17 @@ interface BloodRequest {
   bloodGroup: string;
   unitsNeeded: number;
   urgency: string;
+  priorityLevel?: string;
   status: string;
   notes: string | null;
   matchedDonors: RankedDonor[] | null;
   assignedDonorId: string | null;
   assignedDonor: AssignedDonor | null;
   assignedAt: string | null;
+  hospitalName?: string | null;
+  department?: string | null;
+  treatingDoctor?: string | null;
+  bedNumber?: string | null;
   createdAt: string;
   updatedAt: string;
   patient?: { user: { id: string; name: string; email: string } };
@@ -51,48 +58,88 @@ interface EligibleDonor {
   isEligible: boolean;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  DRAFT: '#6B7280',
-  PENDING_VERIFICATION: '#F59E0B',
-  VERIFIED: '#3B82F6',
-  MATCHING: '#8B5CF6',
-  MATCHED: '#0D9488',
-  IN_PROGRESS: '#F97316',
-  FULFILLED: '#22C55E',
-  CANCELLED: '#EF4444',
-  REJECTED: '#DC2626',
+/* ─── Constants ─────────────────────────────────────────────────────────────── */
+
+const STATUS_META: Record<string, { color: string; bg: string; label: string; step: number }> = {
+  DRAFT:                { color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', label: 'Draft',                step: 0 },
+  PENDING_VERIFICATION: { color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  label: 'Pending Verification', step: 1 },
+  VERIFIED:             { color: '#3b82f6', bg: 'rgba(59,130,246,0.12)',  label: 'Verified',             step: 2 },
+  MATCHING:             { color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)',  label: 'Matching',             step: 3 },
+  MATCHED:              { color: '#0d9488', bg: 'rgba(13,148,136,0.12)',  label: 'Matched',              step: 4 },
+  IN_PROGRESS:          { color: '#f97316', bg: 'rgba(249,115,22,0.12)',  label: 'In Progress',          step: 5 },
+  FULFILLED:            { color: '#22c55e', bg: 'rgba(34,197,94,0.12)',   label: 'Fulfilled',            step: 6 },
+  CANCELLED:            { color: '#ef4444', bg: 'rgba(239,68,68,0.12)',   label: 'Cancelled',            step: -1 },
+  REJECTED:             { color: '#dc2626', bg: 'rgba(220,38,38,0.12)',   label: 'Rejected',             step: -1 },
 };
 
-// Transitions available from each status (for admin buttons)
-const NEXT_ACTIONS: Record<string, { label: string; status: string; color: string }[]> = {
-  DRAFT: [
-    { label: 'Submit for Verification', status: 'PENDING_VERIFICATION', color: '#F59E0B' },
-    { label: 'Cancel', status: 'CANCELLED', color: '#EF4444' },
-  ],
-  PENDING_VERIFICATION: [
-    { label: 'Approve (Verify)', status: 'VERIFIED', color: '#3B82F6' },
-    { label: 'Reject', status: 'REJECTED', color: '#DC2626' },
-  ],
-  VERIFIED: [
-    { label: 'Cancel', status: 'CANCELLED', color: '#EF4444' },
-  ],
-  MATCHED: [
-    { label: 'Begin Processing', status: 'IN_PROGRESS', color: '#F97316' },
-    { label: 'Cancel', status: 'CANCELLED', color: '#EF4444' },
-  ],
-  IN_PROGRESS: [
-    { label: 'Mark Fulfilled', status: 'FULFILLED', color: '#22C55E' },
-    { label: 'Cancel', status: 'CANCELLED', color: '#EF4444' },
-  ],
+const URGENCY_META: Record<string, { color: string; bg: string; dot: string }> = {
+  CRITICAL: { color: '#ef4444', bg: 'rgba(239,68,68,0.1)',   dot: '#ef4444' },
+  URGENT:   { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', dot: '#f59e0b' },
+  NORMAL:   { color: '#22c55e', bg: 'rgba(34,197,94,0.1)',  dot: '#22c55e' },
 };
 
-function formatBloodGroup(bg: string) {
-  return bg.replace('_POS', '+').replace('_NEG', '−');
+const WORKFLOW_STEPS = [
+  { key: 'DRAFT',                label: 'Draft' },
+  { key: 'PENDING_VERIFICATION', label: 'Verification' },
+  { key: 'VERIFIED',             label: 'Verified' },
+  { key: 'MATCHING',             label: 'Matching' },
+  { key: 'MATCHED',              label: 'Matched' },
+  { key: 'IN_PROGRESS',          label: 'In Progress' },
+  { key: 'FULFILLED',            label: 'Fulfilled' },
+];
+
+const NEXT_ACTIONS: Record<string, { label: string; status: string; color: string; icon: string }[]> = {
+  DRAFT:                [{ label: 'Submit for Verification', status: 'PENDING_VERIFICATION', color: '#f59e0b', icon: '📋' },
+                         { label: 'Cancel', status: 'CANCELLED', color: '#ef4444', icon: '✕' }],
+  PENDING_VERIFICATION: [{ label: 'Approve & Verify', status: 'VERIFIED', color: '#3b82f6', icon: '✓' },
+                         { label: 'Reject', status: 'REJECTED', color: '#dc2626', icon: '✕' }],
+  VERIFIED:             [{ label: 'Cancel', status: 'CANCELLED', color: '#ef4444', icon: '✕' }],
+  MATCHED:              [{ label: 'Begin Processing', status: 'IN_PROGRESS', color: '#f97316', icon: '▶' },
+                         { label: 'Cancel', status: 'CANCELLED', color: '#ef4444', icon: '✕' }],
+  IN_PROGRESS:          [{ label: 'Mark Fulfilled', status: 'FULFILLED', color: '#22c55e', icon: '✓' },
+                         { label: 'Cancel', status: 'CANCELLED', color: '#ef4444', icon: '✕' }],
+};
+
+/* ─── Helpers ───────────────────────────────────────────────────────────────── */
+
+function fmtBG(bg: string) { return bg.replace('_POS', '+').replace('_NEG', '−'); }
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function formatStatus(s: string) {
-  return s.replace(/_/g, ' ');
+function fmtDateTime(iso: string) {
+  return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
+
+function initials(name: string) {
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+/* ─── Sub-components ────────────────────────────────────────────────────────── */
+
+function InfoChip({ label, value, accent }: { label: string; value: string; accent?: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+      <span style={{ fontSize: '10px', fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-muted)' }}>
+        {label}
+      </span>
+      <span style={{ fontSize: '13px', fontWeight: 600, color: accent ?? 'var(--color-text)' }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '12px' }}>
+      {children}
+    </p>
+  );
+}
+
+/* ─── Main component ────────────────────────────────────────────────────────── */
 
 export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -105,7 +152,6 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
   const [actionLoading, setActionLoading] = useState('');
   const [error, setError] = useState('');
 
-  // Assign-donor state (hospital role)
   const [eligibleDonors, setEligibleDonors] = useState<EligibleDonor[] | null>(null);
   const [eligibleLoading, setEligibleLoading] = useState(false);
   const [assignLoading, setAssignLoading] = useState('');
@@ -121,124 +167,82 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     try {
       const data = await apiFetch<{ request: BloodRequest }>(`/blood-requests/${id}`);
       setRequest(data.request);
-      if (data.request.matchedDonors) {
-        // matchedDonors might be the full RankedDonor array or a simplified version
-        setMatchResults(data.request.matchedDonors as unknown as RankedDonor[]);
-      }
+      if (data.request.matchedDonors) setMatchResults(data.request.matchedDonors as unknown as RankedDonor[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load request');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const handleStatusChange = async (newStatus: string) => {
-    setActionLoading(newStatus);
-    setError('');
+    setActionLoading(newStatus); setError('');
     try {
-      const data = await apiFetch<{ request: BloodRequest }>(`/blood-requests/${id}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const data = await apiFetch<{ request: BloodRequest }>(`/blood-requests/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
       setRequest(data.request);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Status update failed');
-    } finally {
-      setActionLoading('');
-    }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Status update failed'); }
+    finally { setActionLoading(''); }
   };
 
   const handleMatch = async () => {
-    setActionLoading('MATCHING');
-    setError('');
+    setActionLoading('MATCHING'); setError('');
     try {
-      const data = await apiFetch<{
-        request: BloodRequest;
-        matching: { eligibleDonorsFound: number; rankedDonors: RankedDonor[] };
-      }>(`/blood-requests/${id}/match`, { method: 'POST' });
-      setRequest(data.request);
-      setMatchResults(data.matching.rankedDonors);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Matching failed');
-    } finally {
-      setActionLoading('');
-    }
+      const data = await apiFetch<{ request: BloodRequest; matching: { rankedDonors: RankedDonor[] } }>(`/blood-requests/${id}/match`, { method: 'POST' });
+      setRequest(data.request); setMatchResults(data.matching.rankedDonors);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Matching failed'); }
+    finally { setActionLoading(''); }
   };
 
   const loadEligibleDonors = async () => {
-    setEligibleLoading(true);
-    setAssignError('');
+    setEligibleLoading(true); setAssignError('');
     try {
-      const data = await apiFetch<{ donors: EligibleDonor[]; patientCity: string | null; eligibleCount: number }>(
-        `/blood-requests/${id}/eligible-donors`,
-      );
+      const data = await apiFetch<{ donors: EligibleDonor[] }>(`/blood-requests/${id}/eligible-donors`);
       setEligibleDonors(data.donors);
-    } catch (err) {
-      setAssignError(err instanceof Error ? err.message : 'Failed to load eligible donors');
-    } finally {
-      setEligibleLoading(false);
-    }
+    } catch (err) { setAssignError(err instanceof Error ? err.message : 'Failed to load donors'); }
+    finally { setEligibleLoading(false); }
   };
 
-  const handleOpenAssignPanel = () => {
-    setShowAssignPanel(true);
-    if (!eligibleDonors) loadEligibleDonors();
-  };
+  const handleOpenAssignPanel = () => { setShowAssignPanel(true); if (!eligibleDonors) loadEligibleDonors(); };
 
   const handleAssignDonor = async (donorId: string) => {
-    setAssignLoading(donorId);
-    setAssignError('');
+    setAssignLoading(donorId); setAssignError('');
     try {
-      const data = await apiFetch<{ request: BloodRequest; assignment: { donorName: string; donorBloodGroup: string; locationReason: string } }>(
-        `/blood-requests/${id}/assign-donor`,
-        { method: 'POST', body: JSON.stringify({ donorId }) },
-      );
-      setRequest(data.request);
-      setShowAssignPanel(false);
-    } catch (err) {
-      setAssignError(err instanceof Error ? err.message : 'Assignment failed');
-    } finally {
-      setAssignLoading('');
-    }
+      const data = await apiFetch<{ request: BloodRequest }>(`/blood-requests/${id}/assign-donor`, { method: 'POST', body: JSON.stringify({ donorId }) });
+      setRequest(data.request); setShowAssignPanel(false);
+    } catch (err) { setAssignError(err instanceof Error ? err.message : 'Assignment failed'); }
+    finally { setAssignLoading(''); }
   };
 
   const handleRemoveAssignment = async () => {
-    setActionLoading('REMOVE_ASSIGN');
-    setError('');
+    setActionLoading('REMOVE_ASSIGN'); setError('');
     try {
-      const data = await apiFetch<{ request: BloodRequest }>(
-        `/blood-requests/${id}/assign-donor`,
-        { method: 'DELETE' },
-      );
-      setRequest(data.request);
-      setEligibleDonors(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to remove assignment');
-    } finally {
-      setActionLoading('');
-    }
+      const data = await apiFetch<{ request: BloodRequest }>(`/blood-requests/${id}/assign-donor`, { method: 'DELETE' });
+      setRequest(data.request); setEligibleDonors(null);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Failed to remove assignment'); }
+    finally { setActionLoading(''); }
   };
 
+  /* ── Loading / error states ── */
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <div className="flex items-center gap-3">
-          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none" style={{ color: 'var(--color-primary)' }}>
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-bg)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <svg style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite', color: 'var(--color-primary)' }} viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeOpacity="0.25" />
+            <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
           </svg>
-          <span style={{ color: 'var(--color-text-muted)' }}>Loading...</span>
+          <span style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Loading request…</span>
         </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   if (!request) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--color-bg)' }}>
-        <div className="text-center">
-          <p className="text-lg mb-4" style={{ color: 'var(--color-error)' }}>{error || 'Request not found'}</p>
-          <button onClick={() => router.push('/dashboard/requests')} className="text-sm font-medium" style={{ color: 'var(--color-primary-light)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', backgroundColor: 'var(--color-bg)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '40px', marginBottom: '12px' }}>🩸</div>
+          <p style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text)', marginBottom: '6px' }}>{error || 'Request not found'}</p>
+          <button onClick={() => router.push('/dashboard/requests')} style={{ fontSize: '13px', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
             ← Back to Requests
           </button>
         </div>
@@ -246,328 +250,485 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  const isAdmin = user?.role === 'ADMIN' || user?.role === 'VOLUNTEER';
+  const isAdmin    = user?.role === 'ADMIN' || user?.role === 'VOLUNTEER';
   const isHospital = user?.role === 'HOSPITAL' || user?.role === 'ADMIN';
-  const actions = NEXT_ACTIONS[request.status] || [];
-  const canAssign = isHospital && !['FULFILLED', 'CANCELLED', 'REJECTED'].includes(request.status);
+  const actions    = NEXT_ACTIONS[request.status] ?? [];
+  const canAssign  = isHospital && !['FULFILLED', 'CANCELLED', 'REJECTED'].includes(request.status);
+  const statusMeta = STATUS_META[request.status] ?? STATUS_META.DRAFT;
+  const urgencyMeta = URGENCY_META[request.urgency] ?? URGENCY_META.NORMAL;
+  const currentStep = statusMeta.step;
+  const isTerminal  = ['FULFILLED', 'CANCELLED', 'REJECTED'].includes(request.status);
 
   return (
-    <div className="min-h-screen p-6 md:p-10" style={{ backgroundColor: 'var(--color-bg)' }}>
-      <div className="max-w-3xl mx-auto">
-        <button onClick={() => router.push('/dashboard/requests')} className="text-sm mb-6 inline-block" style={{ color: 'var(--color-text-muted)' }}>
-          ← Back to Requests
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-bg)', padding: '24px 16px 48px' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+
+        {/* ── Back ── */}
+        <button
+          onClick={() => router.push('/dashboard/requests')}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '20px', padding: 0 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+          Back to Requests
         </button>
 
+        {/* ── Error Banner ── */}
         {error && (
-          <div className="px-4 py-3 rounded-xl text-sm mb-4" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-error)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-            {error}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 16px', borderRadius: '10px', marginBottom: '16px', backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <span style={{ fontSize: '14px' }}>⚠</span>
+            <p style={{ fontSize: '13px', color: '#ef4444', fontWeight: 500 }}>{error}</p>
           </div>
         )}
 
-        {/* Request header */}
-        <div className="p-6 rounded-2xl border mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold px-4 py-2 rounded-xl" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}>
-                {formatBloodGroup(request.bloodGroup)}
-              </span>
-              <div>
-                <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text)' }}>
-                  {request.unitsNeeded} unit{request.unitsNeeded > 1 ? 's' : ''} needed
-                </h1>
-                {request.patient?.user && (
-                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    Requested by {request.patient.user.name}
-                  </p>
-                )}
+        {/* ══════════════════════════════════════════════════════════════════
+            HERO CARD — blood group + key info
+        ══════════════════════════════════════════════════════════════════ */}
+        <div style={{
+          borderRadius: '16px', overflow: 'hidden', marginBottom: '12px',
+          border: '1px solid var(--color-border)',
+          backgroundColor: 'var(--color-surface)',
+        }}>
+          {/* Urgency accent bar */}
+          <div style={{ height: '3px', backgroundColor: urgencyMeta.dot, opacity: 0.9 }} />
+
+          <div style={{ padding: '24px' }}>
+            {/* Row 1: blood group + status */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                {/* Blood group badge */}
+                <div style={{
+                  width: '72px', height: '72px', borderRadius: '16px', flexShrink: 0,
+                  backgroundColor: 'rgba(239,68,68,0.1)', border: '1.5px solid rgba(239,68,68,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '24px', fontWeight: 800, color: '#ef4444', letterSpacing: '-0.02em',
+                }}>
+                  {fmtBG(request.bloodGroup)}
+                </div>
+                <div>
+                  <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--color-text)', letterSpacing: '-0.03em', marginBottom: '4px' }}>
+                    {request.unitsNeeded} unit{request.unitsNeeded > 1 ? 's' : ''} of blood needed
+                  </h1>
+                  {request.patient?.user && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{
+                        width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 700, color: '#fff',
+                      }}>
+                        {initials(request.patient.user.name)}
+                      </div>
+                      <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontWeight: 500 }}>
+                        {request.patient.user.name}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Status pill */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
+                <span style={{
+                  fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em',
+                  padding: '5px 12px', borderRadius: '20px',
+                  backgroundColor: statusMeta.bg, color: statusMeta.color,
+                  border: `1px solid ${statusMeta.color}30`,
+                }}>
+                  {statusMeta.label.toUpperCase()}
+                </span>
+                <span style={{
+                  fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px',
+                  backgroundColor: urgencyMeta.bg, color: urgencyMeta.color,
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                }}>
+                  <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: urgencyMeta.dot, display: 'inline-block' }} />
+                  {request.urgency}
+                </span>
               </div>
             </div>
-            <span
-              className="text-xs font-semibold px-3 py-1.5 rounded-full"
-              style={{
-                backgroundColor: `${STATUS_COLORS[request.status]}20`,
-                color: STATUS_COLORS[request.status],
-              }}
-            >
-              {formatStatus(request.status)}
-            </span>
-          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-muted)' }}>Urgency</p>
-              <p className="font-medium" style={{ color: 'var(--color-text)' }}>{request.urgency}</p>
+            {/* Info grid */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '16px',
+              padding: '16px', borderRadius: '10px', backgroundColor: 'var(--color-bg)',
+              border: '1px solid var(--color-border)', marginBottom: request.notes ? '16px' : 0,
+            }}>
+              <InfoChip label="Units" value={`${request.unitsNeeded}`} />
+              <InfoChip label="Urgency" value={request.urgency} accent={urgencyMeta.color} />
+              {(request.hospitalName || request.hospital?.hospitalName) && (
+                <InfoChip label="Hospital" value={request.hospitalName ?? request.hospital?.hospitalName ?? ''} />
+              )}
+              {request.department && <InfoChip label="Department" value={request.department} />}
+              {request.treatingDoctor && <InfoChip label="Doctor" value={request.treatingDoctor} />}
+              {request.bedNumber && <InfoChip label="Bed No." value={request.bedNumber} />}
+              <InfoChip label="Created" value={fmtDate(request.createdAt)} />
+              <InfoChip label="Updated" value={fmtDate(request.updatedAt)} />
+              <InfoChip label="Request ID" value={`#${request.id.slice(0, 8).toUpperCase()}`} />
             </div>
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-muted)' }}>Created</p>
-              <p className="font-medium" style={{ color: 'var(--color-text)' }}>
-                {new Date(request.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-muted)' }}>Updated</p>
-              <p className="font-medium" style={{ color: 'var(--color-text)' }}>
-                {new Date(request.updatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-muted)' }}>ID</p>
-              <p className="font-mono text-xs truncate" style={{ color: 'var(--color-text)' }}>{request.id.slice(0, 8)}...</p>
-            </div>
-          </div>
 
-          {request.notes && (
-            <div className="mt-4 p-3 rounded-xl" style={{ backgroundColor: 'var(--color-bg)' }}>
-              <p className="text-xs mb-1" style={{ color: 'var(--color-text-muted)' }}>Notes</p>
-              <p className="text-sm" style={{ color: 'var(--color-text)' }}>{request.notes}</p>
-            </div>
-          )}
+            {/* Notes */}
+            {request.notes && (
+              <div style={{
+                display: 'flex', gap: '10px', padding: '12px 14px', borderRadius: '10px',
+                backgroundColor: request.urgency === 'CRITICAL' ? 'rgba(239,68,68,0.05)' : 'var(--color-bg)',
+                border: `1px solid ${request.urgency === 'CRITICAL' ? 'rgba(239,68,68,0.2)' : 'var(--color-border)'}`,
+              }}>
+                <span style={{ fontSize: '14px', flexShrink: 0, marginTop: '1px' }}>
+                  {request.urgency === 'CRITICAL' ? '🚨' : request.urgency === 'URGENT' ? '⚠️' : '📝'}
+                </span>
+                <p style={{ fontSize: '13px', color: 'var(--color-text)', lineHeight: 1.6, fontWeight: request.urgency === 'CRITICAL' ? 500 : 400 }}>
+                  {request.notes}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Admin actions */}
-        {isAdmin && (
-          <div className="p-5 rounded-2xl border mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-            <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-muted)' }}>
-              Actions
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {/* Match donors button (only when VERIFIED) */}
+        {/* ══════════════════════════════════════════════════════════════════
+            STATUS PROGRESS TIMELINE
+        ══════════════════════════════════════════════════════════════════ */}
+        {!isTerminal && (
+          <div style={{
+            padding: '16px 20px', borderRadius: '12px', marginBottom: '12px',
+            border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)',
+          }}>
+            <SectionTitle>Request Progress</SectionTitle>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+              {WORKFLOW_STEPS.map((step, idx) => {
+                const done    = currentStep > idx;
+                const active  = currentStep === idx;
+                const isLast  = idx === WORKFLOW_STEPS.length - 1;
+                const color   = done || active ? 'var(--color-primary)' : 'var(--color-border)';
+                return (
+                  <div key={step.key} style={{ display: 'flex', alignItems: 'center', flex: isLast ? 0 : 1 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                      <div style={{
+                        width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
+                        border: `2px solid ${color}`,
+                        backgroundColor: done ? 'var(--color-primary)' : active ? 'var(--color-primary)' : 'var(--color-bg)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '10px', fontWeight: 700,
+                        color: done || active ? '#fff' : 'var(--color-text-muted)',
+                        boxShadow: active ? `0 0 0 3px ${statusMeta.color}30` : 'none',
+                      }}>
+                        {done ? '✓' : idx + 1}
+                      </div>
+                      <span style={{ fontSize: '9px', fontWeight: 500, color: active ? 'var(--color-text)' : 'var(--color-text-muted)', whiteSpace: 'nowrap', letterSpacing: '0.01em' }}>
+                        {step.label}
+                      </span>
+                    </div>
+                    {!isLast && (
+                      <div style={{ flex: 1, height: '2px', backgroundColor: done ? 'var(--color-primary)' : 'var(--color-border)', margin: '0 4px', marginBottom: '16px', borderRadius: '1px' }} />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            ADMIN / VOLUNTEER ACTIONS
+        ══════════════════════════════════════════════════════════════════ */}
+        {isAdmin && !isTerminal && (
+          <div style={{
+            padding: '16px 20px', borderRadius: '12px', marginBottom: '12px',
+            border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)',
+          }}>
+            <SectionTitle>Admin Actions</SectionTitle>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {request.status === 'VERIFIED' && (
                 <button
                   onClick={handleMatch}
                   disabled={!!actionLoading}
-                  className="px-4 py-2 rounded-xl text-white text-sm font-medium transition-all hover:scale-[1.02] disabled:opacity-50"
-                  style={{ backgroundColor: '#8B5CF6' }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    padding: '8px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                    fontSize: '13px', fontWeight: 600, color: '#fff', backgroundColor: '#8b5cf6',
+                    opacity: actionLoading ? 0.6 : 1, transition: 'opacity 150ms ease',
+                  }}
                 >
-                  {actionLoading === 'MATCHING' ? 'Finding Donors...' : '🔍 Find Matching Donors'}
+                  <span>🔍</span>
+                  {actionLoading === 'MATCHING' ? 'Finding Donors…' : 'Find Matching Donors'}
                 </button>
               )}
-
-              {/* Status transition buttons */}
               {actions.map((action) => (
                 <button
                   key={action.status}
                   onClick={() => handleStatusChange(action.status)}
                   disabled={!!actionLoading}
-                  className="px-4 py-2 rounded-xl text-white text-sm font-medium transition-all hover:scale-[1.02] disabled:opacity-50"
-                  style={{ backgroundColor: action.color }}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    padding: '8px 16px', borderRadius: '8px', border: `1px solid ${action.color}40`, cursor: 'pointer',
+                    fontSize: '13px', fontWeight: 600,
+                    color: action.status === 'CANCELLED' || action.status === 'REJECTED' ? action.color : '#fff',
+                    backgroundColor: action.status === 'CANCELLED' || action.status === 'REJECTED' ? 'transparent' : action.color,
+                    opacity: actionLoading ? 0.6 : 1, transition: 'opacity 150ms ease',
+                  }}
                 >
-                  {actionLoading === action.status ? 'Updating...' : action.label}
+                  <span>{action.icon}</span>
+                  {actionLoading === action.status ? 'Updating…' : action.label}
                 </button>
               ))}
-
               {actions.length === 0 && request.status !== 'VERIFIED' && (
-                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  No actions available for this status.
-                </p>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>No actions available at this stage.</p>
               )}
             </div>
           </div>
         )}
 
-        {/* ── Hospital: Assigned Donor ──────────────────────────────────── */}
+        {/* ══════════════════════════════════════════════════════════════════
+            HOSPITAL: ASSIGNED DONOR (when set)
+        ══════════════════════════════════════════════════════════════════ */}
         {canAssign && request.assignedDonor && (
-          <div className="p-5 rounded-2xl border mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'rgba(34,197,94,0.3)' }}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
-                Assigned Donor
-              </h2>
+          <div style={{
+            padding: '16px 20px', borderRadius: '12px', marginBottom: '12px',
+            border: '1px solid rgba(34,197,94,0.25)', backgroundColor: 'var(--color-surface)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <SectionTitle>Assigned Donor</SectionTitle>
               <button
                 onClick={handleRemoveAssignment}
                 disabled={!!actionLoading}
-                className="text-xs font-medium px-3 py-1 rounded-lg border"
-                style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)', backgroundColor: 'transparent', cursor: 'pointer', opacity: actionLoading ? 0.5 : 1 }}
+                style={{
+                  fontSize: '11px', fontWeight: 600, padding: '4px 12px', borderRadius: '6px',
+                  border: '1px solid rgba(239,68,68,0.3)', backgroundColor: 'transparent',
+                  color: '#ef4444', cursor: 'pointer', opacity: actionLoading ? 0.5 : 1,
+                }}
               >
-                {actionLoading === 'REMOVE_ASSIGN' ? 'Removing…' : 'Remove Assignment'}
+                {actionLoading === 'REMOVE_ASSIGN' ? 'Removing…' : 'Remove'}
               </button>
             </div>
-            <div className="flex items-center gap-4 p-4 rounded-xl" style={{ backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0" style={{ backgroundColor: '#22c55e' }}>
-                ✓
-              </div>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{request.assignedDonor.user.name}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
-                    {formatBloodGroup(request.assignedDonor.bloodGroup)}
+
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderRadius: '10px',
+              backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)',
+            }}>
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#22c55e', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', color: '#fff',
+              }}>✓</div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '4px' }}>
+                  {request.assignedDonor.user.name}
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, padding: '2px 8px', borderRadius: '4px', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                    {fmtBG(request.assignedDonor.bloodGroup)}
                   </span>
                   {request.assignedDonor.city && (
-                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>📍 {request.assignedDonor.city}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      📍 {request.assignedDonor.city}
+                    </span>
                   )}
                   {request.assignedAt && (
-                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                      Assigned {new Date(request.assignedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                      Assigned {fmtDateTime(request.assignedAt)}
                     </span>
                   )}
                 </div>
               </div>
+              <span style={{ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e', flexShrink: 0 }}>
+                CONFIRMED
+              </span>
             </div>
           </div>
         )}
 
-        {/* ── Hospital: Assign Donor Button / Panel ─────────────────────── */}
+        {/* ══════════════════════════════════════════════════════════════════
+            HOSPITAL: ASSIGN DONOR PANEL (when no donor assigned yet)
+        ══════════════════════════════════════════════════════════════════ */}
         {canAssign && !request.assignedDonor && (
-          <div className="p-5 rounded-2xl border mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-            <div className="flex items-center justify-between mb-3">
+          <div style={{
+            borderRadius: '12px', marginBottom: '12px', overflow: 'hidden',
+            border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)',
+          }}>
+            {/* Panel header */}
+            <div style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: showAssignPanel ? '1px solid var(--color-border)' : 'none' }}>
               <div>
-                <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
-                  Assign Donor
-                </h2>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                  Only donors in the same city with a compatible blood group are shown.
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '2px' }}>Assign Donor</p>
+                <p style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                  Only donors in the same city with a compatible blood group are shown
                 </p>
               </div>
-              {!showAssignPanel && (
-                <button
-                  onClick={handleOpenAssignPanel}
-                  className="px-4 py-2 rounded-xl text-white text-sm font-medium"
-                  style={{ backgroundColor: 'var(--color-primary)', cursor: 'pointer', border: 'none' }}
-                >
-                  Find & Assign Donor
-                </button>
-              )}
+              <button
+                onClick={showAssignPanel ? () => setShowAssignPanel(false) : handleOpenAssignPanel}
+                style={{
+                  padding: '7px 16px', borderRadius: '8px', cursor: 'pointer',
+                  fontSize: '12px', fontWeight: 600, flexShrink: 0,
+                  backgroundColor: showAssignPanel ? 'var(--color-bg)' : 'var(--color-primary)',
+                  color: showAssignPanel ? 'var(--color-text-muted)' : '#fff',
+                  border: showAssignPanel ? '1px solid var(--color-border)' : '1px solid transparent',
+                }}
+              >
+                {showAssignPanel ? 'Close' : '＋ Find Donor'}
+              </button>
             </div>
 
+            {/* Panel body */}
             {showAssignPanel && (
-              <>
+              <div style={{ padding: '16px 20px' }}>
                 {assignError && (
-                  <div className="mb-3 px-4 py-3 rounded-xl text-sm" style={{ backgroundColor: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
-                    {assignError}
+                  <div style={{ padding: '10px 14px', borderRadius: '8px', marginBottom: '14px', backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                    <p style={{ fontSize: '12px', color: '#ef4444', fontWeight: 500 }}>⚠ {assignError}</p>
                   </div>
                 )}
 
                 {eligibleLoading ? (
-                  <p className="text-sm text-center py-6" style={{ color: 'var(--color-text-muted)' }}>Searching eligible donors…</p>
+                  <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>Searching eligible donors…</p>
+                  </div>
                 ) : eligibleDonors && eligibleDonors.length === 0 ? (
-                  <div className="text-center py-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg)' }}>
-                    <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>No eligible donors found</p>
-                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                      No available donors with a compatible blood group in the same city.
+                  <div style={{ padding: '32px 16px', textAlign: 'center', borderRadius: '10px', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
+                    <p style={{ fontSize: '28px', marginBottom: '8px' }}>🔍</p>
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '4px' }}>No eligible donors found</p>
+                    <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                      No available donors with a matching blood group in the same city.
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {/* Summary line */}
+                    {eligibleDonors && (
+                      <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '4px', fontWeight: 500 }}>
+                        {eligibleDonors.filter(d => d.isEligible).length} eligible · {eligibleDonors.filter(d => !d.isEligible).length} ineligible
+                      </p>
+                    )}
+
                     {(eligibleDonors ?? []).map((donor) => (
                       <div
                         key={donor.donorId}
-                        className="p-4 rounded-xl border flex items-center justify-between gap-3"
                         style={{
-                          backgroundColor: donor.isEligible ? 'var(--color-bg)' : 'rgba(107,114,128,0.04)',
-                          borderColor: donor.isEligible ? 'var(--color-border)' : 'rgba(107,114,128,0.15)',
-                          opacity: donor.isEligible ? 1 : 0.6,
+                          borderRadius: '10px', overflow: 'hidden',
+                          border: `1px solid ${donor.isEligible ? 'rgba(34,197,94,0.2)' : 'var(--color-border)'}`,
+                          backgroundColor: donor.isEligible ? 'rgba(34,197,94,0.03)' : 'rgba(107,114,128,0.03)',
                         }}
                       >
-                        <div className="flex items-start gap-3 min-w-0">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                            style={{ backgroundColor: donor.isEligible ? 'var(--color-primary)' : '#9ca3af' }}
+                        <div style={{ padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                          {/* Avatar + Info */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                            <div style={{
+                              width: '38px', height: '38px', borderRadius: '50%', flexShrink: 0,
+                              backgroundColor: donor.isEligible ? 'var(--color-primary)' : '#9ca3af',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '13px', fontWeight: 700, color: '#fff',
+                            }}>
+                              {initials(donor.name)}
+                            </div>
+                            <div style={{ minWidth: 0 }}>
+                              {/* Name + badges row */}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)' }}>{donor.name}</span>
+                                <span style={{ fontSize: '11px', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                                  {fmtBG(donor.bloodGroup)}
+                                </span>
+                                {donor.compatibility === 'exact'
+                                  ? <span style={{ fontSize: '10px', fontWeight: 600, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}>Exact match</span>
+                                  : <span style={{ fontSize: '10px', fontWeight: 600, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(59,130,246,0.12)', color: '#3b82f6' }}>Compatible</span>
+                                }
+                              </div>
+                              {/* Metadata row */}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                                <span style={{ fontSize: '11px', color: donor.location.isSame ? '#22c55e' : '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  📍 {donor.location.reason}
+                                </span>
+                                <span style={{ fontSize: '11px', color: donor.donationEligible ? 'var(--color-text-muted)' : '#f59e0b', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                  🩸 {donor.daysSinceDonation === null ? 'Never donated' : `${donor.daysSinceDonation}d since donation`}
+                                  {!donor.donationEligible && <span style={{ color: '#f59e0b', fontWeight: 600 }}> · too soon</span>}
+                                </span>
+                                <span style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>
+                                  {donor.totalDonations} donation{donor.totalDonations !== 1 ? 's' : ''}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Assign button */}
+                          <button
+                            onClick={() => handleAssignDonor(donor.donorId)}
+                            disabled={!donor.isEligible || !!assignLoading}
+                            style={{
+                              flexShrink: 0, padding: '7px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 700,
+                              cursor: donor.isEligible ? 'pointer' : 'not-allowed',
+                              backgroundColor: donor.isEligible ? '#22c55e' : 'transparent',
+                              color: donor.isEligible ? '#fff' : '#9ca3af',
+                              border: donor.isEligible ? 'none' : '1px solid var(--color-border)',
+                              opacity: assignLoading === donor.donorId ? 0.7 : 1,
+                              transition: 'opacity 150ms ease',
+                            }}
                           >
-                            {donor.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{donor.name}</p>
-                              <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
-                                {formatBloodGroup(donor.bloodGroup)}
-                              </span>
-                              {donor.compatibility === 'exact' ? (
-                                <span className="text-xs px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>Exact match</span>
-                              ) : (
-                                <span className="text-xs px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>Compatible</span>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-                              <p className="text-xs" style={{ color: donor.location.isSame ? '#22c55e' : '#ef4444' }}>
-                                📍 {donor.location.reason}
-                              </p>
-                              <p className="text-xs" style={{ color: donor.donationEligible ? 'var(--color-text-muted)' : '#ef4444' }}>
-                                🩸 {donor.daysSinceDonation === null ? 'Never donated' : `${donor.daysSinceDonation}d since donation`}
-                                {!donor.donationEligible && ' (not eligible yet)'}
-                              </p>
-                              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                                {donor.totalDonations} donation{donor.totalDonations !== 1 ? 's' : ''} · score {donor.responseScore.toFixed(1)}
-                              </p>
-                            </div>
-                            {!donor.isEligible && (
-                              <p className="text-xs mt-1 font-medium" style={{ color: '#f59e0b' }}>
-                                ⚠ Not eligible: {!donor.location.isSame ? 'different location' : 'recent donation'}
-                              </p>
-                            )}
-                          </div>
+                            {assignLoading === donor.donorId ? '…' : donor.isEligible ? 'Assign' : 'Ineligible'}
+                          </button>
                         </div>
 
-                        <button
-                          onClick={() => handleAssignDonor(donor.donorId)}
-                          disabled={!donor.isEligible || !!assignLoading}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0"
-                          style={{
-                            backgroundColor: donor.isEligible ? 'var(--color-primary)' : 'transparent',
-                            color: donor.isEligible ? '#fff' : 'var(--color-text-muted)',
-                            border: donor.isEligible ? 'none' : '1px solid var(--color-border)',
-                            cursor: donor.isEligible ? 'pointer' : 'not-allowed',
-                            opacity: assignLoading === donor.donorId ? 0.6 : 1,
-                          }}
-                        >
-                          {assignLoading === donor.donorId ? 'Assigning…' : donor.isEligible ? 'Assign' : 'Ineligible'}
-                        </button>
+                        {/* Ineligibility reason bar */}
+                        {!donor.isEligible && (
+                          <div style={{ padding: '6px 14px 8px', backgroundColor: 'rgba(245,158,11,0.06)', borderTop: '1px solid rgba(245,158,11,0.15)' }}>
+                            <p style={{ fontSize: '10px', fontWeight: 600, color: '#f59e0b' }}>
+                              ⚠ Not eligible: {!donor.location.isSame ? 'donor city not matching patient city' : 'donated less than 56 days ago'}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                 )}
-
-                <button
-                  onClick={() => setShowAssignPanel(false)}
-                  className="mt-3 text-xs"
-                  style={{ color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  Cancel
-                </button>
-              </>
+              </div>
             )}
           </div>
         )}
 
-        {/* Matched donors */}
+        {/* ══════════════════════════════════════════════════════════════════
+            ALGORITHM-MATCHED DONORS (from auto-match)
+        ══════════════════════════════════════════════════════════════════ */}
         {matchResults && matchResults.length > 0 && (
-          <div className="p-5 rounded-2xl border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-            <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-muted)' }}>
-              Matched Donors ({matchResults.length})
-            </h2>
-            <div className="space-y-3">
+          <div style={{
+            padding: '16px 20px', borderRadius: '12px', marginBottom: '12px',
+            border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)',
+          }}>
+            <SectionTitle>Algorithm-Matched Donors ({matchResults.length})</SectionTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {matchResults.map((donor, i) => (
                 <div
                   key={donor.donorId || i}
-                  className="p-4 rounded-xl border flex items-start justify-between"
-                  style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
+                  style={{
+                    padding: '12px 14px', borderRadius: '10px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px',
+                    backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)',
+                  }}
                 >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                      style={{ backgroundColor: i < 3 ? 'var(--color-primary)' : '#6B7280' }}
-                    >
-                      #{i + 1}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                        {donor.donorName || `Donor ${donor.donorId?.slice(0, 6)}`}
-                      </p>
-                      <span className="text-xs font-semibold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#EF4444' }}>
-                        {formatBloodGroup(donor.bloodGroup)}
-                      </span>
-                      <div className="mt-1.5 space-y-0.5">
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0 }}>
+                    {/* Rank badge */}
+                    <div style={{
+                      width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0,
+                      backgroundColor: i < 3 ? 'var(--color-primary)' : 'var(--color-surface)',
+                      border: i >= 3 ? '1px solid var(--color-border)' : 'none',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '11px', fontWeight: 700,
+                      color: i < 3 ? '#fff' : 'var(--color-text-muted)',
+                    }}>#{i + 1}</div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                        <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text)' }}>
+                          {donor.donorName || `Donor ${donor.donorId?.slice(0, 6)}`}
+                        </p>
+                        <span style={{ fontSize: '11px', fontWeight: 700, padding: '1px 6px', borderRadius: '4px', backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                          {fmtBG(donor.bloodGroup)}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                         {donor.reasons.map((reason, j) => (
-                          <p key={j} className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                            • {reason}
+                          <p key={j} style={{ fontSize: '11px', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span style={{ color: 'var(--color-primary)', fontSize: '8px' }}>●</span> {reason}
                           </p>
                         ))}
                       </div>
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-lg font-bold" style={{ color: 'var(--color-primary-light)' }}>
-                      {donor.score}
+
+                  {/* Score */}
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <p style={{ fontSize: '20px', fontWeight: 800, color: i < 3 ? 'var(--color-primary)' : 'var(--color-text-muted)', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                      {typeof donor.score === 'number' ? donor.score.toFixed(0) : donor.score}
                     </p>
-                    <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>score</p>
+                    <p style={{ fontSize: '10px', color: 'var(--color-text-muted)', fontWeight: 500, letterSpacing: '0.04em' }}>SCORE</p>
                   </div>
                 </div>
               ))}
@@ -575,14 +736,16 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
-        {/* No matches message */}
+        {/* ── No matches message ── */}
         {request.status === 'MATCHED' && (!matchResults || matchResults.length === 0) && (
-          <div className="text-center py-8 rounded-2xl border" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
-            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-              No matching donors found. Try again later when more donors are available.
+          <div style={{ padding: '32px 16px', textAlign: 'center', borderRadius: '12px', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+            <p style={{ fontSize: '28px', marginBottom: '8px' }}>🩸</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-text-muted)' }}>
+              No matching donors found. Try again when more donors are registered in the area.
             </p>
           </div>
         )}
+
       </div>
     </div>
   );
