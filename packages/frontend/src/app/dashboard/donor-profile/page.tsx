@@ -238,21 +238,6 @@ export default function DonorProfilePage() {
             <input id="donor-lastdon" type="date" value={lastDonation} onChange={(e) => setLastDonation(e.target.value)} className="input-field" />
           </div>
 
-          <div className="grid grid-cols-2" style={{ gap: '12px' }}>
-            <div>
-              <label htmlFor="donor-lat" style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
-                Latitude
-              </label>
-              <input id="donor-lat" type="number" step="any" value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="28.6139" className="input-field" />
-            </div>
-            <div>
-              <label htmlFor="donor-lng" style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
-                Longitude
-              </label>
-              <input id="donor-lng" type="number" step="any" value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="77.2090" className="input-field" />
-            </div>
-          </div>
-
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ width: '100%', padding: '8px 16px' }}>
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
