@@ -10,9 +10,11 @@ interface DonorProfile {
   bloodGroup: string;
   lastDonationDate: string | null;
   isAvailable: boolean;
+  city: string | null;
   latitude: number | null;
   longitude: number | null;
   totalDonations: number;
+  responseScore: number;
 }
 
 interface ProfileData {
@@ -42,6 +44,7 @@ export default function DonorProfilePage() {
   const [success, setSuccess] = useState('');
 
   const [isAvailable, setIsAvailable] = useState(true);
+  const [city, setCity] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [lastDonation, setLastDonation] = useState('');
@@ -55,6 +58,7 @@ export default function DonorProfilePage() {
       const data = await apiFetch<ProfileData>('/donors/me');
       setProfile(data);
       setIsAvailable(data.donor.isAvailable);
+      setCity(data.donor.city || '');
       setLatitude(data.donor.latitude?.toString() || '');
       setLongitude(data.donor.longitude?.toString() || '');
       setLastDonation(data.donor.lastDonationDate ? data.donor.lastDonationDate.slice(0, 10) : '');
@@ -71,6 +75,7 @@ export default function DonorProfilePage() {
     setSuccess('');
     try {
       const updateData: Record<string, unknown> = { isAvailable };
+      if (city !== (profile?.donor.city || '')) updateData.city = city;
       if (latitude) updateData.latitude = parseFloat(latitude);
       if (longitude) updateData.longitude = parseFloat(longitude);
       if (lastDonation) updateData.lastDonationDate = new Date(lastDonation).toISOString();
@@ -104,6 +109,21 @@ export default function DonorProfilePage() {
         Donor Profile
       </h1>
 
+      {/* Missing city warning */}
+      {!profile.donor.city && (
+        <div style={{
+          padding: '14px 16px', borderRadius: '10px', marginBottom: '16px',
+          backgroundColor: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.25)',
+        }}>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text)' }}>
+            ⚠ City not set — you won't appear in donor matching
+          </p>
+          <p style={{ fontSize: '12px', marginTop: '3px', color: 'var(--color-text-muted)' }}>
+            Set your city below so hospitals can assign you to nearby patients.
+          </p>
+        </div>
+      )}
+
       {/* Account summary */}
       <div style={{
         padding: '20px 24px', borderRadius: '14px', marginBottom: '12px',
@@ -130,6 +150,18 @@ export default function DonorProfilePage() {
             <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '3px' }}>Total Donations</p>
             <p style={{ fontSize: '22px', fontWeight: 600, color: 'var(--color-text)', letterSpacing: '-0.02em' }}>
               {profile.donor.totalDonations}
+            </p>
+          </div>
+          <div>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '3px' }}>City</p>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: profile.donor.city ? 'var(--color-text)' : 'var(--color-text-muted)' }}>
+              {profile.donor.city || 'Not set'}
+            </p>
+          </div>
+          <div>
+            <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '3px' }}>Response Score</p>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text)' }}>
+              {profile.donor.responseScore.toFixed(1)}
             </p>
           </div>
           <div>
@@ -179,6 +211,24 @@ export default function DonorProfilePage() {
                 transition: 'left 150ms ease',
               }} />
             </button>
+          </div>
+
+          {/* City — used for location-based donor matching */}
+          <div>
+            <label htmlFor="donor-city" style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+              City <span style={{ color: '#ef4444', fontWeight: 600 }}>*</span>
+            </label>
+            <input
+              id="donor-city"
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="e.g. Mumbai, Delhi, Bangalore…"
+              className="input-field"
+            />
+            <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              Required for hospital-to-donor matching. Must match the patient's city exactly.
+            </p>
           </div>
 
           <div>
