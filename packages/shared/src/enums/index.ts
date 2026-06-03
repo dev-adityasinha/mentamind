@@ -16,3 +16,4 @@ export { UrgencyLevel } from './urgency-level';
 export { Gender } from './gender';
 export { CallStatus } from './call-status';
 export { PriorityLevel } from './priority-level';
+export { DonorResponseStatus } from './donor-response-status';

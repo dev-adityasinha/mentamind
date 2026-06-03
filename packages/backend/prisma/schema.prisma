@@ -78,6 +78,12 @@ enum CallStatus {
   DONATED
 }
 
+enum DonorResponseStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 model User {
   id                String    @id @default(uuid())
   email             String    @unique
@@ -184,12 +190,18 @@ model BloodRequest {
   ocrData             Json?
   // Matching results
   matchedDonors       Json?
+  // Appointment
+  appointmentDate     DateTime?
   // Hospital-assigned donor
-  assignedDonorId     String?
-  assignedDonor       Donor?        @relation("AssignedDonor", fields: [assignedDonorId], references: [id])
-  assignedAt          DateTime?
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  assignedDonorId         String?
+  assignedDonor           Donor?              @relation("AssignedDonor", fields: [assignedDonorId], references: [id])
+  assignedAt              DateTime?
+  // Donor response to assignment
+  donorResponseStatus     DonorResponseStatus @default(PENDING)
+  donorResponseAt         DateTime?
+  donorDeclineReason      String?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
 
   callLogs            DonorCallLog[]
 

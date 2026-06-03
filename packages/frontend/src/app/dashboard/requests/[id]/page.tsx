@@ -34,14 +34,17 @@ interface BloodRequest {
   assignedDonorId: string | null;
   assignedDonor: AssignedDonor | null;
   assignedAt: string | null;
+  appointmentDate: string | null;
+  donorResponseStatus: string;
+  donorResponseAt: string | null;
   hospitalName?: string | null;
   department?: string | null;
   treatingDoctor?: string | null;
   bedNumber?: string | null;
   createdAt: string;
   updatedAt: string;
-  patient?: { user: { id: string; name: string; email: string } };
-  hospital?: { hospitalName: string; address: string } | null;
+  patient?: { city?: string | null; address?: string | null; bloodGroup?: string | null; user: { id: string; name: string; email: string } };
+  hospital?: { hospitalName: string; address: string; phone?: string } | null;
 }
 
 interface EligibleDonor {
@@ -106,6 +109,19 @@ function fmtBG(bg: string) { return bg.replace('_POS', '+').replace('_NEG', '−
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function SBRow({ icon, label, value, accent, highlight }: { icon: string; label: string; value: string; accent?: boolean; highlight?: boolean }) {
+  return (
+    <div>
+      <p style={{ fontSize: '9px', fontWeight: 600, color: 'var(--color-text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '1px' }}>
+        {icon} {label}
+      </p>
+      <p style={{ fontSize: '12px', fontWeight: 600, color: accent ? '#22c55e' : highlight ? '#f59e0b' : 'var(--color-text)', lineHeight: 1.4 }}>
+        {value}
+      </p>
+    </div>
+  );
 }
 
 function fmtDateTime(iso: string) {
@@ -353,12 +369,20 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             }}>
               <InfoChip label="Units" value={`${request.unitsNeeded}`} />
               <InfoChip label="Urgency" value={request.urgency} accent={urgencyMeta.color} />
+              {request.appointmentDate && (
+                <InfoChip
+                  label="📅 Appointment"
+                  value={new Date(request.appointmentDate).toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  accent="var(--color-primary)"
+                />
+              )}
               {(request.hospitalName || request.hospital?.hospitalName) && (
                 <InfoChip label="Hospital" value={request.hospitalName ?? request.hospital?.hospitalName ?? ''} />
               )}
               {request.department && <InfoChip label="Department" value={request.department} />}
               {request.treatingDoctor && <InfoChip label="Doctor" value={request.treatingDoctor} />}
               {request.bedNumber && <InfoChip label="Bed No." value={request.bedNumber} />}
+              <InfoChip label="Donor Response" value={request.donorResponseStatus} accent={request.donorResponseStatus === 'ACCEPTED' ? '#22c55e' : request.donorResponseStatus === 'DECLINED' ? '#ef4444' : '#f59e0b'} />
               <InfoChip label="Created" value={fmtDate(request.createdAt)} />
               <InfoChip label="Updated" value={fmtDate(request.updatedAt)} />
               <InfoChip label="Request ID" value={`#${request.id.slice(0, 8).toUpperCase()}`} />
@@ -530,6 +554,77 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                 CONFIRMED
               </span>
             </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            HOSPITAL: SIDE-BY-SIDE PATIENT vs DONOR COMPARISON
+        ══════════════════════════════════════════════════════════════════ */}
+        {isHospital && request.assignedDonor && (
+          <div style={{
+            padding: '16px 20px', borderRadius: '12px', marginBottom: '12px',
+            border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)',
+          }}>
+            <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '14px' }}>
+              Patient vs Donor — Side by Side
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {/* Patient column */}
+              <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: 'rgba(59,130,246,0.04)', border: '1px solid rgba(59,130,246,0.15)' }}>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: '#3b82f6', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '10px' }}>Patient</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <SBRow icon="👤" label="Name"        value={request.patient?.user.name ?? '—'} />
+                  <SBRow icon="🩸" label="Blood Group" value={fmtBG(request.bloodGroup)} />
+                  <SBRow icon="📍" label="City"        value={request.patient?.city ?? 'Not set'} highlight={!request.patient?.city} />
+                  {request.patient?.address && <SBRow icon="🏠" label="Address"    value={request.patient.address} />}
+                  {request.appointmentDate && (
+                    <SBRow icon="📅" label="Appointment" accent value={new Date(request.appointmentDate).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} />
+                  )}
+                  {request.hospitalName && <SBRow icon="🏥" label="Hospital"   value={request.hospitalName} />}
+                  {request.department   && <SBRow icon="🏢" label="Department" value={request.department} />}
+                  {request.treatingDoctor && <SBRow icon="👨‍⚕️" label="Doctor"  value={request.treatingDoctor} />}
+                  {request.bedNumber    && <SBRow icon="🛏" label="Bed No."    value={request.bedNumber} />}
+                </div>
+              </div>
+              {/* Donor column */}
+              <div style={{ padding: '14px', borderRadius: '10px', backgroundColor: 'rgba(34,197,94,0.04)', border: '1px solid rgba(34,197,94,0.15)' }}>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: '#22c55e', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '10px' }}>Donor</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <SBRow icon="👤" label="Name"        value={request.assignedDonor.user.name} />
+                  <SBRow icon="🩸" label="Blood Group" value={fmtBG(request.assignedDonor.bloodGroup)} />
+                  <SBRow icon="📍" label="City"        value={request.assignedDonor.city ?? 'Not set'} highlight={!request.assignedDonor.city} />
+                  <SBRow icon="✅" label="Response"    value={request.donorResponseStatus}
+                    accent={request.donorResponseStatus === 'ACCEPTED'}
+                    highlight={request.donorResponseStatus === 'DECLINED'}
+                  />
+                  {request.assignedAt && (
+                    <SBRow icon="🕐" label="Assigned" value={new Date(request.assignedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} />
+                  )}
+                  {request.donorResponseAt && (
+                    <SBRow icon="🗓" label="Responded" value={new Date(request.donorResponseAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} />
+                  )}
+                </div>
+              </div>
+            </div>
+            {/* Location match indicator */}
+            {request.patient?.city && request.assignedDonor.city && (
+              <div style={{
+                marginTop: '10px', padding: '10px 14px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px',
+                backgroundColor: request.patient.city.trim().toLowerCase() === request.assignedDonor.city.trim().toLowerCase()
+                  ? 'rgba(34,197,94,0.06)' : 'rgba(245,158,11,0.06)',
+                border: `1px solid ${request.patient.city.trim().toLowerCase() === request.assignedDonor.city.trim().toLowerCase()
+                  ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.2)'}`,
+              }}>
+                <span style={{ fontSize: '14px' }}>
+                  {request.patient.city.trim().toLowerCase() === request.assignedDonor.city.trim().toLowerCase() ? '✅' : '⚠️'}
+                </span>
+                <p style={{ fontSize: '12px', fontWeight: 500, color: 'var(--color-text)' }}>
+                  {request.patient.city.trim().toLowerCase() === request.assignedDonor.city.trim().toLowerCase()
+                    ? `Same city — both in ${request.patient.city}`
+                    : `Cities differ — Patient: ${request.patient.city} · Donor: ${request.assignedDonor.city}`}
+                </p>
+              </div>
+            )}
           </div>
         )}
 

@@ -7,6 +7,7 @@ import {
   RequestStatus,
   UrgencyLevel,
   PriorityLevel,
+  DonorResponseStatus,
   assertValidTransition,
   getCompatibleDonorGroups,
   canDonate,
@@ -36,6 +37,7 @@ const createRequestSchema = z.object({
   urgency: z.enum(urgencyValues).default('NORMAL'),
   priorityLevel: z.enum(priorityValues).default('MEDIUM'),
   notes: z.string().max(1000).optional(),
+  appointmentDate: z.string().datetime().optional(),
   // Hospital details
   hospitalId: z.string().uuid().optional(),
   hospitalName: z.string().max(255).optional(),
@@ -107,6 +109,7 @@ router.post(
 
     const {
       bloodGroup, unitsNeeded, urgency, priorityLevel, notes,
+      appointmentDate,
       hospitalId, hospitalName, department, treatingDoctor, bedNumber,
       requisitionBase64, requisitionFileName, requisitionMimeType,
     } = parsed.data;
@@ -130,6 +133,7 @@ router.post(
         priorityLevel: priorityLevel as PriorityLevel,
         status: RequestStatus.DRAFT,
         notes,
+        appointmentDate: appointmentDate ? new Date(appointmentDate) : null,
         hospitalId: hospitalId ?? null,
         hospitalName: hospitalName ?? null,
         department: department ?? null,
@@ -199,6 +203,34 @@ router.get(
         { urgency: 'asc' }, // CRITICAL first (enum order)
         { createdAt: 'desc' },
       ],
+    });
+
+    res.status(200).json({ requests });
+  }),
+);
+
+// ─── GET /my-assignments — Donor sees their assigned blood requests ──────────
+// NOTE: Must be declared BEFORE /:id to prevent Express matching it as an id
+
+router.get(
+  '/my-assignments',
+  requireRole(Role.DONOR),
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user!.userId;
+
+    const donor = await prisma.donor.findUnique({ where: { userId } });
+    if (!donor) throw new AppError('Donor profile not found', 404, 'DONOR_NOT_FOUND');
+
+    const requests = await prisma.bloodRequest.findMany({
+      where: {
+        assignedDonorId: donor.id,
+        status: { notIn: [RequestStatus.CANCELLED, RequestStatus.REJECTED, RequestStatus.FULFILLED] },
+      },
+      include: {
+        patient: { include: { user: { select: { id: true, name: true } } } },
+        hospital: { select: { hospitalName: true, address: true, latitude: true, longitude: true, phone: true } },
+      },
+      orderBy: [{ donorResponseStatus: 'asc' }, { appointmentDate: 'asc' }, { createdAt: 'desc' }],
     });
 
     res.status(200).json({ requests });
@@ -763,6 +795,132 @@ router.delete(
     );
 
     res.status(200).json({ request: updated });
+  }),
+);
+
+// ─── POST /:id/donor-response — Donor accepts or declines assignment ────────
+
+router.post(
+  '/:id/donor-response',
+  requireRole(Role.DONOR),
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    const parsed = z.object({
+      response: z.enum(['ACCEPTED', 'DECLINED']),
+      declineReason: z.string().max(500).optional(),
+    }).safeParse(req.body);
+
+    if (!parsed.success) {
+      throw new AppError(
+        `Validation failed: ${parsed.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ')}`,
+        400, 'VALIDATION_ERROR',
+      );
+    }
+
+    const userId = req.user!.userId;
+    const donor = await prisma.donor.findUnique({
+      where: { userId },
+      include: { user: { select: { id: true, name: true } } },
+    });
+    if (!donor) throw new AppError('Donor profile not found', 404, 'DONOR_NOT_FOUND');
+
+    const request = await prisma.bloodRequest.findUnique({
+      where: { id },
+      include: {
+        patient: { include: { user: { select: { id: true, name: true } } } },
+        hospital: { select: { hospitalName: true, address: true } },
+      },
+    });
+
+    if (!request) throw new AppError('Blood request not found', 404, 'REQUEST_NOT_FOUND');
+    if (request.assignedDonorId !== donor.id) {
+      throw new AppError('You are not assigned to this request', 403, 'NOT_ASSIGNED');
+    }
+    if (request.donorResponseStatus !== DonorResponseStatus.PENDING) {
+      throw new AppError(
+        `You have already ${request.donorResponseStatus.toLowerCase()} this request`,
+        400, 'ALREADY_RESPONDED',
+      );
+    }
+
+    const { response, declineReason } = parsed.data;
+    const services = getServices(req);
+
+    if (response === 'ACCEPTED') {
+      // Update request: accepted + move to IN_PROGRESS
+      const updated = await prisma.bloodRequest.update({
+        where: { id },
+        data: {
+          donorResponseStatus: DonorResponseStatus.ACCEPTED,
+          donorResponseAt: new Date(),
+          status: RequestStatus.IN_PROGRESS,
+        },
+      });
+
+      // Build rich patient notification
+      const apptLine = request.appointmentDate
+        ? `Appointment: ${new Date(request.appointmentDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`
+        : 'Appointment date to be confirmed by hospital.';
+      const hospitalLine = request.hospital?.hospitalName ?? request.hospitalName ?? 'Hospital';
+      const donorLocation = donor.city ? `Donor location: ${donor.city}` : '';
+
+      void services.notifier.send({
+        userId: request.patient.user.id,
+        type: 'DONOR_ACCEPTED',
+        title: '🎉 A donor has been confirmed for your request!',
+        message: [
+          `Donor ${donor.user.name} (${donor.bloodGroup.replace('_POS', '+').replace('_NEG', '−')}) has accepted your blood request.`,
+          apptLine,
+          `Hospital: ${hospitalLine}`,
+          donorLocation,
+        ].filter(Boolean).join('\n'),
+        channel: 'IN_APP',
+      });
+
+      void createAuditLog(userId, {
+        action: 'DONOR_ACCEPTED_REQUEST', entityType: 'BloodRequest', entityId: id,
+        newValue: { donorId: donor.id, donorName: donor.user.name },
+      }, req);
+
+      res.status(200).json({ request: updated, message: 'You have accepted the request.' });
+
+    } else {
+      // DECLINED — remove assignment, reset donor response, mark donor unavailable
+      const updated = await prisma.bloodRequest.update({
+        where: { id },
+        data: {
+          donorResponseStatus: DonorResponseStatus.DECLINED,
+          donorResponseAt: new Date(),
+          donorDeclineReason: declineReason ?? null,
+          assignedDonorId: null,
+          assignedAt: null,
+          // Revert to MATCHED so hospital can assign another donor
+          status: request.status === RequestStatus.IN_PROGRESS ? RequestStatus.MATCHED : request.status,
+        },
+      });
+
+      // Mark donor as unavailable so they don't get re-matched immediately
+      await prisma.donor.update({
+        where: { id: donor.id },
+        data: { isAvailable: false },
+      });
+
+      // Notify patient
+      void services.notifier.send({
+        userId: request.patient.user.id,
+        type: 'DONOR_DECLINED',
+        title: '⚠ Donor is currently unavailable',
+        message: `The assigned donor is not available at this time${declineReason ? `: "${declineReason}"` : '.'}  Your request is active — the hospital will assign another donor shortly.`,
+        channel: 'IN_APP',
+      });
+
+      void createAuditLog(userId, {
+        action: 'DONOR_DECLINED_REQUEST', entityType: 'BloodRequest', entityId: id,
+        newValue: { donorId: donor.id, declineReason: declineReason ?? null },
+      }, req);
+
+      res.status(200).json({ request: updated, message: 'You have declined the request. Your availability has been set to unavailable.' });
+    }
   }),
 );
 

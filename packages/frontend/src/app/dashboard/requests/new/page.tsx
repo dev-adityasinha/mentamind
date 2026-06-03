@@ -30,9 +30,13 @@ export default function NewRequestPage() {
   const [bloodGroup, setBloodGroup] = useState('');
   const [unitsNeeded, setUnitsNeeded] = useState(1);
   const [urgency, setUrgency] = useState('NORMAL');
+  const [appointmentDate, setAppointmentDate] = useState('');
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Min date = today
+  const today = new Date().toISOString().slice(0, 16);
 
   if (!user) return null;
 
@@ -67,7 +71,11 @@ export default function NewRequestPage() {
     try {
       await apiFetch('/blood-requests', {
         method: 'POST',
-        body: JSON.stringify({ bloodGroup, unitsNeeded, urgency, notes: notes || undefined }),
+        body: JSON.stringify({
+          bloodGroup, unitsNeeded, urgency,
+          notes: notes || undefined,
+          appointmentDate: appointmentDate ? new Date(appointmentDate).toISOString() : undefined,
+        }),
       });
       router.push('/dashboard/requests');
     } catch (err) {
@@ -164,6 +172,25 @@ export default function NewRequestPage() {
             </div>
           </div>
 
+          {/* Appointment Date */}
+          <div>
+            <label htmlFor="req-appt" style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+              Preferred Appointment Date & Time <span style={{ color: '#ef4444' }}>*</span>
+            </label>
+            <input
+              id="req-appt"
+              type="datetime-local"
+              min={today}
+              value={appointmentDate}
+              onChange={(e) => setAppointmentDate(e.target.value)}
+              className="input-field"
+              required
+            />
+            <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              The date and time when you need the blood transfusion.
+            </p>
+          </div>
+
           {/* Notes */}
           <div>
             <label htmlFor="req-notes" style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
@@ -183,7 +210,7 @@ export default function NewRequestPage() {
 
         <button
           type="submit"
-          disabled={loading || !bloodGroup}
+          disabled={loading || !bloodGroup || !appointmentDate}
           className="btn-primary"
           style={{ width: '100%', padding: '9px 16px' }}
         >

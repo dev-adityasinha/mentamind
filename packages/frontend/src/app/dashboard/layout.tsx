@@ -98,6 +98,7 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { label: 'Profile', icon: 'User', href: '/dashboard/profile' },
   ],
   DONOR: [
+    { label: 'My Assignments', icon: 'Clipboard', href: '/dashboard/donor-requests' },
     { label: 'Notifications', icon: 'Bell', href: '/dashboard/notifications' },
     { label: 'Donor Profile', icon: 'Heart', href: '/dashboard/donor-profile' },
   ],
