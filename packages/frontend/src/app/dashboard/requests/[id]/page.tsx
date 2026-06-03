@@ -155,6 +155,135 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
+/* ─── Patient Donor Assignment Card ────────────────────────────────────────── */
+
+const DONOR_RESP_META: Record<string, { icon: string; label: string; color: string; bg: string; border: string }> = {
+  PENDING:  { icon: '⏳', label: 'Awaiting donor confirmation',  color: '#f59e0b', bg: 'rgba(245,158,11,0.06)',  border: 'rgba(245,158,11,0.2)'  },
+  ACCEPTED: { icon: '✅', label: 'Donor confirmed — you\'re set!', color: '#22c55e', bg: 'rgba(34,197,94,0.06)',  border: 'rgba(34,197,94,0.2)'   },
+  DECLINED: { icon: '❌', label: 'Donor unavailable — hospital reassigning', color: '#ef4444', bg: 'rgba(239,68,68,0.06)', border: 'rgba(239,68,68,0.2)' },
+};
+
+function DonorAssignmentCard({ request }: { request: BloodRequest }) {
+  const resp = DONOR_RESP_META[request.donorResponseStatus] ?? DONOR_RESP_META.PENDING;
+  const hospital = request.hospital?.hospitalName ?? request.hospitalName ?? null;
+  const hospitalAddr = request.hospital?.address ?? null;
+  const hospitalPhone = request.hospital?.phone ?? null;
+
+  return (
+    <div style={{
+      borderRadius: '16px', overflow: 'hidden', marginBottom: '12px',
+      border: `1px solid ${resp.border}`,
+      backgroundColor: 'var(--color-surface)',
+    }}>
+      {/* Header stripe */}
+      <div style={{ padding: '14px 20px', backgroundColor: resp.bg, borderBottom: `1px solid ${resp.border}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '18px' }}>{resp.icon}</span>
+        <div>
+          <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text)' }}>Donor Found</p>
+          <p style={{ fontSize: '12px', color: resp.color, fontWeight: 500, marginTop: '2px' }}>{resp.label}</p>
+        </div>
+      </div>
+
+      <div style={{ padding: '20px' }}>
+        {/* ── Row 1: Blood group + appointment ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+          {/* Blood group */}
+          <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: 'rgba(239,68,68,0.1)', border: '1.5px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: 800, color: '#ef4444', flexShrink: 0 }}>
+              {fmtBG(request.assignedDonor!.bloodGroup)}
+            </div>
+            <div>
+              <p style={{ fontSize: '10px', fontWeight: 500, color: 'var(--color-text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '2px' }}>Donor Blood Group</p>
+              <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-text)' }}>{fmtBG(request.assignedDonor!.bloodGroup)}</p>
+            </div>
+          </div>
+
+          {/* Appointment */}
+          {request.appointmentDate ? (
+            <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: 'rgba(59,130,246,0.05)', border: '1px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: 'rgba(59,130,246,0.1)', border: '1.5px solid rgba(59,130,246,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
+                📅
+              </div>
+              <div>
+                <p style={{ fontSize: '10px', fontWeight: 500, color: 'var(--color-text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '2px' }}>Appointment</p>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: '#3b82f6', lineHeight: 1.4 }}>
+                  {new Date(request.appointmentDate).toLocaleString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+                <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--color-text)', letterSpacing: '-0.01em' }}>
+                  {new Date(request.appointmentDate).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div style={{ padding: '16px', borderRadius: '12px', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '20px' }}>📅</span>
+              <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>Appointment date to be confirmed by hospital</p>
+            </div>
+          )}
+        </div>
+
+        {/* ── Detail cards grid ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+          {/* Donor location */}
+          <DetailCard icon="📍" title="Donor Location" value={request.assignedDonor!.city ?? 'Not provided'} accent={!!request.assignedDonor!.city} />
+
+          {/* Hospital */}
+          {hospital && <DetailCard icon="🏥" title="Hospital" value={hospital} />}
+          {hospitalAddr && <DetailCard icon="🗺" title="Hospital Address" value={hospitalAddr} wide />}
+          {hospitalPhone && <DetailCard icon="📞" title="Hospital Phone" value={hospitalPhone} />}
+          {request.department && <DetailCard icon="🏢" title="Department" value={request.department} />}
+          {request.treatingDoctor && <DetailCard icon="👨‍⚕️" title="Treating Doctor" value={request.treatingDoctor} />}
+          {request.bedNumber && <DetailCard icon="🛏" title="Bed / Ward" value={request.bedNumber} />}
+        </div>
+
+        {/* ── What to bring ── */}
+        <div style={{ padding: '14px 16px', borderRadius: '10px', backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)' }}>
+          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-text-muted)', marginBottom: '10px' }}>
+            📋 What to bring
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {[
+              'Government-issued photo ID (Aadhaar / PAN / Passport)',
+              'Doctor\'s prescription or hospital letter',
+              'Blood requisition form (if provided by hospital)',
+              'A responsible attendant (family / friend)',
+            ].map((item) => (
+              <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                <span style={{ color: 'var(--color-primary)', fontSize: '10px', marginTop: '3px', flexShrink: 0 }}>●</span>
+                <p style={{ fontSize: '12px', color: 'var(--color-text)', lineHeight: 1.5 }}>{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Status note ── */}
+        {request.donorResponseStatus === 'PENDING' && (
+          <div style={{ marginTop: '12px', padding: '12px 14px', borderRadius: '10px', backgroundColor: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', display: 'flex', gap: '10px' }}>
+            <span style={{ fontSize: '14px', flexShrink: 0 }}>⏳</span>
+            <p style={{ fontSize: '12px', color: '#f59e0b', lineHeight: 1.5, fontWeight: 500 }}>
+              The donor has been notified and will confirm their availability shortly. You will receive a notification once they accept.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DetailCard({ icon, title, value, accent, wide }: { icon: string; title: string; value: string; accent?: boolean; wide?: boolean }) {
+  return (
+    <div style={{
+      padding: '12px 14px', borderRadius: '10px', gridColumn: wide ? '1 / -1' : undefined,
+      backgroundColor: 'var(--color-bg)', border: '1px solid var(--color-border)',
+    }}>
+      <p style={{ fontSize: '10px', fontWeight: 500, color: 'var(--color-text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '4px' }}>
+        {icon} {title}
+      </p>
+      <p style={{ fontSize: '13px', fontWeight: 600, color: accent ? 'var(--color-primary)' : 'var(--color-text)', lineHeight: 1.4 }}>{value}</p>
+    </div>
+  );
+}
+
 /* ─── Main component ────────────────────────────────────────────────────────── */
 
 export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -447,6 +576,14 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
               })}
             </div>
           </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════
+            PATIENT: DONOR ASSIGNMENT INFO CARD
+            Shown when a donor has been assigned — gives patient full detail
+        ══════════════════════════════════════════════════════════════════ */}
+        {user?.role === 'PATIENT' && request.assignedDonor && (
+          <DonorAssignmentCard request={request} />
         )}
 
         {/* ══════════════════════════════════════════════════════════════════

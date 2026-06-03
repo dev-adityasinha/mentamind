@@ -710,22 +710,50 @@ router.post(
       },
     });
 
-    // Notify donor
     const services = getServices(req);
+    const bgLabel = (bg: string) => bg.replace('_POS', '+').replace('_NEG', '−');
+
+    // Load full hospital info for richer notification
+    const hospitalRecord = request.hospitalId
+      ? await prisma.hospital.findUnique({ where: { id: request.hospitalId }, select: { hospitalName: true, address: true, phone: true } })
+      : null;
+
+    const hospitalName = hospitalRecord?.hospitalName ?? request.hospitalName ?? 'the hospital';
+    const hospitalAddr = hospitalRecord?.address ?? '';
+
+    // ── Notify donor ──────────────────────────────────────────────────────────
+    const apptLine = request.appointmentDate
+      ? `Appointment: ${new Date(request.appointmentDate).toLocaleString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`
+      : 'Appointment date: to be confirmed';
+
     void services.notifier.send({
       userId: donor.user.id,
       type: 'DONOR_ASSIGNED',
-      title: 'You have been assigned for a blood donation',
-      message: `You have been assigned to donate ${donor.bloodGroup.replace('_POS', '+').replace('_NEG', '−')} blood for a patient. Please contact the hospital immediately.`,
+      title: `🩸 You have been assigned for a blood donation`,
+      message: [
+        `Blood group required: ${bgLabel(request.bloodGroup)}`,
+        `Your blood group: ${bgLabel(donor.bloodGroup)}`,
+        apptLine,
+        `Hospital: ${hospitalName}`,
+        hospitalAddr ? `Address: ${hospitalAddr}` : '',
+        `Please check My Assignments and Accept or Decline as soon as possible.`,
+      ].filter(Boolean).join('\n'),
       channel: 'IN_APP',
     });
 
-    // Notify patient
+    // ── Notify patient ────────────────────────────────────────────────────────
     void services.notifier.send({
       userId: request.patient.userId,
       type: 'DONOR_ASSIGNED_TO_REQUEST',
-      title: 'A donor has been assigned to your blood request',
-      message: `A compatible donor (${donor.bloodGroup.replace('_POS', '+').replace('_NEG', '−')}) has been assigned to your blood request by the hospital.`,
+      title: `🎯 A donor has been found for your blood request`,
+      message: [
+        `A ${bgLabel(donor.bloodGroup)} donor has been assigned to your request.`,
+        apptLine,
+        `Hospital: ${hospitalName}`,
+        hospitalAddr ? `Hospital Address: ${hospitalAddr}` : '',
+        donor.city ? `Donor Location: ${donor.city}` : '',
+        `The donor will now confirm their availability. You will be notified once they accept.`,
+      ].filter(Boolean).join('\n'),
       channel: 'IN_APP',
     });
 

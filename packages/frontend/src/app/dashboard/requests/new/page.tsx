@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { apiFetch } from '@/lib/api';
+import DateTimePicker from '@/lib/DateTimePicker';
 
 const BLOOD_GROUPS = [
   { value: 'A_POS', label: 'A+' },
@@ -35,8 +36,7 @@ export default function NewRequestPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Min date = today
-  const today = new Date().toISOString().slice(0, 16);
+  const today = new Date();
 
   if (!user) return null;
 
@@ -172,22 +172,19 @@ export default function NewRequestPage() {
             </div>
           </div>
 
-          {/* Appointment Date */}
+          {/* Appointment Date — visual calendar + clock */}
           <div>
-            <label htmlFor="req-appt" style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
-              Preferred Appointment Date & Time <span style={{ color: '#ef4444' }}>*</span>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+              Appointment Date & Time <span style={{ color: '#ef4444' }}>*</span>
             </label>
-            <input
-              id="req-appt"
-              type="datetime-local"
-              min={today}
+            <DateTimePicker
               value={appointmentDate}
-              onChange={(e) => setAppointmentDate(e.target.value)}
-              className="input-field"
-              required
+              onChange={setAppointmentDate}
+              minDate={today}
+              placeholder="Choose date & time for transfusion"
             />
             <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              The date and time when you need the blood transfusion.
+              When you need the blood transfusion. Minutes snap to 5-min intervals.
             </p>
           </div>
 
