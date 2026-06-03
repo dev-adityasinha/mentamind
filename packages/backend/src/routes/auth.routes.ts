@@ -50,6 +50,14 @@ const registerSchema = z
     department: z.string().max(255).optional(),
   })
   .superRefine((data, ctx) => {
+    // City is required for all roles
+    if (!data.city || data.city.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'City is required',
+        path: ['city'],
+      });
+    }
     if (data.role === Role.DONOR && !data.bloodGroup) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -215,6 +223,7 @@ router.post(
               userId: newUser.id,
               hospitalName: data.hospitalName!,
               address: data.hospitalAddress ?? data.address ?? '',
+              city: data.city ?? null,
               phone: data.hospitalPhone ?? data.phone,
               department: data.department ?? null,
               latitude: data.latitude ?? null,

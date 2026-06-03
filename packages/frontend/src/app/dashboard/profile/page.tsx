@@ -184,8 +184,8 @@ function PatientProfileSection({
               <input id="prof-age" type="number" min={0} max={150} value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 34" className="input-field" />
             </div>
             <div>
-              <label htmlFor="prof-city" style={fieldLabel}>City</label>
-              <input id="prof-city" type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Mumbai" className="input-field" />
+              <label htmlFor="prof-city" style={fieldLabel}>City <span style={{ color: '#ef4444' }}>*</span></label>
+              <input id="prof-city" type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Mumbai" className="input-field" required />
             </div>
           </div>
 
@@ -222,6 +222,7 @@ interface HospitalProfile {
   id: string;
   hospitalName: string;
   address: string;
+  city: string | null;
   phone: string;
   department: string | null;
   isVerified: boolean;
@@ -242,6 +243,7 @@ function HospitalProfileSection({
 
   const [hospitalName, setHospitalName] = useState('');
   const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
   const [department, setDepartment] = useState('');
 
@@ -251,6 +253,7 @@ function HospitalProfileSection({
         setProfile(hospital);
         setHospitalName(hospital.hospitalName);
         setAddress(hospital.address);
+        setCity(hospital.city || '');
         setPhone(hospital.phone);
         setDepartment(hospital.department || '');
       })
@@ -266,6 +269,7 @@ function HospitalProfileSection({
       const updateData: Record<string, unknown> = {};
       if (hospitalName !== profile?.hospitalName) updateData.hospitalName = hospitalName;
       if (address !== profile?.address) updateData.address = address;
+      if (city !== (profile?.city || '')) updateData.city = city;
       if (phone !== profile?.phone) updateData.phone = phone;
       if (department !== (profile?.department || '')) updateData.department = department;
 
@@ -336,6 +340,10 @@ function HospitalProfileSection({
           <div>
             <label htmlFor="hosp-address" style={fieldLabel}>Address</label>
             <input id="hosp-address" type="text" value={address} onChange={(e) => setAddress(e.target.value)} className="input-field" />
+          </div>
+          <div>
+            <label htmlFor="hosp-city" style={fieldLabel}>City <span style={{ color: '#ef4444' }}>*</span></label>
+            <input id="hosp-city" type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Mumbai, Delhi, Bangalore" className="input-field" required />
           </div>
 
           <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ width: '100%', padding: '8px 16px' }}>

@@ -21,6 +21,7 @@ function asyncHandler(
 const updateHospitalSchema = z.object({
   hospitalName: z.string().max(255).optional(),
   address: z.string().max(500).optional(),
+  city: z.string().max(100).optional(),
   phone: z.string().max(20).optional(),
   department: z.string().max(255).optional(),
   latitude: z.number().min(-90).max(90).optional(),
@@ -37,6 +38,7 @@ router.get(
         id: true,
         hospitalName: true,
         address: true,
+        city: true,
         department: true,
         latitude: true,
         longitude: true,
@@ -95,6 +97,7 @@ router.put(
     const updateData: Record<string, unknown> = {};
     if (data.hospitalName !== undefined) updateData.hospitalName = data.hospitalName;
     if (data.address !== undefined) updateData.address = data.address;
+    if (data.city !== undefined) updateData.city = data.city;
     if (data.phone !== undefined) updateData.phone = data.phone;
     if (data.department !== undefined) updateData.department = data.department;
     if (data.latitude !== undefined) updateData.latitude = data.latitude;

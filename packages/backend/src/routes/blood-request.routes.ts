@@ -227,10 +227,33 @@ router.get(
       RequestStatus.IN_PROGRESS,
     ];
 
+    // Auto-filter by donor's own blood group compatibility
+    // A donor with blood group X can donate to recipients whose group is in getCompatibleRecipientGroups(X)
+    const donor = await prisma.donor.findUnique({
+      where: { userId: req.user!.userId },
+      select: { bloodGroup: true },
+    });
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = { status: { in: activeStatuses } };
+
+    if (donor) {
+      // Get all blood groups this donor can donate to (respecting ABO/Rh compatibility)
+      const { getCompatibleRecipientGroups } = await import('@mentamind/shared');
+      const donorCanDonateToGroups = getCompatibleRecipientGroups(donor.bloodGroup as BloodGroup);
+      // If a manual bloodGroup filter is applied, intersect with compatible groups
+      if (bloodGroupFilter && bloodGroupValues.includes(bloodGroupFilter)) {
+        where.bloodGroup = donorCanDonateToGroups.includes(bloodGroupFilter as BloodGroup)
+          ? bloodGroupFilter   // within compatible range — apply as-is
+          : { in: [] };        // outside compatibility — return nothing
+      } else {
+        where.bloodGroup = { in: donorCanDonateToGroups };
+      }
+    } else if (bloodGroupFilter && bloodGroupValues.includes(bloodGroupFilter)) {
+      where.bloodGroup = bloodGroupFilter;
+    }
+
     if (urgencyFilter && urgencyValues.includes(urgencyFilter)) where.urgency = urgencyFilter;
-    if (bloodGroupFilter && bloodGroupValues.includes(bloodGroupFilter)) where.bloodGroup = bloodGroupFilter;
 
     const requests = await prisma.bloodRequest.findMany({
       where,
@@ -262,7 +285,11 @@ router.get(
       ],
     });
 
-    res.status(200).json({ requests, total: requests.length });
+    res.status(200).json({
+      requests,
+      total: requests.length,
+      donorBloodGroup: donor?.bloodGroup ?? null,
+    });
   }),
 );
 

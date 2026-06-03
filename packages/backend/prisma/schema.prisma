@@ -154,6 +154,7 @@ model Hospital {
   user         User      @relation(fields: [userId], references: [id])
   hospitalName String
   address      String
+  city         String?
   phone        String
   department   String?
   isVerified   Boolean   @default(false)

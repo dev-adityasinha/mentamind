@@ -33,7 +33,9 @@ interface RegisterData {
   role: string;
   bloodGroup?: string;
   hospitalName?: string;
+  hospitalAddress?: string;
   address?: string;
+  city?: string;
 }
 
 interface AuthResponse {

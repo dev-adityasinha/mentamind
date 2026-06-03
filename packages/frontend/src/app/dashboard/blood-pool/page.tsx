@@ -75,16 +75,18 @@ export default function BloodPoolPage() {
   const [urgencyTab, setUrgencyTab] = useState<string>('ALL');
   const [bgFilter, setBgFilter] = useState('');
   const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [donorBloodGroup, setDonorBloodGroup] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
       const params = new URLSearchParams();
       if (urgencyTab !== 'ALL') params.set('urgency', urgencyTab);
       if (bgFilter) params.set('bloodGroup', bgFilter);
-      const data = await apiFetch<{ requests: PoolRequest[]; total: number }>(
+      const data = await apiFetch<{ requests: PoolRequest[]; total: number; donorBloodGroup: string | null }>(
         `/blood-requests/pool${params.toString() ? '?' + params.toString() : ''}`,
       );
       setRequests(data.requests);
+      if (data.donorBloodGroup) setDonorBloodGroup(data.donorBloodGroup);
       setLastRefresh(new Date());
     } catch {
       // silent
@@ -110,8 +112,14 @@ export default function BloodPoolPage() {
               Blood Requests Pool
             </h1>
             <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-              All active blood requests in the system. You will be contacted by the hospital if you are a match.
+              Requests compatible with your blood group — only patients you can donate to are shown.
             </p>
+            {donorBloodGroup && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '6px', padding: '4px 10px', borderRadius: '6px', backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>🩸 Your Blood Group:</span>
+                <span style={{ fontSize: '12px', fontWeight: 800, color: '#ef4444' }}>{donorBloodGroup.replace('_POS', '+').replace('_NEG', '−')}</span>
+              </div>
+            )}
           </div>
           <button
             onClick={() => { setLoading(true); load(); }}

@@ -184,6 +184,7 @@ interface BloodRequest {
   id: string; bloodGroup: string; unitsNeeded: number; urgency: string;
   priorityLevel?: string; status: string; createdAt: string;
   hospitalName?: string | null; treatingDoctor?: string | null;
+  patient?: { user: { id: string; name: string } } | null;
 }
 interface MedRequest { id: string; status: string; notes: string | null; createdAt: string; }
 
@@ -487,6 +488,7 @@ function HospitalDashboard({ user }: { user: { name: string } }) {
                   <div>
                     <p style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-text)' }}>
                       {req.unitsNeeded} unit{req.unitsNeeded > 1 ? 's' : ''}
+                      {req.patient?.user?.name ? ` · ${req.patient.user.name}` : ''}
                       {req.treatingDoctor ? ` · ${req.treatingDoctor}` : ''}
                     </p>
                     <p style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginTop: '2px' }}>{fmtDate(req.createdAt)}</p>

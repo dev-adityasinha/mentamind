@@ -32,6 +32,7 @@ export default function RegisterPage() {
   const [hospitalAddress, setHospitalAddress] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [city, setCity] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,6 +50,10 @@ export default function RegisterPage() {
       setError('Please enter hospital name');
       return;
     }
+    if (!city.trim()) {
+      setError('City is required');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -58,6 +63,7 @@ export default function RegisterPage() {
         phone,
         password,
         role,
+        city,
         ...(role === 'DONOR' ? { bloodGroup } : {}),
         ...(role === 'HOSPITAL' ? { hospitalName, hospitalAddress } : {}),
       });
@@ -159,7 +165,7 @@ export default function RegisterPage() {
 
             {role === 'DONOR' && (
               <div className="animate-fade-in">
-                <Field label="Blood Group">
+                <Field label="Blood Group *">
                   <select
                     value={bloodGroup}
                     onChange={(e) => setBloodGroup(e.target.value)}
@@ -176,6 +182,17 @@ export default function RegisterPage() {
                 </Field>
               </div>
             )}
+
+            <Field label="City *">
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                placeholder="e.g. Mumbai, Delhi, Bangalore"
+                className="input-field"
+              />
+            </Field>
 
             {role === 'HOSPITAL' && (
               <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>

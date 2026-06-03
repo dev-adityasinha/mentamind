@@ -16,9 +16,16 @@ interface BloodRequest {
   createdAt: string;
   appointmentDate: string | null;
   hospitalName: string | null;
+  department: string | null;
+  treatingDoctor: string | null;
+  bedNumber: string | null;
   assignedDonorId: string | null;
   donorResponseStatus: string;
-  patient?: { user: { name: string } };
+  patient?: {
+    city?: string | null;
+    user: { id: string; name: string; email: string; role: string };
+  };
+  hospital?: { hospitalName: string; address: string } | null;
 }
 
 /* ─── helpers ─────────────────────────────────────────────────────────────────── */
@@ -185,16 +192,25 @@ export default function RequestsPage() {
                       </span>
 
                       <div>
-                        <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '2px' }}>
+                        <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text)', marginBottom: '3px' }}>
                           {req.unitsNeeded} unit{req.unitsNeeded > 1 ? 's' : ''} needed
                         </p>
-                        {req.patient?.user && (
-                          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
-                            {req.patient.user.name}
-                          </p>
+                        {/* Patient name — always shown if available */}
+                        {req.patient?.user?.name ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2px' }}>
+                            <span style={{ fontSize: '10px' }}>👤</span>
+                            <p style={{ fontSize: '13px', fontWeight: isHospital ? 600 : 400, color: isHospital ? 'var(--color-text)' : 'var(--color-text-muted)' }}>
+                              {req.patient.user.name}
+                            </p>
+                          </div>
+                        ) : (
+                          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>Patient name unavailable</p>
+                        )}
+                        {req.patient?.city && (
+                          <p style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>📍 {req.patient.city}</p>
                         )}
                         {isHospital && req.hospitalName && (
-                          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>
+                          <p style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '1px' }}>
                             🏥 {req.hospitalName}
                           </p>
                         )}
