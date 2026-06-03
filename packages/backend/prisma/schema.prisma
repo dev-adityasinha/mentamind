@@ -135,7 +135,8 @@ model Donor {
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
-  callLogs         DonorCallLog[]
+  callLogs          DonorCallLog[]
+  assignedRequests  BloodRequest[] @relation("AssignedDonor")
 
   @@index([bloodGroup, isAvailable])
   @@index([isAvailable])
@@ -183,6 +184,10 @@ model BloodRequest {
   ocrData             Json?
   // Matching results
   matchedDonors       Json?
+  // Hospital-assigned donor
+  assignedDonorId     String?
+  assignedDonor       Donor?        @relation("AssignedDonor", fields: [assignedDonorId], references: [id])
+  assignedAt          DateTime?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
 

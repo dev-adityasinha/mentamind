@@ -9,6 +9,7 @@ import {
   PriorityLevel,
   assertValidTransition,
   getCompatibleDonorGroups,
+  canDonate,
 } from '@mentamind/shared';
 import { authenticateToken } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
@@ -426,6 +427,342 @@ router.post(
         })),
       },
     });
+  }),
+);
+
+// ─── Location helpers ──────────────────────────────────────────────────────
+
+const SAME_LOCATION_MAX_KM = 25;
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+interface LocationResult {
+  isSame: boolean;
+  reason: string;
+  distanceKm?: number;
+}
+
+function checkSameLocation(
+  patientCity: string | null,
+  patientLat: number | null,
+  patientLng: number | null,
+  donorCity: string | null,
+  donorLat: number | null,
+  donorLng: number | null,
+): LocationResult {
+  // Primary: city name match (case-insensitive, trimmed)
+  if (patientCity && donorCity) {
+    if (patientCity.trim().toLowerCase() === donorCity.trim().toLowerCase()) {
+      return { isSame: true, reason: `Same city: ${patientCity}` };
+    }
+  }
+
+  // Secondary: coordinate-based proximity
+  if (
+    patientLat !== null && patientLng !== null &&
+    donorLat   !== null && donorLng   !== null
+  ) {
+    const dist = haversineKm(patientLat, patientLng, donorLat, donorLng);
+    if (dist <= SAME_LOCATION_MAX_KM) {
+      return { isSame: true, reason: `${dist.toFixed(1)} km from patient`, distanceKm: dist };
+    }
+    return { isSame: false, reason: `${dist.toFixed(1)} km from patient (>${SAME_LOCATION_MAX_KM} km limit)`, distanceKm: dist };
+  }
+
+  // No usable location data
+  if (!patientCity && patientLat === null) {
+    return { isSame: false, reason: 'Patient location not set — update patient profile with city or coordinates' };
+  }
+  if (!donorCity && donorLat === null) {
+    return { isSame: false, reason: 'Donor location not set' };
+  }
+  return { isSame: false, reason: `Different cities: patient in "${patientCity ?? 'unknown'}", donor in "${donorCity ?? 'unknown'}"` };
+}
+
+// ─── GET /:id/eligible-donors — Hospital views donors eligible to assign ─────
+
+router.get(
+  '/:id/eligible-donors',
+  requireRole(Role.HOSPITAL, Role.ADMIN),
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+
+    // Load request with patient location
+    const request = await prisma.bloodRequest.findUnique({
+      where: { id },
+      include: {
+        patient: { select: { city: true, address: true, user: { select: { name: true } } } },
+        hospital: { select: { latitude: true, longitude: true } },
+      },
+    });
+
+    if (!request) throw new AppError('Blood request not found', 404, 'REQUEST_NOT_FOUND');
+
+    // Fetch the patient's location fields from Patient model
+    const patient = await prisma.patient.findUnique({
+      where: { id: request.patientId },
+      select: { city: true, address: true },
+    });
+
+    // Find all available donors with compatible blood groups
+    const compatibleGroups = getCompatibleDonorGroups(request.bloodGroup as BloodGroup);
+
+    const donors = await prisma.donor.findMany({
+      where: {
+        isAvailable: true,
+        bloodGroup: { in: compatibleGroups },
+      },
+      include: {
+        user: { select: { id: true, name: true } },
+      },
+    });
+
+    // Score each donor: blood compatibility + location + eligibility
+    const today = new Date();
+    const eligible = donors.map((donor) => {
+      const isExactMatch = donor.bloodGroup === request.bloodGroup;
+      const compatibility = isExactMatch ? 'exact' : 'compatible';
+
+      // Days since last donation
+      const daysSinceDonation = donor.lastDonationDate
+        ? Math.floor((today.getTime() - new Date(donor.lastDonationDate).getTime()) / 86400000)
+        : null;
+      const donationEligible = daysSinceDonation === null || daysSinceDonation >= 56;
+
+      // Location check: patient city vs donor city
+      const patientCity = patient?.city ?? null;
+      // Use hospital lat/lng if patient has no coordinates (patient location via city only)
+      const location = checkSameLocation(
+        patientCity, null, null,
+        donor.city, donor.latitude, donor.longitude,
+      );
+
+      return {
+        donorId: donor.id,
+        name: donor.user.name,
+        bloodGroup: donor.bloodGroup,
+        compatibility,
+        city: donor.city,
+        latitude: donor.latitude,
+        longitude: donor.longitude,
+        totalDonations: donor.totalDonations,
+        responseScore: donor.responseScore,
+        lastDonationDate: donor.lastDonationDate,
+        daysSinceDonation,
+        donationEligible,
+        location,
+        isEligible: location.isSame && donationEligible,
+      };
+    });
+
+    // Sort: eligible first, then by responseScore desc
+    eligible.sort((a, b) => {
+      if (a.isEligible && !b.isEligible) return -1;
+      if (!a.isEligible && b.isEligible) return 1;
+      return b.responseScore - a.responseScore;
+    });
+
+    res.status(200).json({
+      requestBloodGroup: request.bloodGroup,
+      patientCity: patient?.city ?? null,
+      donors: eligible,
+      eligibleCount: eligible.filter((d) => d.isEligible).length,
+    });
+  }),
+);
+
+// ─── POST /:id/assign-donor — Hospital assigns a specific donor ───────────────
+
+router.post(
+  '/:id/assign-donor',
+  requireRole(Role.HOSPITAL, Role.ADMIN),
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+    const parsed = z.object({ donorId: z.string().uuid() }).safeParse(req.body);
+    if (!parsed.success) {
+      throw new AppError('donorId (UUID) is required', 400, 'VALIDATION_ERROR');
+    }
+
+    const { donorId } = parsed.data;
+
+    // Load request
+    const request = await prisma.bloodRequest.findUnique({
+      where: { id },
+      include: {
+        patient: { select: { id: true, city: true, userId: true, user: { select: { name: true } } } },
+      },
+    });
+    if (!request) throw new AppError('Blood request not found', 404, 'REQUEST_NOT_FOUND');
+
+    // Must not already be FULFILLED / CANCELLED / REJECTED
+    if (['FULFILLED', 'CANCELLED', 'REJECTED'].includes(request.status)) {
+      throw new AppError(
+        `Cannot assign a donor to a ${request.status} request`,
+        400,
+        'INVALID_STATUS',
+      );
+    }
+
+    // Load donor
+    const donor = await prisma.donor.findUnique({
+      where: { id: donorId },
+      include: { user: { select: { id: true, name: true } } },
+    });
+    if (!donor) throw new AppError('Donor not found', 404, 'DONOR_NOT_FOUND');
+
+    // ── Guard 1: Blood group compatibility ──────────────────────────────────
+    const compatible = canDonate(donor.bloodGroup as BloodGroup, request.bloodGroup as BloodGroup);
+    if (!compatible) {
+      throw new AppError(
+        `Blood group mismatch: donor is ${donor.bloodGroup} but patient needs ${request.bloodGroup}-compatible blood`,
+        422,
+        'BLOOD_GROUP_INCOMPATIBLE',
+      );
+    }
+
+    // ── Guard 2: Same location ───────────────────────────────────────────────
+    const patient = await prisma.patient.findUnique({
+      where: { id: request.patientId },
+      select: { city: true },
+    });
+
+    const location = checkSameLocation(
+      patient?.city ?? null, null, null,
+      donor.city, donor.latitude, donor.longitude,
+    );
+
+    if (!location.isSame) {
+      throw new AppError(
+        `Location mismatch: ${location.reason}. Donor and patient must be in the same city or within ${SAME_LOCATION_MAX_KM} km.`,
+        422,
+        'LOCATION_MISMATCH',
+      );
+    }
+
+    // ── Guard 3: Donation eligibility (56-day rule) ──────────────────────────
+    if (donor.lastDonationDate) {
+      const days = Math.floor(
+        (Date.now() - new Date(donor.lastDonationDate).getTime()) / 86400000,
+      );
+      if (days < 56) {
+        throw new AppError(
+          `Donor last donated ${days} days ago. Minimum 56 days required between donations.`,
+          422,
+          'DONOR_NOT_ELIGIBLE',
+        );
+      }
+    }
+
+    // ── Assign ───────────────────────────────────────────────────────────────
+    const updated = await prisma.bloodRequest.update({
+      where: { id },
+      data: {
+        assignedDonorId: donorId,
+        assignedAt: new Date(),
+        // Advance status to IN_PROGRESS if it was MATCHED or earlier active states
+        status: ['DRAFT','PENDING_VERIFICATION','VERIFIED','MATCHING','MATCHED'].includes(request.status)
+          ? RequestStatus.IN_PROGRESS
+          : request.status,
+      },
+      include: {
+        assignedDonor: { include: { user: { select: { id: true, name: true } } } },
+      },
+    });
+
+    // Notify donor
+    const services = getServices(req);
+    void services.notifier.send({
+      userId: donor.user.id,
+      type: 'DONOR_ASSIGNED',
+      title: 'You have been assigned for a blood donation',
+      message: `You have been assigned to donate ${donor.bloodGroup.replace('_POS', '+').replace('_NEG', '−')} blood for a patient. Please contact the hospital immediately.`,
+      channel: 'IN_APP',
+    });
+
+    // Notify patient
+    void services.notifier.send({
+      userId: request.patient.userId,
+      type: 'DONOR_ASSIGNED_TO_REQUEST',
+      title: 'A donor has been assigned to your blood request',
+      message: `A compatible donor (${donor.bloodGroup.replace('_POS', '+').replace('_NEG', '−')}) has been assigned to your blood request by the hospital.`,
+      channel: 'IN_APP',
+    });
+
+    void createAuditLog(
+      req.user!.userId,
+      {
+        action: 'DONOR_ASSIGNED_BY_HOSPITAL',
+        entityType: 'BloodRequest',
+        entityId: id,
+        oldValue: { assignedDonorId: request.assignedDonorId, status: request.status },
+        newValue: { assignedDonorId: donorId, donorName: donor.user.name, location: location.reason, status: updated.status },
+      },
+      req,
+    );
+
+    res.status(200).json({
+      request: updated,
+      assignment: {
+        donorName: donor.user.name,
+        donorBloodGroup: donor.bloodGroup,
+        locationReason: location.reason,
+        distanceKm: location.distanceKm ?? null,
+      },
+    });
+  }),
+);
+
+// ─── DELETE /:id/assign-donor — Hospital removes donor assignment ─────────────
+
+router.delete(
+  '/:id/assign-donor',
+  requireRole(Role.HOSPITAL, Role.ADMIN),
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+
+    const request = await prisma.bloodRequest.findUnique({ where: { id } });
+    if (!request) throw new AppError('Blood request not found', 404, 'REQUEST_NOT_FOUND');
+
+    if (!request.assignedDonorId) {
+      throw new AppError('No donor is currently assigned to this request', 400, 'NO_ASSIGNMENT');
+    }
+
+    if (['FULFILLED', 'CANCELLED', 'REJECTED'].includes(request.status)) {
+      throw new AppError(`Cannot remove assignment from a ${request.status} request`, 400, 'INVALID_STATUS');
+    }
+
+    const updated = await prisma.bloodRequest.update({
+      where: { id },
+      data: {
+        assignedDonorId: null,
+        assignedAt: null,
+        // Revert to MATCHED if it was IN_PROGRESS due to assignment
+        status: request.status === RequestStatus.IN_PROGRESS ? RequestStatus.MATCHED : request.status,
+      },
+    });
+
+    void createAuditLog(
+      req.user!.userId,
+      {
+        action: 'DONOR_ASSIGNMENT_REMOVED',
+        entityType: 'BloodRequest',
+        entityId: id,
+        oldValue: { assignedDonorId: request.assignedDonorId },
+        newValue: { assignedDonorId: null },
+      },
+      req,
+    );
+
+    res.status(200).json({ request: updated });
   }),
 );
 

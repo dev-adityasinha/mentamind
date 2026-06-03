@@ -13,6 +13,13 @@ interface RankedDonor {
   donorName?: string;
 }
 
+interface AssignedDonor {
+  id: string;
+  user: { id: string; name: string };
+  bloodGroup: string;
+  city: string | null;
+}
+
 interface BloodRequest {
   id: string;
   bloodGroup: string;
@@ -21,10 +28,27 @@ interface BloodRequest {
   status: string;
   notes: string | null;
   matchedDonors: RankedDonor[] | null;
+  assignedDonorId: string | null;
+  assignedDonor: AssignedDonor | null;
+  assignedAt: string | null;
   createdAt: string;
   updatedAt: string;
   patient?: { user: { id: string; name: string; email: string } };
   hospital?: { hospitalName: string; address: string } | null;
+}
+
+interface EligibleDonor {
+  donorId: string;
+  name: string;
+  bloodGroup: string;
+  compatibility: 'exact' | 'compatible';
+  city: string | null;
+  totalDonations: number;
+  responseScore: number;
+  daysSinceDonation: number | null;
+  donationEligible: boolean;
+  location: { isSame: boolean; reason: string; distanceKm?: number };
+  isEligible: boolean;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -81,6 +105,13 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
   const [actionLoading, setActionLoading] = useState('');
   const [error, setError] = useState('');
 
+  // Assign-donor state (hospital role)
+  const [eligibleDonors, setEligibleDonors] = useState<EligibleDonor[] | null>(null);
+  const [eligibleLoading, setEligibleLoading] = useState(false);
+  const [assignLoading, setAssignLoading] = useState('');
+  const [assignError, setAssignError] = useState('');
+  const [showAssignPanel, setShowAssignPanel] = useState(false);
+
   useEffect(() => {
     if (!authLoading && !user) { router.push('/login'); return; }
     if (user) loadRequest();
@@ -134,6 +165,60 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
+  const loadEligibleDonors = async () => {
+    setEligibleLoading(true);
+    setAssignError('');
+    try {
+      const data = await apiFetch<{ donors: EligibleDonor[]; patientCity: string | null; eligibleCount: number }>(
+        `/blood-requests/${id}/eligible-donors`,
+      );
+      setEligibleDonors(data.donors);
+    } catch (err) {
+      setAssignError(err instanceof Error ? err.message : 'Failed to load eligible donors');
+    } finally {
+      setEligibleLoading(false);
+    }
+  };
+
+  const handleOpenAssignPanel = () => {
+    setShowAssignPanel(true);
+    if (!eligibleDonors) loadEligibleDonors();
+  };
+
+  const handleAssignDonor = async (donorId: string) => {
+    setAssignLoading(donorId);
+    setAssignError('');
+    try {
+      const data = await apiFetch<{ request: BloodRequest; assignment: { donorName: string; donorBloodGroup: string; locationReason: string } }>(
+        `/blood-requests/${id}/assign-donor`,
+        { method: 'POST', body: JSON.stringify({ donorId }) },
+      );
+      setRequest(data.request);
+      setShowAssignPanel(false);
+    } catch (err) {
+      setAssignError(err instanceof Error ? err.message : 'Assignment failed');
+    } finally {
+      setAssignLoading('');
+    }
+  };
+
+  const handleRemoveAssignment = async () => {
+    setActionLoading('REMOVE_ASSIGN');
+    setError('');
+    try {
+      const data = await apiFetch<{ request: BloodRequest }>(
+        `/blood-requests/${id}/assign-donor`,
+        { method: 'DELETE' },
+      );
+      setRequest(data.request);
+      setEligibleDonors(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to remove assignment');
+    } finally {
+      setActionLoading('');
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -162,7 +247,9 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'VOLUNTEER';
+  const isHospital = user?.role === 'HOSPITAL' || user?.role === 'ADMIN';
   const actions = NEXT_ACTIONS[request.status] || [];
+  const canAssign = isHospital && !['FULFILLED', 'CANCELLED', 'REJECTED'].includes(request.status);
 
   return (
     <div className="min-h-screen p-6 md:p-10" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -275,6 +362,168 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                 </p>
               )}
             </div>
+          </div>
+        )}
+
+        {/* ── Hospital: Assigned Donor ──────────────────────────────────── */}
+        {canAssign && request.assignedDonor && (
+          <div className="p-5 rounded-2xl border mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'rgba(34,197,94,0.3)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+                Assigned Donor
+              </h2>
+              <button
+                onClick={handleRemoveAssignment}
+                disabled={!!actionLoading}
+                className="text-xs font-medium px-3 py-1 rounded-lg border"
+                style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)', backgroundColor: 'transparent', cursor: 'pointer', opacity: actionLoading ? 0.5 : 1 }}
+              >
+                {actionLoading === 'REMOVE_ASSIGN' ? 'Removing…' : 'Remove Assignment'}
+              </button>
+            </div>
+            <div className="flex items-center gap-4 p-4 rounded-xl" style={{ backgroundColor: 'rgba(34,197,94,0.05)', border: '1px solid rgba(34,197,94,0.15)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0" style={{ backgroundColor: '#22c55e' }}>
+                ✓
+              </div>
+              <div>
+                <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{request.assignedDonor.user.name}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                    {formatBloodGroup(request.assignedDonor.bloodGroup)}
+                  </span>
+                  {request.assignedDonor.city && (
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>📍 {request.assignedDonor.city}</span>
+                  )}
+                  {request.assignedAt && (
+                    <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      Assigned {new Date(request.assignedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Hospital: Assign Donor Button / Panel ─────────────────────── */}
+        {canAssign && !request.assignedDonor && (
+          <div className="p-5 rounded-2xl border mb-4" style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+                  Assign Donor
+                </h2>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+                  Only donors in the same city with a compatible blood group are shown.
+                </p>
+              </div>
+              {!showAssignPanel && (
+                <button
+                  onClick={handleOpenAssignPanel}
+                  className="px-4 py-2 rounded-xl text-white text-sm font-medium"
+                  style={{ backgroundColor: 'var(--color-primary)', cursor: 'pointer', border: 'none' }}
+                >
+                  Find & Assign Donor
+                </button>
+              )}
+            </div>
+
+            {showAssignPanel && (
+              <>
+                {assignError && (
+                  <div className="mb-3 px-4 py-3 rounded-xl text-sm" style={{ backgroundColor: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+                    {assignError}
+                  </div>
+                )}
+
+                {eligibleLoading ? (
+                  <p className="text-sm text-center py-6" style={{ color: 'var(--color-text-muted)' }}>Searching eligible donors…</p>
+                ) : eligibleDonors && eligibleDonors.length === 0 ? (
+                  <div className="text-center py-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg)' }}>
+                    <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>No eligible donors found</p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                      No available donors with a compatible blood group in the same city.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {(eligibleDonors ?? []).map((donor) => (
+                      <div
+                        key={donor.donorId}
+                        className="p-4 rounded-xl border flex items-center justify-between gap-3"
+                        style={{
+                          backgroundColor: donor.isEligible ? 'var(--color-bg)' : 'rgba(107,114,128,0.04)',
+                          borderColor: donor.isEligible ? 'var(--color-border)' : 'rgba(107,114,128,0.15)',
+                          opacity: donor.isEligible ? 1 : 0.6,
+                        }}
+                      >
+                        <div className="flex items-start gap-3 min-w-0">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                            style={{ backgroundColor: donor.isEligible ? 'var(--color-primary)' : '#9ca3af' }}
+                          >
+                            {donor.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{donor.name}</p>
+                              <span className="text-xs font-bold px-1.5 py-0.5 rounded" style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                                {formatBloodGroup(donor.bloodGroup)}
+                              </span>
+                              {donor.compatibility === 'exact' ? (
+                                <span className="text-xs px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: 'rgba(34,197,94,0.1)', color: '#22c55e' }}>Exact match</span>
+                              ) : (
+                                <span className="text-xs px-1.5 py-0.5 rounded font-medium" style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>Compatible</span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+                              <p className="text-xs" style={{ color: donor.location.isSame ? '#22c55e' : '#ef4444' }}>
+                                📍 {donor.location.reason}
+                              </p>
+                              <p className="text-xs" style={{ color: donor.donationEligible ? 'var(--color-text-muted)' : '#ef4444' }}>
+                                🩸 {donor.daysSinceDonation === null ? 'Never donated' : `${donor.daysSinceDonation}d since donation`}
+                                {!donor.donationEligible && ' (not eligible yet)'}
+                              </p>
+                              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                {donor.totalDonations} donation{donor.totalDonations !== 1 ? 's' : ''} · score {donor.responseScore.toFixed(1)}
+                              </p>
+                            </div>
+                            {!donor.isEligible && (
+                              <p className="text-xs mt-1 font-medium" style={{ color: '#f59e0b' }}>
+                                ⚠ Not eligible: {!donor.location.isSame ? 'different location' : 'recent donation'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleAssignDonor(donor.donorId)}
+                          disabled={!donor.isEligible || !!assignLoading}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0"
+                          style={{
+                            backgroundColor: donor.isEligible ? 'var(--color-primary)' : 'transparent',
+                            color: donor.isEligible ? '#fff' : 'var(--color-text-muted)',
+                            border: donor.isEligible ? 'none' : '1px solid var(--color-border)',
+                            cursor: donor.isEligible ? 'pointer' : 'not-allowed',
+                            opacity: assignLoading === donor.donorId ? 0.6 : 1,
+                          }}
+                        >
+                          {assignLoading === donor.donorId ? 'Assigning…' : donor.isEligible ? 'Assign' : 'Ineligible'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setShowAssignPanel(false)}
+                  className="mt-3 text-xs"
+                  style={{ color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+              </>
+            )}
           </div>
         )}
 
