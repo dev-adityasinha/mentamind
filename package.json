@@ -1,0 +1,26 @@
+{
+  "name": "@mentamind/monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mentamind Foundation Assistance Platform — blood donation and free medicine support",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=packages/backend & npm run dev --workspace=packages/frontend",
+    "dev:backend": "npm run dev --workspace=packages/backend",
+    "dev:frontend": "npm run dev --workspace=packages/frontend",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:backend": "npm run build --workspace=packages/backend",
+    "build:frontend": "npm run build --workspace=packages/frontend",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "test": "npm run test --workspaces --if-present",
+    "test:unit": "npm run test:unit --workspace=packages/backend",
+    "test:integration": "npm run test:integration --workspace=packages/backend",
+    "db:migrate": "npm run db:migrate --workspace=packages/backend",
+    "db:push": "npm run db:push --workspace=packages/backend",
+    "db:seed": "npm run db:seed --workspace=packages/backend",
+    "db:studio": "npm run db:studio --workspace=packages/backend",
+    "lint": "npm run lint --workspaces --if-present"
+  }
+}

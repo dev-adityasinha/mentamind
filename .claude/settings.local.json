@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker *)",
+      "Bash(npm install *)",
+      "PowerShell(Start-Process \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\" -ErrorAction SilentlyContinue; Write-Output \"Docker Desktop launch attempted\")",
+      "PowerShell(npm run *)",
+      "PowerShell(docker exec mentamind-postgres *)"
+    ]
+  }
+}
