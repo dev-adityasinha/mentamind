@@ -209,6 +209,63 @@ router.get(
   }),
 );
 
+// ─── GET /pool — Donor browses all active blood requests (anonymised) ────────
+// Declared BEFORE /:id to prevent Express route shadowing
+
+router.get(
+  '/pool',
+  requireRole(Role.DONOR),
+  asyncHandler(async (req: Request, res: Response) => {
+    const urgencyFilter = req.query.urgency as string | undefined;
+    const bloodGroupFilter = req.query.bloodGroup as string | undefined;
+
+    const activeStatuses = [
+      RequestStatus.PENDING_VERIFICATION,
+      RequestStatus.VERIFIED,
+      RequestStatus.MATCHING,
+      RequestStatus.MATCHED,
+      RequestStatus.IN_PROGRESS,
+    ];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = { status: { in: activeStatuses } };
+    if (urgencyFilter && urgencyValues.includes(urgencyFilter)) where.urgency = urgencyFilter;
+    if (bloodGroupFilter && bloodGroupValues.includes(bloodGroupFilter)) where.bloodGroup = bloodGroupFilter;
+
+    const requests = await prisma.bloodRequest.findMany({
+      where,
+      select: {
+        id: true,
+        bloodGroup: true,
+        unitsNeeded: true,
+        urgency: true,
+        priorityLevel: true,
+        status: true,
+        appointmentDate: true,
+        hospitalName: true,
+        department: true,
+        treatingDoctor: true,
+        notes: true,
+        createdAt: true,
+        // Patient: city only, NO name/email/personal info
+        patient: { select: { city: true } },
+        // Hospital: public info only
+        hospital: { select: { hospitalName: true, address: true, latitude: true, longitude: true } },
+        // Donor response
+        assignedDonorId: true,
+        donorResponseStatus: true,
+      },
+      orderBy: [
+        { urgency: 'asc' },       // CRITICAL first
+        { appointmentDate: 'asc' }, // soonest appointment first
+        { createdAt: 'asc' },     // oldest request first
+      ],
+    });
+
+    res.status(200).json({ requests, total: requests.length });
+  }),
+);
+
 // ─── GET /my-assignments — Donor sees their assigned blood requests ──────────
 // NOTE: Must be declared BEFORE /:id to prevent Express matching it as an id
 
