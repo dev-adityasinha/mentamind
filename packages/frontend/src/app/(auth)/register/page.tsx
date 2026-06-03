@@ -3,7 +3,6 @@
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-
 const BLOOD_GROUPS = [
   { value: 'A_POS', label: 'A+' },
   { value: 'A_NEG', label: 'A−' },

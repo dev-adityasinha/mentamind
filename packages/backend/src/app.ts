@@ -26,12 +26,19 @@ export function createApp(): {
 
   // Security middleware
   app.use(helmet());
-  app.use(
-    cors({
-      origin: config.FRONTEND_URL,
-      credentials: true,
-    }),
-  );
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      const allowed = [config.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002'];
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
 
   // Logging
   app.use(morgan(config.NODE_ENV === 'production' ? 'combined' : 'dev'));
