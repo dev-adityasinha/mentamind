@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: mentamind-backend
+    runtime: node
+    rootDir: .
+    buildCommand: npm install && npm run build:shared && npm run build:backend && cd packages/backend && npx prisma generate
+    startCommand: npm run start --workspace=packages/backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mentamind-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: JWT_ACCESS_EXPIRY
+        value: 15m
+      - key: JWT_REFRESH_EXPIRY
+        value: 7d
+      - key: MINIO_ENDPOINT
+        sync: false
+      - key: MINIO_PORT
+        value: 9000
+      - key: MINIO_USE_SSL
+        value: false
+      - key: MINIO_ACCESS_KEY
+        sync: false
+      - key: MINIO_SECRET_KEY
+        sync: false
+      - key: MINIO_BUCKET
+        value: mentamind
+      - key: FRONTEND_URL
+        sync: false
+
+databases:
+  - name: mentamind-db
+    databaseName: mentamind
+    user: mentamind
