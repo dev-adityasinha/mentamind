@@ -12,6 +12,7 @@ from app.routers import (
     admin,
     ai_coach,
     auth,
+    chat,
     forum,
     hr_dashboard,
     invitations,
@@ -122,6 +123,7 @@ app.include_router(journal.router)
 app.include_router(hr_dashboard.router)
 app.include_router(settings_router.router)
 app.include_router(saml.router)
+app.include_router(chat.router)
 
 
 @app.get("/health")

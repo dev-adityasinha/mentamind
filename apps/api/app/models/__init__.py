@@ -1,6 +1,7 @@
 from app.models.ai_coach import AiCoachMessage, AiCoachSession
 from app.models.appointment import Appointment
 from app.models.audit_log import AuditLog
+from app.models.chat import ChatSession
 from app.models.comment import Comment
 from app.models.consent_record import ConsentRecord
 from app.models.daily_completion import DailyCompletion
@@ -9,6 +10,7 @@ from app.models.emotion_analysis import EmotionAnalysis
 from app.models.invitation import Invitation
 from app.models.journal import JournalEntry
 from app.models.meditation_session import MeditationSession
+from app.models.message import ChatMessage
 from app.models.mood_log import MoodLog
 from app.models.notification_event import NotificationEvent
 from app.models.organization import Organization
@@ -46,4 +48,6 @@ __all__ = [
     "PostLike",
     "Comment",
     "ContentReport",
+    "ChatSession",
+    "ChatMessage",
 ]
