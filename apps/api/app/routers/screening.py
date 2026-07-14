@@ -15,12 +15,13 @@ from app.schemas.screening import (
     ScreeningResultResponse,
 )
 
+
 def calculate_screening(test_id: str, answers: list[int]) -> dict:
     score = sum(answers)
     severity = "Minimal"
     insights = ""
     next_steps = ""
-    
+
     if test_id.lower() == "phq-9":
         if score >= 20:
             severity = "Severe"
@@ -63,8 +64,14 @@ def calculate_screening(test_id: str, answers: list[int]) -> dict:
         severity = "Unknown"
         insights = "Assessment completed."
         next_steps = "Review your results."
-        
-    return {"score": score, "severity": severity, "insights": insights, "next_steps": next_steps}
+
+    return {
+        "score": score,
+        "severity": severity,
+        "insights": insights,
+        "next_steps": next_steps,
+    }
+
 
 router = APIRouter(prefix="/screening", tags=["screening"])
 
@@ -87,10 +94,10 @@ async def save_screening_result(
         meta["answers"] = body.answers
     if body.max_score:
         meta["max_score"] = body.max_score
-        
+
     insights = None
     next_steps = None
-    
+
     if body.answers:
         calc = calculate_screening(body.test_id, body.answers)
         final_score = calc["score"]
@@ -100,7 +107,7 @@ async def save_screening_result(
     else:
         final_score = body.score
         final_severity = body.severity
-        
+
     record = TestScore(
         user_id=current_user.id,
         test_id=body.test_id,
@@ -111,7 +118,7 @@ async def save_screening_result(
     db.add(record)
     await db.commit()
     await db.refresh(record)
-    
+
     return {
         "id": record.id,
         "test_id": record.test_id,

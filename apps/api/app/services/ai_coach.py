@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import uuid
 from datetime import UTC, datetime
 
@@ -10,10 +9,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.ai_coach import AiCoachMessage, AiCoachSession
 from app.models.mood_log import MoodLog
 from app.models.test_score import TestScore
-from app.models.meditation import MeditationTrack
 from app.schemas.ai_coach import CoachMessageResponse
-from app.services.encryption import decrypt
 from app.services.ai_providers.factory import get_ai_provider
+from app.services.encryption import decrypt
 
 SYSTEM_PROMPT = (
     "You are a warm, supportive mental wellness coach. "
@@ -46,19 +44,25 @@ async def generate_coach_response(
     db: AsyncSession | None = None,
 ) -> CoachMessageResponse:
     provider = get_ai_provider()
-    
+
     # Context injection
     context_str = ""
     if db:
         mood_res = await db.execute(
-            select(MoodLog).where(MoodLog.user_id == user_id).order_by(MoodLog.logged_at.desc()).limit(1)
+            select(MoodLog)
+            .where(MoodLog.user_id == user_id)
+            .order_by(MoodLog.logged_at.desc())
+            .limit(1)
         )
         latest_mood = mood_res.scalar_one_or_none()
         if latest_mood:
             context_str += f"\nUser's latest mood is: {latest_mood.score}/10, energy: {latest_mood.energy_score}/10, stress: {latest_mood.stress_score}/10."
 
         test_res = await db.execute(
-            select(TestScore).where(TestScore.user_id == user_id).order_by(TestScore.created_at.desc()).limit(1)
+            select(TestScore)
+            .where(TestScore.user_id == user_id)
+            .order_by(TestScore.created_at.desc())
+            .limit(1)
         )
         latest_test = test_res.scalar_one_or_none()
         if latest_test:
@@ -90,7 +94,7 @@ async def generate_coach_response(
         messages.append({"role": db_msg.role, "content": content})
 
     messages.append({"role": "user", "content": user_message_content})
-    
+
     tools = [
         {
             "type": "function",
@@ -102,12 +106,12 @@ async def generate_coach_response(
                     "properties": {
                         "category": {
                             "type": "string",
-                            "description": "Category of meditation (guided, sleep, relaxation, focus, stress, anxiety)"
+                            "description": "Category of meditation (guided, sleep, relaxation, focus, stress, anxiety)",
                         }
                     },
-                    "required": ["category"]
-                }
-            }
+                    "required": ["category"],
+                },
+            },
         }
     ]
 
@@ -116,22 +120,20 @@ async def generate_coach_response(
             messages=messages,
             system_prompt=final_system_prompt,
             user_id=user_id,
-            tools=tools
+            tools=tools,
         )
-    except Exception as e:
+    except Exception:
         # Fallback if tool calling or something else fails
         try:
             ai_text = await provider.generate_response(
-                messages=messages,
-                system_prompt=final_system_prompt,
-                user_id=user_id
+                messages=messages, system_prompt=final_system_prompt, user_id=user_id
             )
         except Exception:
             ai_text = "I'm here for you. What's on your mind?"
-            
+
     # Simple naive tool call parsing since we don't have full ToolCall handling in the base interface for simplicity
     # If the AI hallucinates a tool call as text, we try to catch it or just provide the text.
-    
+
     return CoachMessageResponse(
         id=uuid.uuid4(),
         session_id=session.id,

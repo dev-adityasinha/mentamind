@@ -7,11 +7,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.models.comment import Comment
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func, Enum
+import enum
+
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-import enum
 
 
 class PostCategory(enum.StrEnum):
@@ -49,10 +50,10 @@ class Post(Base):
     comments: Mapped[list[Comment]] = relationship(
         "Comment", back_populates="post", cascade="all, delete-orphan"
     )
-    tags: Mapped[list["PostTag"]] = relationship(
+    tags: Mapped[list[PostTag]] = relationship(
         "PostTag", back_populates="post", cascade="all, delete-orphan"
     )
-    moods: Mapped[list["PostMood"]] = relationship(
+    moods: Mapped[list[PostMood]] = relationship(
         "PostMood", back_populates="post", cascade="all, delete-orphan"
     )
 

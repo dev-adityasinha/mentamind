@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.models.post import PostCategory
+
 
 class CommentBase(BaseModel):
     content: str = Field(..., min_length=1, max_length=2000)
@@ -24,14 +26,13 @@ class CommentResponse(CommentBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-from app.models.post import PostCategory
-
 class PostBase(BaseModel):
     content: str = Field(..., min_length=1, max_length=5000)
     category: PostCategory = Field(default=PostCategory.GENERAL)
     is_anonymous: bool = Field(default=False)
     tags: list[str] = Field(default_factory=list, max_length=10)
     moods: list[str] = Field(default_factory=list, max_length=5)
+
 
 class PostCreateRequest(PostBase):
     pass
@@ -46,7 +47,6 @@ class PostResponse(PostBase):
     reply_count: int
     created_at: datetime
     updated_at: datetime
-
 
     model_config = ConfigDict(from_attributes=True)
 

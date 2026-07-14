@@ -2,25 +2,25 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import desc, select, or_
-from sqlalchemy.orm import selectinload
+from sqlalchemy import desc, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.comment import Comment
-from app.models.post import Post, PostLike, PostTag, PostMood, PostCategory
+from app.models.notification_event import NotificationCategory, NotificationEvent
+from app.models.post import Post, PostCategory, PostLike, PostMood, PostTag
 from app.models.report import ContentReport
 from app.models.user import User
-from app.models.notification_event import NotificationEvent, NotificationCategory
 from app.schemas.forum import (
     CommentCreateRequest,
     CommentResponse,
     ContentReportCreateRequest,
     ContentReportResponse,
     PostCreateRequest,
-    PostResponse,
     PostReportRequest,
+    PostResponse,
 )
 
 router = APIRouter(prefix="/forum", tags=["forum"])
@@ -36,13 +36,15 @@ async def get_posts(
     search: str | None = Query(None, description="Search query"),
     sort: str = Query("recent", description="Sort by 'recent' or 'trending'"),
 ):
-    query = select(Post).options(
-        selectinload(Post.tags), selectinload(Post.moods)
-    ).where(Post.org_id == current_user.org_id)
+    query = (
+        select(Post)
+        .options(selectinload(Post.tags), selectinload(Post.moods))
+        .where(Post.org_id == current_user.org_id)
+    )
 
     if category:
         query = query.where(Post.category == category)
-        
+
     if search:
         query = query.where(Post.content.ilike(f"%{search}%"))
 
@@ -53,7 +55,8 @@ async def get_posts(
                 query = query.where(
                     or_(
                         Post.likes < cursor_post.likes,
-                        (Post.likes == cursor_post.likes) & (Post.created_at < cursor_post.created_at)
+                        (Post.likes == cursor_post.likes)
+                        & (Post.created_at < cursor_post.created_at),
                     )
                 )
             else:
@@ -63,7 +66,7 @@ async def get_posts(
         query = query.order_by(desc(Post.likes), desc(Post.created_at)).limit(limit)
     else:
         query = query.order_by(desc(Post.created_at)).limit(limit)
-        
+
     result = await db.execute(query)
     posts = result.scalars().all()
 
@@ -73,7 +76,7 @@ async def get_posts(
         is_mine = post.author_id == current_user.id
         if post.is_anonymous:
             post.author_id = None
-        
+
         # Build PostResponse manually due to the lists
         resp = PostResponse.model_validate(post)
         resp.tags = [t.tag for t in post.tags]
@@ -99,10 +102,10 @@ async def create_post(
         category=body.category,
         is_anonymous=body.is_anonymous,
     )
-    
+
     for tag in body.tags:
         post.tags.append(PostTag(tag=tag))
-        
+
     for mood in body.moods:
         post.moods.append(PostMood(mood=mood))
 
@@ -110,7 +113,13 @@ async def create_post(
     await db.commit()
     await db.refresh(post)
     # Eager load tags/moods for the response
-    post = (await db.execute(select(Post).options(selectinload(Post.tags), selectinload(Post.moods)).where(Post.id == post.id))).scalar_one()
+    post = (
+        await db.execute(
+            select(Post)
+            .options(selectinload(Post.tags), selectinload(Post.moods))
+            .where(Post.id == post.id)
+        )
+    ).scalar_one()
 
     is_mine = post.author_id == current_user.id
     if post.is_anonymous:
@@ -162,9 +171,11 @@ async def delete_post(
     post = await db.get(Post, post_id)
     if not post or post.org_id != current_user.org_id:
         raise HTTPException(status_code=404, detail="Post not found")
-        
+
     if post.author_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You can only delete your own posts")
+        raise HTTPException(
+            status_code=403, detail="You can only delete your own posts"
+        )
 
     await db.delete(post)
     await db.commit()
@@ -220,7 +231,7 @@ async def create_comment(
     )
     db.add(comment)
     post.reply_count += 1
-    
+
     # Trigger notification for the post author if they are not anonymous and it's someone else commenting
     if post.author_id and post.author_id != current_user.id and not post.is_anonymous:
         notif = NotificationEvent(
@@ -231,7 +242,7 @@ async def create_comment(
             body_encrypted="Someone replied to your community post.",
         )
         db.add(notif)
-        
+
     await db.commit()
     await db.refresh(comment)
 

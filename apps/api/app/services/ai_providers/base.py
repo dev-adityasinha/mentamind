@@ -1,6 +1,7 @@
-from abc import ABC, abstractmethod
 import uuid
+from abc import ABC, abstractmethod
 from typing import Any
+
 
 class AIProviderAdapter(ABC):
     @abstractmethod
@@ -9,7 +10,7 @@ class AIProviderAdapter(ABC):
         messages: list[dict],
         system_prompt: str,
         user_id: uuid.UUID,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> str:
         """
         Generate a response from the AI provider.
