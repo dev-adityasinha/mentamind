@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 
 from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -34,6 +35,14 @@ class UserSettings(Base):
     audio_voice_volume: Mapped[float] = mapped_column(default=0.8, nullable=False)
     language: Mapped[str] = mapped_column(String(10), default="en", nullable=False)
     timezone: Mapped[str] = mapped_column(String(50), default="UTC", nullable=False)
+
+    # Profile fields
+    age: Mapped[int | None] = mapped_column(nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    country: Mapped[str | None] = mapped_column(String(2), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    mental_health_goals: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
