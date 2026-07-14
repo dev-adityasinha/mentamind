@@ -9,6 +9,10 @@ class AdminStatsResponse(BaseModel):
     total_posts: int
     active_reports: int
     total_ai_sessions: int
+    total_assessments: int = 0
+    total_meditation_minutes: int = 0
+    daily_registrations: int = 0
+    mood_tracking_stats: dict[str, int] = {}
 
 
 class AdminReportResponse(BaseModel):

@@ -24,11 +24,14 @@ class CommentResponse(CommentBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+from app.models.post import PostCategory
+
 class PostBase(BaseModel):
     content: str = Field(..., min_length=1, max_length=5000)
-    category: str = Field(default="general")
+    category: PostCategory = Field(default=PostCategory.GENERAL)
     is_anonymous: bool = Field(default=False)
-
+    tags: list[str] = Field(default_factory=list, max_length=10)
+    moods: list[str] = Field(default_factory=list, max_length=5)
 
 class PostCreateRequest(PostBase):
     pass
@@ -38,10 +41,12 @@ class PostResponse(PostBase):
     id: UUID
     author_id: UUID | None = None  # None if anonymous
     org_id: UUID
+    is_mine: bool = False
     likes: int
     reply_count: int
     created_at: datetime
     updated_at: datetime
+
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -49,6 +54,10 @@ class PostResponse(PostBase):
 class ContentReportCreateRequest(BaseModel):
     target_type: str = Field(..., pattern="^(post|comment)$")
     target_id: UUID
+    reason: str = Field(..., min_length=1, max_length=1024)
+
+
+class PostReportRequest(BaseModel):
     reason: str = Field(..., min_length=1, max_length=1024)
 
 

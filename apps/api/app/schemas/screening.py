@@ -17,6 +17,8 @@ class ScreeningResultResponse(BaseModel):
     test_id: str
     score: int
     severity: str | None
+    insights: str | None = None
+    next_steps: str | None = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

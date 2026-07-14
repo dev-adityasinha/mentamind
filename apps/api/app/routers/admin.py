@@ -12,7 +12,10 @@ from app.models.ai_coach import AiCoachSession
 from app.models.comment import Comment
 from app.models.post import Post
 from app.models.report import ContentReport
+from app.models.test_score import TestScore
+from app.models.meditation import MeditationHistory
 from app.models.user import User, UserRole
+from app.models.mood_log import MoodLog
 from app.schemas.admin import (
     AdminReportResponse,
     AdminReportStatusUpdateRequest,
@@ -54,11 +57,36 @@ async def get_admin_stats(
     ai_sessions_result = await db.execute(select(func.count(AiCoachSession.id)))
     total_ai_sessions = ai_sessions_result.scalar() or 0
 
+    # Get total assessments
+    assessments_result = await db.execute(select(func.count(TestScore.id)))
+    total_assessments = assessments_result.scalar() or 0
+
+    # Get total meditation minutes
+    meditation_result = await db.execute(select(func.sum(MeditationHistory.duration_minutes)))
+    total_meditation_minutes = meditation_result.scalar() or 0
+
+    # Get daily registrations
+    start_of_day = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    daily_reg_result = await db.execute(
+        select(func.count(User.id)).where(User.created_at >= start_of_day)
+    )
+    daily_registrations = daily_reg_result.scalar() or 0
+
+    # Get mood tracking stats (count of logs per primary mood)
+    mood_result = await db.execute(
+        select(MoodLog.primary_mood, func.count(MoodLog.id)).group_by(MoodLog.primary_mood)
+    )
+    mood_tracking_stats = {row[0]: row[1] for row in mood_result.all()}
+
     return AdminStatsResponse(
         total_users=total_users,
         total_posts=total_posts,
         active_reports=active_reports,
         total_ai_sessions=total_ai_sessions,
+        total_assessments=total_assessments,
+        total_meditation_minutes=total_meditation_minutes,
+        daily_registrations=daily_registrations,
+        mood_tracking_stats=mood_tracking_stats,
     )
 
 

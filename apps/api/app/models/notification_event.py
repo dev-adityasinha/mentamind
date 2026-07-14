@@ -26,6 +26,7 @@ class NotificationCategory(StrEnum):
     JOURNAL_PROMPT = "journal_prompt"
     COACH_SESSION = "coach_session"
     STREAK_MILESTONE = "streak_milestone"
+    COMMUNITY_REPLY = "community_reply"
 
 
 class NotificationChannel(StrEnum):
@@ -46,6 +47,7 @@ CATEGORY_RATE_CAP: dict[NotificationCategory, int] = {
     NotificationCategory.JOURNAL_PROMPT: 1,
     NotificationCategory.COACH_SESSION: 2,
     NotificationCategory.STREAK_MILESTONE: 1,
+    NotificationCategory.COMMUNITY_REPLY: 20,
 }
 
 
@@ -56,7 +58,7 @@ class NotificationEvent(Base):
         CheckConstraint(
             "category IN ('checkin_reminder', 'burnout_alert', "
             "'appointment_reminder', 'wellness_tip', 'consent_update', "
-            "'journal_prompt', 'coach_session', 'streak_milestone')",
+            "'journal_prompt', 'coach_session', 'streak_milestone', 'community_reply')",
             name="ck_notification_events_category",
         ),
         Index("ix_notification_events_user_id", "user_id"),

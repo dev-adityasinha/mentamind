@@ -121,6 +121,7 @@ async def send_coach_message(
         user_id=current_user.id,
         user_message_content=request.content,
         db_messages=prev_messages[:-1],
+        db=db,
     )
 
     ai_content_encrypted = encrypt(ai_response.content or "", current_user.id.bytes)
