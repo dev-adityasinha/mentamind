@@ -1,8 +1,14 @@
+from __future__ import annotations
+
 import uuid
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+if TYPE_CHECKING:
+    from app.models.comment import Comment
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -20,6 +26,14 @@ class Post(Base):
     )
     likes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     reply_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    category: Mapped[str] = mapped_column(String(32), nullable=False, default="general")
+    is_anonymous: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Relationships
+    comments: Mapped[list[Comment]] = relationship(
+        "Comment", back_populates="post", cascade="all, delete-orphan"
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
