@@ -107,3 +107,39 @@ def generate_invite_token() -> tuple[str, str]:
     """
     raw = secrets.token_urlsafe(32)
     return raw, hash_token(raw)
+
+
+def create_verification_token(email: str) -> str:
+    expire = datetime.now(UTC) + timedelta(hours=24)
+    payload = {"sub": email, "exp": expire, "type": "verify_email"}
+    return jwt.encode(
+        payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
+    )
+
+
+def decode_verification_token(token: str) -> str:
+    """Decode and validate a verification token. Returns email. Raises JWTError if invalid."""
+    payload = jwt.decode(
+        token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
+    )
+    if payload.get("type") != "verify_email":
+        raise JWTError("Not a verification token")
+    return payload.get("sub")
+
+
+def create_password_reset_token(email: str) -> str:
+    expire = datetime.now(UTC) + timedelta(hours=1)
+    payload = {"sub": email, "exp": expire, "type": "password_reset"}
+    return jwt.encode(
+        payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
+    )
+
+
+def decode_password_reset_token(token: str) -> str:
+    """Decode and validate a password reset token. Returns email. Raises JWTError if invalid."""
+    payload = jwt.decode(
+        token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
+    )
+    if payload.get("type") != "password_reset":
+        raise JWTError("Not a password reset token")
+    return payload.get("sub")

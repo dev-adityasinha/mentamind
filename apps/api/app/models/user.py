@@ -19,6 +19,8 @@ class UserRole(StrEnum):
     ADMIN = "admin"
     COUNSELOR = "counselor"
     STUDENT = "student"
+    MODERATOR = "moderator"
+    THERAPIST = "therapist"
 
 
 class User(Base):

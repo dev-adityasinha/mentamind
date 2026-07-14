@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies.auth import get_current_user, require_ghost_user
-from app.models.organization import Organization
+from app.models.organization import Organization, DataResidencyRegion
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserRole
 from app.schemas.auth import (
@@ -17,6 +17,10 @@ from app.schemas.auth import (
     LoginRequest,
     RefreshRequest,
     RegisterOrganizationRequest,
+    RegisterRequest,
+    VerifyEmailRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
     SpawnGhostResponse,
     TokenResponse,
 )
@@ -27,8 +31,14 @@ from app.services.auth_service import (
     hash_password,
     hash_token,
     verify_password,
+    create_verification_token,
+    decode_verification_token,
+    create_password_reset_token,
+    decode_password_reset_token,
 )
+from app.services.email import send_verification_email, send_password_reset_email
 from app.settings import settings
+from jose import JWTError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -163,6 +173,113 @@ async def register_organization(
     await db.commit()
 
     return TokenResponse(access_token=access_token, refresh_token=raw_refresh)
+
+
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register_user(
+    body: RegisterRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    email_hash = hash_email(body.email)
+    existing = await db.execute(select(User).where(User.email_hash == email_hash))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status.HTTP_409_CONFLICT, "Email already registered")
+
+    org_id = None
+    if body.org_id:
+        try:
+            org_id = uuid.UUID(body.org_id)
+        except ValueError:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid organization ID")
+        org = await db.get(Organization, org_id)
+        if not org:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Organization not found")
+    else:
+        # Create a personal organization for the user
+        org = Organization(
+            name=f"{body.display_name.strip()}'s Organization",
+            data_residency_region=DataResidencyRegion.IN
+        )
+        db.add(org)
+        await db.flush()
+        org_id = org.id
+
+    user = User(
+        org_id=org_id,
+        email_hash=email_hash,
+        display_name=body.display_name.strip(),
+        role=UserRole.EMPLOYEE,
+        password_hash=hash_password(body.password),
+        consent_analytics=False,
+        consent_ai_coaching=False,
+    )
+    db.add(user)
+    await db.commit()
+
+    import asyncio
+    token = create_verification_token(body.email)
+    asyncio.create_task(send_verification_email(body.email, token))
+
+    return {"message": "User created. Please check your email to verify."}
+
+
+@router.post("/verify-email", status_code=status.HTTP_200_OK)
+async def verify_email(
+    body: VerifyEmailRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    try:
+        email = decode_verification_token(body.token)
+    except JWTError:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid or expired token")
+
+    email_hash = hash_email(email)
+    result = await db.execute(select(User).where(User.email_hash == email_hash))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
+
+    # In a real app we might update an `is_verified` flag here
+    return {"message": "Email verified successfully"}
+
+
+@router.post("/forgot-password", status_code=status.HTTP_200_OK)
+async def forgot_password(
+    body: ForgotPasswordRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    email_hash = hash_email(body.email)
+    result = await db.execute(select(User).where(User.email_hash == email_hash))
+    user = result.scalar_one_or_none()
+    if user:
+        import asyncio
+        token = create_password_reset_token(body.email)
+        asyncio.create_task(send_password_reset_email(body.email, token))
+    
+    # Always return a generic message to prevent email enumeration
+    return {"message": "If an account exists, a password reset link has been sent."}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+async def reset_password(
+    body: ResetPasswordRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> dict:
+    try:
+        email = decode_password_reset_token(body.token)
+    except JWTError:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Invalid or expired token")
+
+    email_hash = hash_email(email)
+    result = await db.execute(select(User).where(User.email_hash == email_hash))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
+
+    user.password_hash = hash_password(body.new_password)
+    await db.commit()
+
+    return {"message": "Password updated successfully"}
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
