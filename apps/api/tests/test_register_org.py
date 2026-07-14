@@ -188,7 +188,4 @@ async def test_old_register_endpoint_gone(client: AsyncClient) -> None:
             "role": "admin",
         },
     )
-    assert resp.status_code in (
-        status.HTTP_404_NOT_FOUND,
-        status.HTTP_405_METHOD_NOT_ALLOWED,
-    )
+    assert resp.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

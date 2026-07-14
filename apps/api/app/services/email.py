@@ -43,7 +43,9 @@ async def send_invitation_email(to_email: str, token: str, role: str) -> None:
             """,
             }
         )
-        logger.info(f"Invitation email sent to {to_email}. Resend ID: {r.get('id')}")
+        logger.info(
+            f"Invitation email sent to {to_email}. " f"Resend ID: {r.get('id')}"
+        )
     except Exception as e:
         logger.error(f"Failed to send email to {to_email}: {e}")
 
@@ -97,12 +99,16 @@ async def send_password_reset_email(to_email: str, token: str) -> None:
                 "subject": "Reset your Mentamind password",
                 "html": f"""
             <h2>Password Reset Request</h2>
-            <p>We received a request to reset your password. Click the link below to set a new one:</p>
+            <p>We received a request to reset your password.
+            Click the link below to set a new one:</p>
             <p><a href="{reset_url}">{reset_url}</a></p>
-            <p>This link will expire in 1 hour. If you did not request this, please ignore this email.</p>
+            <p>This link will expire in 1 hour.
+            If you did not request this, please ignore this email.</p>
             """,
             }
         )
-        logger.info(f"Password reset email sent to {to_email}. Resend ID: {r.get('id')}")
+        logger.info(
+            f"Password reset email sent to {to_email}. Resend ID: {r.get('id')}"
+        )
     except Exception as e:
         logger.error(f"Failed to send password reset email to {to_email}: {e}")

@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies.auth import get_current_user, require_roles
 from app.models.user import User, UserRole
-from app.schemas.user import UserResponse
+from app.models.user_settings import UserSettings
+from app.schemas.user import UserProfileResponse, UserProfileUpdateRequest, UserResponse
 
 router = APIRouter(tags=["users"])
 
@@ -17,19 +18,16 @@ async def get_me(current_user: Annotated[User, Depends(get_current_user)]) -> Us
     return current_user
 
 
-from app.models.user_settings import UserSettings
-from app.schemas.user import UserProfileResponse, UserProfileUpdateRequest
-from fastapi import HTTPException, status
-
-
 @router.get("/me/profile", response_model=UserProfileResponse)
 async def get_my_profile(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
-    result = await db.execute(select(UserSettings).where(UserSettings.user_id == current_user.id))
+    result = await db.execute(
+        select(UserSettings).where(UserSettings.user_id == current_user.id)
+    )
     settings = result.scalar_one_or_none()
-    
+
     return {
         "id": current_user.id,
         "display_name": current_user.display_name,
@@ -51,9 +49,11 @@ async def update_my_profile(
         current_user.display_name = body.display_name.strip()
         db.add(current_user)
 
-    result = await db.execute(select(UserSettings).where(UserSettings.user_id == current_user.id))
+    result = await db.execute(
+        select(UserSettings).where(UserSettings.user_id == current_user.id)
+    )
     settings = result.scalar_one_or_none()
-    
+
     if not settings:
         settings = UserSettings(user_id=current_user.id)
         db.add(settings)

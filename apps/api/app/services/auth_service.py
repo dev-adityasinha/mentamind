@@ -118,7 +118,9 @@ def create_verification_token(email: str) -> str:
 
 
 def decode_verification_token(token: str) -> str:
-    """Decode and validate a verification token. Returns email. Raises JWTError if invalid."""
+    """Decode and validate a verification token.
+    Returns email. Raises JWTError if invalid.
+    """
     payload = jwt.decode(
         token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
     )
@@ -136,7 +138,9 @@ def create_password_reset_token(email: str) -> str:
 
 
 def decode_password_reset_token(token: str) -> str:
-    """Decode and validate a password reset token. Returns email. Raises JWTError if invalid."""
+    """Decode and validate a password reset token.
+    Returns email. Raises JWTError if invalid.
+    """
     payload = jwt.decode(
         token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
     )

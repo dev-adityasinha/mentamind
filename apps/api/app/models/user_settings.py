@@ -41,7 +41,9 @@ class UserSettings(Base):
     gender: Mapped[str | None] = mapped_column(String(50), nullable=True)
     country: Mapped[str | None] = mapped_column(String(2), nullable=True)
     avatar_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
-    mental_health_goals: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    mental_health_goals: Mapped[list[str]] = mapped_column(
+        JSONB, nullable=False, default=list
+    )
 
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
