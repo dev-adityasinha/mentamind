@@ -83,7 +83,7 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
                 band: scoreResult.band,
             });
         }
-    }, [currentIndex, answers, clear, testId, testData, scorer]);
+    }, [currentIndex, answers, clear, testId, testData, scorer, addEntry]);
 
     const handlePrevious = useCallback(() => {
         if (currentIndex > 0) {

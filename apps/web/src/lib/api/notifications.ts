@@ -1,4 +1,4 @@
-import { client } from "./client";
+import { apiFetch } from "./client";
 
 export interface NotificationResponse {
   id: string;
@@ -14,18 +14,21 @@ export async function fetchNotifications(
   unreadOnly: boolean = false,
   limit: number = 20
 ): Promise<NotificationResponse[]> {
-  const response = await client.get("/me/notifications", {
-    params: {
-      unread_only: unreadOnly,
-      limit,
-    },
-  });
-  return response.data;
+  const query = new URLSearchParams({
+    unread_only: unreadOnly.toString(),
+    limit: limit.toString(),
+  }).toString();
+  const response = await apiFetch(`/me/notifications?${query}`);
+  if (!response.ok) throw new Error("Failed to fetch notifications");
+  return response.json();
 }
 
 export async function markNotificationRead(
   notificationId: string
 ): Promise<NotificationResponse> {
-  const response = await client.post(`/me/notifications/${notificationId}/read`);
-  return response.data;
+  const response = await apiFetch(`/me/notifications/${notificationId}/read`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error("Failed to mark notification read");
+  return response.json();
 }
