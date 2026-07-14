@@ -1,0 +1,268 @@
+{
+  "id": "mood-mdq",
+  "title": "Mood Pattern Screening",
+  "shortTitle": "MDQ",
+  "description": "FLAG-ONLY screening for bipolar-spectrum mood patterns. Uses three-criteria logic: \u22657 Yes in Section 1, clustering (Q14=Yes), and functional impact (Q15\u22652).",
+  "timeFrame": "At any time in your life",
+  "totalQuestions": 15,
+  "questions": [
+    {
+      "id": "q1",
+      "section": 1,
+      "text": "Have you had periods of unusually elevated mood?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "section": 1,
+      "text": "Have you had periods of unusual irritability?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "section": 1,
+      "text": "Have you felt much more confident than usual?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "section": 1,
+      "text": "Have you needed much less sleep than usual?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "section": 1,
+      "text": "Have you talked much more or faster than usual?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "section": 1,
+      "text": "Have your thoughts raced?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "section": 1,
+      "text": "Have you been easily distracted?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "section": 1,
+      "text": "Have you had much more energy than usual?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "section": 1,
+      "text": "Have you been unusually social or goal-driven?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "section": 1,
+      "text": "Have you done risky or out-of-character things?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "section": 1,
+      "text": "Have you had increased desire for pleasurable activities?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "section": 1,
+      "text": "Have you felt unusually creative or flooded with ideas?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "section": 1,
+      "text": "Have others noticed you were not your usual self?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "section": 2,
+      "text": "Did several of these experiences happen during the same period?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "section": 3,
+      "text": "How much did these experiences affect your life?",
+      "options": [
+        {
+          "value": 0,
+          "label": "No problems"
+        },
+        {
+          "value": 1,
+          "label": "Minor problems"
+        },
+        {
+          "value": 2,
+          "label": "Moderate problems"
+        },
+        {
+          "value": 3,
+          "label": "Serious problems"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "rule_based",
+    "positiveScreen": {
+      "condition1": "Section 1 (Q1-Q13) \u2265 7 Yes responses",
+      "condition2": "Q14 = Yes (symptoms clustered)",
+      "condition3": "Q15 \u2265 2 (moderate or serious impact)",
+      "allRequired": true
+    },
+    "maxScore": 13
+  },
+  "bands": [
+    {
+      "label": "Negative screen",
+      "description": "Bipolar-spectrum traits unlikely"
+    },
+    {
+      "label": "Positive screen",
+      "description": "Bipolar-spectrum traits possible \u2014 refer for evaluation"
+    }
+  ],
+  "safetyNotes": [
+    "NEVER say 'You have bipolar disorder' or 'You are bipolar'.",
+    "Use: 'Your responses show patterns sometimes seen in bipolar-spectrum mood changes.'",
+    "This is a FLAG-ONLY tool \u2014 NOT a diagnosis."
+  ]
+}

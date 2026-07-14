@@ -1,0 +1,409 @@
+{
+  "id": "erq",
+  "title": "Emotion Regulation",
+  "shortTitle": "ERQ",
+  "description": "Measures two emotion regulation strategies: Cognitive Reappraisal and Expressive Suppression. Scores are averaged per subscale.",
+  "timeFrame": "How you generally feel",
+  "totalQuestions": 10,
+  "responseScale": {
+    "min": 1,
+    "max": 7
+  },
+  "subscales": [
+    {
+      "id": "cognitive_reappraisal",
+      "label": "Cognitive Reappraisal",
+      "items": [
+        1,
+        3,
+        5,
+        7,
+        8,
+        10
+      ]
+    },
+    {
+      "id": "expressive_suppression",
+      "label": "Expressive Suppression",
+      "items": [
+        2,
+        4,
+        6,
+        9
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "cognitive_reappraisal",
+      "text": "When I want to feel more positive emotion, I change what I'm thinking about",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "expressive_suppression",
+      "text": "I keep my emotions to myself",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "cognitive_reappraisal",
+      "text": "When I want to feel less negative emotion, I change what I'm thinking about",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "expressive_suppression",
+      "text": "When I am feeling positive emotions, I am careful not to express them",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "cognitive_reappraisal",
+      "text": "When I'm faced with a stressful situation, I make myself think about it in a way that helps me stay calm",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "expressive_suppression",
+      "text": "I control my emotions by not expressing them",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "cognitive_reappraisal",
+      "text": "When I want to feel more positive emotion, I change the way I'm thinking about the situation",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "cognitive_reappraisal",
+      "text": "I control my emotions by changing the way I think about the situation I'm in",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "expressive_suppression",
+      "text": "When I am feeling negative emotions, I make sure not to express them",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "cognitive_reappraisal",
+      "text": "When I want to feel less negative emotion, I change the way I'm thinking about the situation",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Slightly disagree"
+        },
+        {
+          "value": 4,
+          "label": "Neutral"
+        },
+        {
+          "value": 5,
+          "label": "Slightly agree"
+        },
+        {
+          "value": 6,
+          "label": "Agree"
+        },
+        {
+          "value": 7,
+          "label": "Strongly agree"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "average_by_subscale",
+    "subscaleRange": [
+      1,
+      7
+    ],
+    "maxScore": 70
+  },
+  "interpretation": {
+    "cognitive_reappraisal": {
+      "high": "Strong use of cognitive reappraisal \u2014 healthy regulation.",
+      "low": "Low reappraisal use \u2014 may benefit from CBT-based techniques."
+    },
+    "expressive_suppression": {
+      "high": "High suppression \u2014 associated with lower well-being.",
+      "low": "Low suppression \u2014 healthy emotional expression."
+    }
+  },
+  "safetyNotes": [
+    "Personality/regulation measure, not a clinical screener."
+  ]
+}

@@ -1,0 +1,216 @@
+{
+  "id": "cognitive",
+  "title": "Cognitive Screening",
+  "shortTitle": "MoCA",
+  "description": "Screens for possible cognitive difficulties across attention, executive function, memory, language, and orientation. Q7 (delayed recall) scores 0-5 points.",
+  "timeFrame": "Right now / today",
+  "totalQuestions": 11,
+  "questions": [
+    {
+      "id": "q1",
+      "section": "attention",
+      "text": "Sustained attention \u2014 repeat the sequence 7-2-9-4",
+      "options": [
+        {
+          "value": 1,
+          "label": "Repeated correctly"
+        },
+        {
+          "value": 0,
+          "label": "Could not repeat"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "section": "attention",
+      "text": "Mental focus \u2014 repeat 5-1-8 in reverse order (8-1-5)",
+      "options": [
+        {
+          "value": 1,
+          "label": "Reversed correctly"
+        },
+        {
+          "value": 0,
+          "label": "Could not reverse"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "section": "attention",
+      "text": "Selective attention \u2014 count letter A in F-A-B-C-A-D-E-A-G",
+      "options": [
+        {
+          "value": 1,
+          "label": "Correct (3 times)"
+        },
+        {
+          "value": 0,
+          "label": "Incorrect"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "section": "executive",
+      "text": "Category switching \u2014 Dog\u2192Cat\u2192Dog\u2192Cat\u2192?",
+      "options": [
+        {
+          "value": 1,
+          "label": "Dog (correct)"
+        },
+        {
+          "value": 0,
+          "label": "Other answer"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "section": "executive",
+      "text": "Logical sequencing \u2014 2\u21924\u21926\u21928\u2192?",
+      "options": [
+        {
+          "value": 1,
+          "label": "10 (correct)"
+        },
+        {
+          "value": 0,
+          "label": "Other answer"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "section": "memory",
+      "text": "Word learning: Apple\u2013Chair\u2013River\u2013Train\u2013Coin (no score, for later recall)",
+      "scoreable": false
+    },
+    {
+      "id": "q7",
+      "section": "memory",
+      "text": "Delayed recall \u2014 select remembered words from: Apple, Chair, River, Train, Coin, Book, Phone",
+      "maxScore": 5,
+      "options": [
+        {
+          "value": 0,
+          "label": "0 correct"
+        },
+        {
+          "value": 1,
+          "label": "1 correct"
+        },
+        {
+          "value": 2,
+          "label": "2 correct"
+        },
+        {
+          "value": 3,
+          "label": "3 correct"
+        },
+        {
+          "value": 4,
+          "label": "4 correct"
+        },
+        {
+          "value": 5,
+          "label": "5 correct"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "section": "language",
+      "text": "Object understanding \u2014 what word describes both a bicycle and a car?",
+      "options": [
+        {
+          "value": 1,
+          "label": "Vehicle (correct)"
+        },
+        {
+          "value": 0,
+          "label": "Other answer"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "section": "language",
+      "text": "Sentence comprehension \u2014 which sentence makes sense?",
+      "options": [
+        {
+          "value": 1,
+          "label": "'The child drank water because they were thirsty' (correct)"
+        },
+        {
+          "value": 0,
+          "label": "Other sentence"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "section": "orientation",
+      "text": "Date awareness \u2014 what is today's date?",
+      "options": [
+        {
+          "value": 1,
+          "label": "Answered correctly"
+        },
+        {
+          "value": 0,
+          "label": "Incorrect or unsure"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "section": "orientation",
+      "text": "Place awareness \u2014 where are you right now?",
+      "options": [
+        {
+          "value": 1,
+          "label": "Identified correctly"
+        },
+        {
+          "value": 0,
+          "label": "Could not identify"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 12,
+    "note": "Q6 is not scored. Q7 has max 5 points."
+  },
+  "bands": [
+    {
+      "label": "No significant difficulty",
+      "min": 10,
+      "max": 12
+    },
+    {
+      "label": "Mild cognitive difficulty",
+      "min": 7,
+      "max": 9
+    },
+    {
+      "label": "Possible cognitive concern",
+      "min": 0,
+      "max": 6
+    }
+  ],
+  "recommendedActions": {
+    "No significant difficulty": "No concerns.",
+    "Mild cognitive difficulty": "Monitor. May relate to stress, sleep, or depression.",
+    "Possible cognitive concern": "Professional assessment recommended."
+  },
+  "safetyNotes": [
+    "NEVER say 'cognitive impairment', 'dementia', or any disease name.",
+    "Use: 'Your responses suggest possible difficulty with attention or memory. This is only a screening result.'",
+    "Screening only \u2014 NOT a diagnosis."
+  ]
+}

@@ -1,0 +1,429 @@
+{
+  "id": "psqi",
+  "title": "Sleep Quality",
+  "shortTitle": "PSQI",
+  "description": "Measures sleep quality and disturbances over the past month across 7 components. Global PSQI > 5 indicates poor sleep quality.",
+  "timeFrame": "Over the last 1 month",
+  "totalQuestions": 14,
+  "questions": [
+    {
+      "id": "q1",
+      "component": "timing",
+      "text": "What time did you usually go to bed?",
+      "inputType": "time",
+      "scoreable": false
+    },
+    {
+      "id": "q2",
+      "component": "sleep_latency",
+      "text": "How long did it usually take you to fall asleep?",
+      "options": [
+        {
+          "value": 0,
+          "label": "\u2264 15 minutes"
+        },
+        {
+          "value": 1,
+          "label": "16-30 minutes"
+        },
+        {
+          "value": 2,
+          "label": "31-60 minutes"
+        },
+        {
+          "value": 3,
+          "label": "> 60 minutes"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "component": "timing",
+      "text": "What time did you usually wake up?",
+      "inputType": "time",
+      "scoreable": false
+    },
+    {
+      "id": "q4",
+      "component": "sleep_duration",
+      "text": "How many hours of actual sleep did you get per night?",
+      "options": [
+        {
+          "value": 0,
+          "label": "> 7 hours"
+        },
+        {
+          "value": 1,
+          "label": "6-7 hours"
+        },
+        {
+          "value": 2,
+          "label": "5-6 hours"
+        },
+        {
+          "value": 3,
+          "label": "< 5 hours"
+        }
+      ]
+    },
+    {
+      "id": "q5a",
+      "component": "sleep_disturbances",
+      "text": "Difficulty falling asleep",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5b",
+      "component": "sleep_disturbances",
+      "text": "Waking up in the middle of the night",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5c",
+      "component": "sleep_disturbances",
+      "text": "Needing to use the bathroom at night",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5d",
+      "component": "sleep_disturbances",
+      "text": "Trouble breathing comfortably",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5e",
+      "component": "sleep_disturbances",
+      "text": "Coughing or snoring loudly",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5f",
+      "component": "sleep_disturbances",
+      "text": "Feeling too cold",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5g",
+      "component": "sleep_disturbances",
+      "text": "Feeling too hot",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5h",
+      "component": "sleep_disturbances",
+      "text": "Having bad dreams",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5i",
+      "component": "sleep_disturbances",
+      "text": "Experiencing pain that disturbed sleep",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q5j",
+      "component": "sleep_disturbances",
+      "text": "Other reasons (stress, phone use, etc.)",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "component": "sleep_medication",
+      "text": "How often did you use sleep medication?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "component": "daytime_dysfunction",
+      "text": "Trouble staying awake during daily activities",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not during the past month"
+        },
+        {
+          "value": 1,
+          "label": "Less than once a week"
+        },
+        {
+          "value": 2,
+          "label": "Once or twice a week"
+        },
+        {
+          "value": 3,
+          "label": "Three or more times a week"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "component": "daytime_dysfunction",
+      "text": "Difficulty maintaining enthusiasm or motivation",
+      "options": [
+        {
+          "value": 0,
+          "label": "No difficulty"
+        },
+        {
+          "value": 1,
+          "label": "Slight difficulty"
+        },
+        {
+          "value": 2,
+          "label": "Moderate difficulty"
+        },
+        {
+          "value": 3,
+          "label": "Severe difficulty"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "component": "subjective_quality",
+      "text": "Overall sleep quality rating",
+      "options": [
+        {
+          "value": 0,
+          "label": "Very good"
+        },
+        {
+          "value": 1,
+          "label": "Fairly good"
+        },
+        {
+          "value": 2,
+          "label": "Fairly bad"
+        },
+        {
+          "value": 3,
+          "label": "Very bad"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "component_based",
+    "components": {
+      "subjective_quality": "Q9",
+      "sleep_latency": "Q2 + Q5a (combined, capped 0-3)",
+      "sleep_duration": "Q4",
+      "sleep_disturbances": "Q5b-Q5j (sum, categorized 0-3)",
+      "sleep_medication": "Q6",
+      "daytime_dysfunction": "Q7 + Q8 (combined, capped 0-3)"
+    },
+    "globalRange": [
+      0,
+      21
+    ],
+    "note": "Sleep efficiency requires bedtime/wake time inputs (Q1, Q3) which are non-scored time entries \u2014 simplified for self-report.",
+    "maxScore": 21
+  },
+  "bands": [
+    {
+      "label": "Good sleep quality",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "label": "Poor sleep quality",
+      "min": 6,
+      "max": 21
+    }
+  ],
+  "recommendedActions": {
+    "Good sleep quality": "Normal sleep hygiene tips.",
+    "Poor sleep quality": "Sleep improvement plan. Screen for anxiety/depression if score > 10."
+  },
+  "safetyNotes": [
+    "Not a diagnosis of insomnia.",
+    "Sleep meds \u2265 2 \u2192 flag for clinician review."
+  ]
+}

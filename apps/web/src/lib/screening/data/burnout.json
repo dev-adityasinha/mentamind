@@ -1,0 +1,896 @@
+{
+  "id": "burnout",
+  "title": "Burnout Check",
+  "shortTitle": "MBI",
+  "description": "Measures burnout across three subscales: Emotional Exhaustion (EE), Depersonalization (DP), and Personal Accomplishment (PA). PA is reverse-interpreted (low PA = burnout).",
+  "timeFrame": "Over the last 6 months",
+  "totalQuestions": 22,
+  "responseScale": {
+    "min": 0,
+    "max": 6
+  },
+  "subscales": [
+    {
+      "id": "emotional_exhaustion",
+      "label": "Emotional Exhaustion (EE)",
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "depersonalization",
+      "label": "Depersonalization (DP)",
+      "items": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "id": "personal_accomplishment",
+      "label": "Personal Accomplishment (PA)",
+      "items": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "reverseInterpretation": true
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel emotionally drained from my work/studies",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel used up at the end of the day",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel tired when I get up in the morning and have to face another day",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "emotional_exhaustion",
+      "text": "Working with people all day is really a strain for me",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel burned out from my work/studies",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel frustrated by my work or study routine",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel I'm working too hard",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "emotional_exhaustion",
+      "text": "Working directly with people puts too much stress on me",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "emotional_exhaustion",
+      "text": "I feel like I'm at the end of my rope",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "depersonalization",
+      "text": "I feel I treat some people as if they were impersonal objects",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "subscale": "depersonalization",
+      "text": "I've become more callous toward people since I started this work/course",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "subscale": "depersonalization",
+      "text": "I worry that this work/study is hardening me emotionally",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "subscale": "depersonalization",
+      "text": "I don't really care what happens to some people",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "subscale": "depersonalization",
+      "text": "I feel others blame me for their problems",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "subscale": "personal_accomplishment",
+      "text": "I can easily understand how people feel about things",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "subscale": "personal_accomplishment",
+      "text": "I deal very effectively with the problems of others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "subscale": "personal_accomplishment",
+      "text": "I feel I am positively influencing people through my work",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "subscale": "personal_accomplishment",
+      "text": "I feel very energetic",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "subscale": "personal_accomplishment",
+      "text": "I can easily create a relaxed atmosphere",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "subscale": "personal_accomplishment",
+      "text": "I feel exhilarated after working closely with others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "subscale": "personal_accomplishment",
+      "text": "I have accomplished many worthwhile things in this work/studies",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "subscale": "personal_accomplishment",
+      "text": "I feel emotionally calm and composed at my work/study",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "A few times a year"
+        },
+        {
+          "value": 2,
+          "label": "Once a month"
+        },
+        {
+          "value": 3,
+          "label": "A few times a month"
+        },
+        {
+          "value": 4,
+          "label": "Once a week"
+        },
+        {
+          "value": 5,
+          "label": "A few times a week"
+        },
+        {
+          "value": 6,
+          "label": "Every day"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_by_subscale",
+    "emotional_exhaustion": {
+      "min": 0,
+      "max": 54
+    },
+    "depersonalization": {
+      "min": 0,
+      "max": 30
+    },
+    "personal_accomplishment": {
+      "min": 0,
+      "max": 48
+    },
+    "maxScore": 84
+  },
+  "interpretation": {
+    "emotional_exhaustion": {
+      "low": [
+        0,
+        16
+      ],
+      "moderate": [
+        17,
+        26
+      ],
+      "high": [
+        27,
+        54
+      ]
+    },
+    "depersonalization": {
+      "low": [
+        0,
+        6
+      ],
+      "moderate": [
+        7,
+        12
+      ],
+      "high": [
+        13,
+        30
+      ]
+    },
+    "personal_accomplishment": {
+      "high": [
+        0,
+        31
+      ],
+      "moderate": [
+        32,
+        38
+      ],
+      "low": [
+        39,
+        48
+      ]
+    }
+  },
+  "recommendedActions": {
+    "low_burnout": "Maintain current balance.",
+    "moderate_burnout": "Rest, lifestyle adjustments recommended.",
+    "high_burnout": "Urgent professional support. Mental health screening."
+  },
+  "safetyNotes": [
+    "PA is reverse-interpreted: LOW PA score = HIGH burnout.",
+    "Screening only."
+  ]
+}

@@ -1,0 +1,277 @@
+{
+  "id": "rses",
+  "title": "Self-Esteem Check",
+  "shortTitle": "RSES",
+  "description": "Measures global self-esteem. Items 6-10 are reverse-scored (3 - score).",
+  "timeFrame": "How you generally feel about yourself",
+  "totalQuestions": 10,
+  "responseScale": {
+    "min": 0,
+    "max": 3
+  },
+  "reverseScored": [
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "reverseMax": 3,
+  "questions": [
+    {
+      "id": "q1",
+      "text": "I feel that I am a person of worth, at least on an equal plane with others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "I feel that I have a number of good qualities",
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "All in all, I am inclined to feel that I am a failure",
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "I am able to do things as well as most other people",
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "I feel I do not have much to be proud of",
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "I take a positive attitude toward myself",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "On the whole, I am satisfied with myself",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "I wish I could have more respect for myself",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "text": "I certainly feel useless at times",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "text": "At times I think I am no good at all",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 1,
+          "label": "Disagree"
+        },
+        {
+          "value": 2,
+          "label": "Agree"
+        },
+        {
+          "value": 3,
+          "label": "Strongly agree"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_with_reverse",
+    "minScore": 0,
+    "maxScore": 30
+  },
+  "bands": [
+    {
+      "label": "Low self-esteem",
+      "min": 0,
+      "max": 14
+    },
+    {
+      "label": "Normal self-esteem",
+      "min": 15,
+      "max": 25
+    },
+    {
+      "label": "High self-esteem",
+      "min": 26,
+      "max": 30
+    }
+  ],
+  "recommendedActions": {
+    "Low self-esteem": "Professional support recommended. Explore self-compassion strategies.",
+    "Normal self-esteem": "Healthy range. Maintain current habits.",
+    "High self-esteem": "Strong self-esteem. No intervention needed."
+  },
+  "safetyNotes": [
+    "This is a self-perception measure, not a clinical screener."
+  ]
+}

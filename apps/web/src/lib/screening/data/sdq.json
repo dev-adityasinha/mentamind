@@ -1,0 +1,586 @@
+{
+  "id": "sdq",
+  "title": "Strengths & Difficulties",
+  "shortTitle": "SDQ",
+  "description": "Screens emotional, behavioral, and social difficulties in adolescents and young adults. Prosocial subscale (Q21-Q25) is scored separately as a strength.",
+  "timeFrame": "Over the last 6 months",
+  "totalQuestions": 25,
+  "responseScale": {
+    "min": 0,
+    "max": 2
+  },
+  "subscales": [
+    {
+      "id": "emotional",
+      "label": "Emotional Symptoms",
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "conduct",
+      "label": "Conduct Problems",
+      "items": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ]
+    },
+    {
+      "id": "hyperactivity",
+      "label": "Hyperactivity / Inattention",
+      "items": [
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "id": "peer_problems",
+      "label": "Peer Relationship Problems",
+      "items": [
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id": "prosocial",
+      "label": "Prosocial Strengths",
+      "items": [
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "isStrength": true
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "emotional",
+      "text": "I get frequent physical complaints when stressed",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "emotional",
+      "text": "I worry a lot",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "emotional",
+      "text": "I often feel unhappy or low",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "emotional",
+      "text": "I feel nervous in new situations",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "emotional",
+      "text": "I have many fears",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "conduct",
+      "text": "I often lose my temper",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "conduct",
+      "text": "I break rules",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "conduct",
+      "text": "I fight or act aggressively",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "conduct",
+      "text": "I lie or cheat",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "conduct",
+      "text": "I take things that are not mine",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "subscale": "hyperactivity",
+      "text": "I am restless",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "subscale": "hyperactivity",
+      "text": "I have trouble staying still",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "subscale": "hyperactivity",
+      "text": "I am easily distracted",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "subscale": "hyperactivity",
+      "text": "I have difficulty concentrating",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "subscale": "hyperactivity",
+      "text": "I act without thinking",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "subscale": "peer_problems",
+      "text": "I feel lonely",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "subscale": "peer_problems",
+      "text": "I am bullied or excluded",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "subscale": "peer_problems",
+      "text": "I find it hard to make friends",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "subscale": "peer_problems",
+      "text": "I prefer being alone",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "subscale": "peer_problems",
+      "text": "I get along better with adults than peers",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "subscale": "prosocial",
+      "text": "I am considerate of others' feelings",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "subscale": "prosocial",
+      "text": "I help others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q23",
+      "subscale": "prosocial",
+      "text": "I share with others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q24",
+      "subscale": "prosocial",
+      "text": "I am kind to younger or weaker people",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    },
+    {
+      "id": "q25",
+      "subscale": "prosocial",
+      "text": "I try to help when someone is upset",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not true"
+        },
+        {
+          "value": 1,
+          "label": "Somewhat true"
+        },
+        {
+          "value": 2,
+          "label": "Certainly true"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_by_subscale",
+    "totalDifficulties": "emotional + conduct + hyperactivity + peer_problems",
+    "totalDifficultiesRange": [
+      0,
+      40
+    ],
+    "prosocialRange": [
+      0,
+      10
+    ],
+    "maxScore": 40
+  },
+  "bands": [
+    {
+      "label": "Normal",
+      "min": 0,
+      "max": 13
+    },
+    {
+      "label": "Borderline",
+      "min": 14,
+      "max": 16
+    },
+    {
+      "label": "High difficulties",
+      "min": 17,
+      "max": 40
+    }
+  ],
+  "recommendedActions": {
+    "Normal": "No intervention needed.",
+    "Borderline": "Monitor. Supportive check-in.",
+    "High difficulties": "Professional screening recommended."
+  },
+  "safetyNotes": [
+    "Prosocial score is a STRENGTH indicator, not added to difficulties.",
+    "Screening only."
+  ]
+}

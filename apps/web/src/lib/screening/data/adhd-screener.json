@@ -1,0 +1,570 @@
+{
+  "id": "adhd-screener",
+  "title": "Attention & Focus",
+  "shortTitle": "ASRS",
+  "description": "Screens for ADHD symptoms. Part A (Q1-6) is the core screening; Part B (Q7-18) provides supplemental information.",
+  "timeFrame": "Over the last 6 months",
+  "totalQuestions": 18,
+  "responseScale": {
+    "min": 0,
+    "max": 4
+  },
+  "subscales": [
+    {
+      "id": "part_a",
+      "label": "Part A (Core Screening)",
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "part_b",
+      "label": "Part B (Supplemental)",
+      "items": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "part_a",
+      "text": "Difficulty wrapping up the final details of a project",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "part_a",
+      "text": "Difficulty getting things in order when doing a task",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "part_a",
+      "text": "Difficulty remembering appointments or obligations",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "part_a",
+      "text": "Avoiding or delaying getting started on tasks that require a lot of thought",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "part_a",
+      "text": "Fidgeting or squirming when sitting for a long time",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "part_a",
+      "text": "Feeling overly active or compelled to do things",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "part_b",
+      "text": "Making careless mistakes",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "part_b",
+      "text": "Difficulty keeping attention on tasks",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "part_b",
+      "text": "Difficulty concentrating on what people say",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "part_b",
+      "text": "Misplacing or having difficulty finding things",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "subscale": "part_b",
+      "text": "Being distracted by activity or noise around you",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "subscale": "part_b",
+      "text": "Leaving your seat during meetings or situations where you are expected to remain seated",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "subscale": "part_b",
+      "text": "Feeling restless or fidgety",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "subscale": "part_b",
+      "text": "Difficulty unwinding or relaxing during free time",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "subscale": "part_b",
+      "text": "Talking too much in social situations",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "subscale": "part_b",
+      "text": "Finishing other people's sentences",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "subscale": "part_b",
+      "text": "Difficulty waiting your turn",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "subscale": "part_b",
+      "text": "Interrupting others when they are busy",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Rarely"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 72,
+    "partAMax": 24
+  },
+  "bands": [
+    {
+      "label": "Unlikely ADHD",
+      "partARange": [
+        0,
+        9
+      ]
+    },
+    {
+      "label": "Possible ADHD",
+      "partARange": [
+        10,
+        16
+      ]
+    },
+    {
+      "label": "Likely ADHD",
+      "partARange": [
+        17,
+        24
+      ]
+    }
+  ],
+  "recommendedActions": {
+    "Unlikely ADHD": "No further action needed.",
+    "Possible ADHD": "Professional evaluation recommended.",
+    "Likely ADHD": "Professional ADHD evaluation strongly recommended."
+  },
+  "safetyNotes": [
+    "Part A score drives the screening result.",
+    "This is a screening tool \u2014 NOT a diagnosis."
+  ]
+}

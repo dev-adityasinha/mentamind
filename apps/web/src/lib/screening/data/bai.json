@@ -1,0 +1,514 @@
+{
+  "id": "bai",
+  "title": "Anxiety Patterns",
+  "shortTitle": "BAI",
+  "description": "Deep anxiety severity assessment focusing on somatic and cognitive anxiety symptoms over the past week.",
+  "timeFrame": "Past 7 days",
+  "totalQuestions": 21,
+  "responseScale": {
+    "min": 0,
+    "max": 3
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Numbness or tingling sensations",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Feeling unusually hot",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Wobbliness or unsteadiness in legs",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Difficulty relaxing",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Fear of something terrible happening",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Dizziness or lightheadedness",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Heart pounding or racing",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "Feeling shaky or trembling",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "text": "Feeling unsteady or off balance",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "text": "Feeling nervous",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "text": "Feeling like choking",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "text": "Hands trembling",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "text": "Feeling faint",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "text": "Fear of losing control",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "text": "Difficulty breathing",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "text": "Fear of dying",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "text": "Feeling scared",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "text": "Indigestion or stomach discomfort",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "text": "Feeling faint or lightheaded",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "text": "Face flushing",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "text": "Sweating (not due to heat or exercise)",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Mildly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Severely"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 63
+  },
+  "bands": [
+    {
+      "label": "Minimal",
+      "min": 0,
+      "max": 7
+    },
+    {
+      "label": "Mild",
+      "min": 8,
+      "max": 15
+    },
+    {
+      "label": "Moderate",
+      "min": 16,
+      "max": 25
+    },
+    {
+      "label": "Severe",
+      "min": 26,
+      "max": 63
+    }
+  ],
+  "recommendedActions": {
+    "Minimal": "No intervention needed.",
+    "Mild": "Monitor. Stress management techniques.",
+    "Moderate": "Consider professional consultation.",
+    "Severe": "Urgent professional support. Combine with medical rule-outs for somatic symptoms."
+  },
+  "safetyNotes": [
+    "Strong somatic anxiety emphasis.",
+    "Best used after GAD-7 \u2265 10.",
+    "Not a diagnosis."
+  ]
+}

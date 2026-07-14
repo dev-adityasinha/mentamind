@@ -1,0 +1,205 @@
+{
+  "id": "gad-7",
+  "title": "Worry & Anxiety Check",
+  "shortTitle": "GAD-7",
+  "description": "Screens for generalized anxiety disorder severity over the past two weeks.",
+  "timeFrame": "Over the last 2 weeks",
+  "totalQuestions": 7,
+  "responseScale": {
+    "min": 0,
+    "max": 3
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Feeling nervous, anxious, or on edge",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Not being able to stop or control worrying",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Worrying too much about different things",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Trouble relaxing",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Being so restless that it is hard to sit still",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Becoming easily annoyed or irritable",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Feeling afraid, as if something awful might happen",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 21
+  },
+  "bands": [
+    {
+      "label": "Minimal",
+      "min": 0,
+      "max": 4
+    },
+    {
+      "label": "Mild",
+      "min": 5,
+      "max": 9
+    },
+    {
+      "label": "Moderate",
+      "min": 10,
+      "max": 14
+    },
+    {
+      "label": "Severe",
+      "min": 15,
+      "max": 21
+    }
+  ],
+  "recommendedActions": {
+    "Minimal": "No intervention needed. Continue monitoring.",
+    "Mild": "Watchful waiting. Consider stress management techniques.",
+    "Moderate": "Consider professional consultation. Anxiety management strategies recommended.",
+    "Severe": "Active treatment recommended. Professional mental health support strongly advised."
+  },
+  "safetyNotes": [
+    "This is a screening tool, not a diagnosis.",
+    "GAD-7 \u2265 10 suggests clinically significant anxiety."
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "id": "suicide-risk",
+  "title": "Safety Screening",
+  "shortTitle": "C-SSRS",
+  "description": "HIGH-RISK FLAG-ONLY screening for suicidal ideation and behavior. Rule-based escalation \u2014 any positive response triggers immediate safety protocol.",
+  "timeFrame": "In the past month / lifetime",
+  "totalQuestions": 6,
+  "responseScale": {
+    "min": 0,
+    "max": 1
+  },
+  "allHighRisk": true,
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Have you wished you were dead or wished you could go to sleep and not wake up?",
+      "highRisk": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Have you actually had any thoughts of killing yourself?",
+      "highRisk": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Have you been thinking about how you might do this?",
+      "highRisk": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Have you had these thoughts and had some intention of acting on them?",
+      "highRisk": true,
+      "escalationLevel": "critical",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Have you started to work out or worked out the details of how to kill yourself? Did you intend to carry out this plan?",
+      "highRisk": true,
+      "escalationLevel": "critical",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Have you ever done anything, started to do anything, or prepared to do anything to end your life?",
+      "highRisk": true,
+      "escalationLevel": "critical",
+      "options": [
+        {
+          "value": 0,
+          "label": "No"
+        },
+        {
+          "value": 1,
+          "label": "Yes"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "rule_based",
+    "rules": [
+      {
+        "condition": "Q1=Yes OR Q2=Yes",
+        "result": "Ideation present \u2014 risk flagged"
+      },
+      {
+        "condition": "Q3=Yes",
+        "result": "Ideation with method \u2014 elevated risk"
+      },
+      {
+        "condition": "Q4=Yes OR Q5=Yes",
+        "result": "Ideation with intent/plan \u2014 HIGH RISK"
+      },
+      {
+        "condition": "Q6=Yes",
+        "result": "Prior attempt \u2014 CRITICAL RISK"
+      }
+    ],
+    "maxScore": 6
+  },
+  "escalation": {
+    "anyYes": "Immediately show crisis resources. Flag for human review.",
+    "q4OrQ5OrQ6": "CRITICAL \u2014 immediate escalation to a human professional. Do not proceed with normal flow."
+  },
+  "safetyNotes": [
+    "NEVER use the word 'suicide' in AI-generated feedback.",
+    "NEVER label the user as 'suicidal'.",
+    "Always show crisis helpline numbers.",
+    "This is a FLAG-ONLY tool \u2014 not a diagnosis."
+  ]
+}

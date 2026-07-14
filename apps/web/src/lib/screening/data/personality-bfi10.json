@@ -1,0 +1,351 @@
+{
+  "id": "personality-bfi10",
+  "title": "Personality Snapshot",
+  "shortTitle": "BFI-10",
+  "description": "Measures Big Five personality traits. Items Q6, Q7, Q8, Q9, Q10 are reverse-scored (6 - selected score).",
+  "timeFrame": "How you generally see yourself",
+  "totalQuestions": 10,
+  "responseScale": {
+    "min": 1,
+    "max": 5
+  },
+  "reverseScored": [
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "reverseFormula": "6 - score",
+  "subscales": [
+    {
+      "id": "openness",
+      "label": "Openness to Experience",
+      "items": [
+        1,
+        6
+      ]
+    },
+    {
+      "id": "conscientiousness",
+      "label": "Conscientiousness",
+      "items": [
+        3,
+        8
+      ]
+    },
+    {
+      "id": "extraversion",
+      "label": "Extraversion",
+      "items": [
+        2,
+        7
+      ]
+    },
+    {
+      "id": "agreeableness",
+      "label": "Agreeableness",
+      "items": [
+        4,
+        9
+      ]
+    },
+    {
+      "id": "neuroticism",
+      "label": "Neuroticism",
+      "items": [
+        5,
+        10
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "openness",
+      "text": "I see myself as someone who is curious and imaginative",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "extraversion",
+      "text": "I see myself as someone who is outgoing and energetic",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "conscientiousness",
+      "text": "I see myself as someone who is organized and dependable",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "agreeableness",
+      "text": "I see myself as someone who is kind and cooperative",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "neuroticism",
+      "text": "I see myself as someone who feels anxious or emotionally unstable",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "openness",
+      "reverse": true,
+      "text": "I see myself as someone who prefers routine and familiarity over new experiences",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "extraversion",
+      "reverse": true,
+      "text": "I see myself as someone who is reserved or quiet",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "conscientiousness",
+      "reverse": true,
+      "text": "I see myself as someone who tends to be careless or disorganized",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "agreeableness",
+      "reverse": true,
+      "text": "I see myself as someone who is critical or argumentative",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "neuroticism",
+      "reverse": true,
+      "text": "I see myself as someone who stays calm under stress",
+      "options": [
+        {
+          "value": 1,
+          "label": "Strongly disagree"
+        },
+        {
+          "value": 2,
+          "label": "Disagree"
+        },
+        {
+          "value": 3,
+          "label": "Neutral"
+        },
+        {
+          "value": 4,
+          "label": "Agree"
+        },
+        {
+          "value": 5,
+          "label": "Strongly agree"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_by_subscale",
+    "traitRange": [
+      2,
+      10
+    ],
+    "maxScore": 50
+  },
+  "interpretation": "Each trait scored 2-10. Used for AI personalization, not diagnosis.",
+  "safetyNotes": [
+    "Personality profiling, NOT a clinical screener."
+  ]
+}

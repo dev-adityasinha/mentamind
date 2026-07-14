@@ -1,0 +1,262 @@
+{
+  "id": "phq-9",
+  "title": "Mood Assessment",
+  "shortTitle": "PHQ-9",
+  "description": "Screens for depression severity. Q9 addresses self-harm ideation and requires special handling.",
+  "timeFrame": "Over the last 2 weeks",
+  "totalQuestions": 9,
+  "responseScale": {
+    "min": 0,
+    "max": 3
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Little interest or pleasure in doing things",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Feeling down, depressed, or hopeless",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Trouble falling or staying asleep, or sleeping too much",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Feeling tired or having little energy",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Poor appetite or overeating",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Feeling bad about yourself \u2014 or that you are a failure or have let yourself or your family down",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Trouble concentrating on things, such as reading or watching TV",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "Moving or speaking so slowly that other people could have noticed? Or the opposite \u2014 being so fidgety or restless that you have been moving around a lot more than usual",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "text": "Thoughts that you would be better off dead, or of hurting yourself in some way",
+      "highRisk": true,
+      "escalationTrigger": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Several days"
+        },
+        {
+          "value": 2,
+          "label": "More than half the days"
+        },
+        {
+          "value": 3,
+          "label": "Nearly every day"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 27
+  },
+  "bands": [
+    {
+      "label": "None-minimal",
+      "min": 0,
+      "max": 4
+    },
+    {
+      "label": "Mild",
+      "min": 5,
+      "max": 9
+    },
+    {
+      "label": "Moderate",
+      "min": 10,
+      "max": 14
+    },
+    {
+      "label": "Moderately severe",
+      "min": 15,
+      "max": 19
+    },
+    {
+      "label": "Severe",
+      "min": 20,
+      "max": 27
+    }
+  ],
+  "recommendedActions": {
+    "None-minimal": "No treatment needed.",
+    "Mild": "Watchful waiting. Repeat PHQ-9 at follow-up.",
+    "Moderate": "Consider counselling or pharmacotherapy.",
+    "Moderately severe": "Active treatment with pharmacotherapy and/or psychotherapy.",
+    "Severe": "Immediate initiation of pharmacotherapy and, if severe impairment, expedited referral."
+  },
+  "escalation": {
+    "trigger": "Q9 \u2265 1",
+    "action": "Immediate safety assessment. Show crisis resources. Flag for clinical review."
+  },
+  "safetyNotes": [
+    "Q9 is a HIGH-RISK question about self-harm/suicidal ideation.",
+    "Any non-zero answer to Q9 MUST trigger the escalation modal.",
+    "This is a screening tool, not a diagnosis."
+  ]
+}

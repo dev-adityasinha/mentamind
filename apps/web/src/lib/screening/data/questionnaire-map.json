@@ -1,0 +1,330 @@
+{
+    "categories": [
+        {
+            "id": "mood-emotions",
+            "name": "Mood & Emotions",
+            "description": "Understand your emotional patterns and how you've been feeling recently.",
+            "icon": "heart",
+            "color": "#8b5cf6",
+            "tests": [
+                {
+                    "id": "phq-4",
+                    "shortTitle": "PHQ-4",
+                    "title": "Quick Mood Check",
+                    "purpose": "A brief check-in on anxiety and low mood",
+                    "questions": 4,
+                    "time": "~1 min",
+                    "tags": [
+                        "quick",
+                        "recommended"
+                    ]
+                },
+                {
+                    "id": "phq-9",
+                    "shortTitle": "PHQ-9",
+                    "title": "Mood Assessment",
+                    "purpose": "Explore patterns of low mood and motivation",
+                    "questions": 9,
+                    "time": "~3 min",
+                    "tags": [
+                        "detailed"
+                    ]
+                },
+                {
+                    "id": "gad-7",
+                    "shortTitle": "GAD-7",
+                    "title": "Worry & Anxiety Check",
+                    "purpose": "Understand how worry and anxiety show up in your life",
+                    "questions": 7,
+                    "time": "~2 min",
+                    "tags": [
+                        "recommended"
+                    ]
+                },
+                {
+                    "id": "bdi-ii",
+                    "shortTitle": "BDI-II",
+                    "title": "Depression Exploration",
+                    "purpose": "A deeper look at how depression may be affecting you",
+                    "questions": 21,
+                    "time": "~5 min",
+                    "tags": [
+                        "detailed"
+                    ]
+                },
+                {
+                    "id": "bai",
+                    "shortTitle": "BAI",
+                    "title": "Anxiety Patterns",
+                    "purpose": "Understand physical and emotional signs of anxiety",
+                    "questions": 21,
+                    "time": "~5 min",
+                    "tags": [
+                        "detailed"
+                    ]
+                },
+                {
+                    "id": "who-5",
+                    "shortTitle": "WHO-5",
+                    "title": "Well-Being Index",
+                    "purpose": "A quick snapshot of your overall well-being",
+                    "questions": 5,
+                    "time": "~1 min",
+                    "tags": [
+                        "quick",
+                        "recommended"
+                    ]
+                },
+                {
+                    "id": "mood-mdq",
+                    "shortTitle": "MDQ",
+                    "title": "Mood Pattern Screening",
+                    "purpose": "Explore whether your mood follows certain patterns",
+                    "questions": 15,
+                    "time": "~4 min",
+                    "tags": []
+                }
+            ]
+        },
+        {
+            "id": "stress-coping",
+            "name": "Stress & Coping",
+            "description": "Explore how stress affects you and how you manage it.",
+            "icon": "shield",
+            "color": "#f59e0b",
+            "tests": [
+                {
+                    "id": "pss-10",
+                    "shortTitle": "PSS-10",
+                    "title": "Perceived Stress",
+                    "purpose": "How stressed have you felt over the past month?",
+                    "questions": 10,
+                    "time": "~3 min",
+                    "tags": [
+                        "recommended"
+                    ]
+                },
+                {
+                    "id": "pss-4",
+                    "shortTitle": "PSS-4",
+                    "title": "Quick Stress Check",
+                    "purpose": "A brief snapshot of your recent stress levels",
+                    "questions": 4,
+                    "time": "~1 min",
+                    "tags": [
+                        "quick"
+                    ]
+                },
+                {
+                    "id": "erq",
+                    "shortTitle": "ERQ",
+                    "title": "Emotion Regulation",
+                    "purpose": "How do you manage and process your emotions?",
+                    "questions": 10,
+                    "time": "~3 min",
+                    "tags": []
+                },
+                {
+                    "id": "burnout",
+                    "shortTitle": "MBI",
+                    "title": "Burnout Check",
+                    "purpose": "Assess feelings of exhaustion and disconnection at work or school",
+                    "questions": 22,
+                    "time": "~5 min",
+                    "tags": [
+                        "detailed"
+                    ]
+                },
+                {
+                    "id": "academic-stress",
+                    "shortTitle": "ASS",
+                    "title": "Academic Stress",
+                    "purpose": "How academic pressure is affecting you",
+                    "questions": 18,
+                    "time": "~4 min",
+                    "tags": []
+                }
+            ]
+        },
+        {
+            "id": "sleep-body",
+            "name": "Sleep & Body",
+            "description": "Understand how sleep and physical patterns affect your mental health.",
+            "icon": "moon",
+            "color": "#0ea5e9",
+            "tests": [
+                {
+                    "id": "isi",
+                    "shortTitle": "ISI",
+                    "title": "Insomnia Assessment",
+                    "purpose": "How sleep difficulties are affecting your daily life",
+                    "questions": 7,
+                    "time": "~2 min",
+                    "tags": [
+                        "recommended"
+                    ]
+                },
+                {
+                    "id": "psqi",
+                    "shortTitle": "PSQI",
+                    "title": "Sleep Quality",
+                    "purpose": "A comprehensive look at your sleep patterns and quality",
+                    "questions": 11,
+                    "time": "~4 min",
+                    "tags": [
+                        "detailed"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "self-attention",
+            "name": "Self & Attention",
+            "description": "Explore how you see yourself and how your mind focuses.",
+            "icon": "brain",
+            "color": "#ec4899",
+            "tests": [
+                {
+                    "id": "rses",
+                    "shortTitle": "RSES",
+                    "title": "Self-Esteem Check",
+                    "purpose": "Explore your relationship with self-worth",
+                    "questions": 10,
+                    "time": "~3 min",
+                    "tags": [
+                        "recommended"
+                    ]
+                },
+                {
+                    "id": "adhd-screener",
+                    "shortTitle": "ASRS",
+                    "title": "Attention & Focus",
+                    "purpose": "Do you find it hard to focus or stay organized?",
+                    "questions": 18,
+                    "time": "~4 min",
+                    "tags": []
+                },
+                {
+                    "id": "cognitive",
+                    "shortTitle": "MoCA",
+                    "title": "Cognitive Screening",
+                    "purpose": "A brief check on memory and thinking patterns",
+                    "questions": 11,
+                    "time": "~4 min",
+                    "tags": []
+                },
+                {
+                    "id": "personality-bfi10",
+                    "shortTitle": "BFI-10",
+                    "title": "Personality Snapshot",
+                    "purpose": "A quick look at your personality traits",
+                    "questions": 10,
+                    "time": "~2 min",
+                    "tags": [
+                        "quick"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "behaviour-safety",
+            "name": "Behaviour & Safety",
+            "description": "Important screenings for personal safety and behavioural patterns.",
+            "icon": "alert",
+            "color": "#ef4444",
+            "tests": [
+                {
+                    "id": "sdq",
+                    "shortTitle": "SDQ",
+                    "title": "Strengths & Difficulties",
+                    "purpose": "Understand emotional and behavioural patterns",
+                    "questions": 25,
+                    "time": "~5 min",
+                    "tags": []
+                },
+                {
+                    "id": "ies-r",
+                    "shortTitle": "IES-R",
+                    "title": "Trauma Impact",
+                    "purpose": "How a stressful event may still be affecting you",
+                    "questions": 22,
+                    "time": "~5 min",
+                    "tags": []
+                },
+                {
+                    "id": "suicide-risk",
+                    "shortTitle": "C-SSRS",
+                    "title": "Safety Screening",
+                    "purpose": "A confidential check-in on your safety",
+                    "questions": 6,
+                    "time": "~2 min",
+                    "tags": [
+                        "safety"
+                    ]
+                }
+            ]
+        }
+    ],
+    "guidedQuestions": [
+        {
+            "id": "feeling",
+            "text": "What brings you here today?",
+            "options": [
+                {
+                    "label": "I've been feeling anxious or worried",
+                    "recommendedTests": [
+                        "phq-4",
+                        "gad-7",
+                        "pss-10"
+                    ],
+                    "icon": "cloud"
+                },
+                {
+                    "label": "I've been feeling low or unmotivated",
+                    "recommendedTests": [
+                        "phq-4",
+                        "phq-9",
+                        "who-5"
+                    ],
+                    "icon": "rain"
+                },
+                {
+                    "label": "I'm not sleeping well",
+                    "recommendedTests": [
+                        "isi",
+                        "psqi",
+                        "who-5"
+                    ],
+                    "icon": "moon"
+                },
+                {
+                    "label": "I feel overwhelmed or burned out",
+                    "recommendedTests": [
+                        "pss-10",
+                        "burnout",
+                        "erq"
+                    ],
+                    "icon": "fire"
+                },
+                {
+                    "label": "I'm struggling with focus or attention",
+                    "recommendedTests": [
+                        "adhd-screener",
+                        "cognitive",
+                        "pss-4"
+                    ],
+                    "icon": "target"
+                },
+                {
+                    "label": "I just want to check in with myself",
+                    "recommendedTests": [
+                        "phq-4",
+                        "who-5",
+                        "pss-4"
+                    ],
+                    "icon": "sparkle"
+                }
+            ]
+        }
+    ]
+}

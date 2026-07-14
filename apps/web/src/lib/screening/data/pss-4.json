@@ -1,0 +1,155 @@
+{
+  "id": "pss-4",
+  "title": "Quick Stress Check",
+  "shortTitle": "PSS-4",
+  "description": "Ultra-brief stress screener. Items 2 and 3 are reverse-scored.",
+  "timeFrame": "In the last month",
+  "totalQuestions": 4,
+  "responseScale": {
+    "min": 0,
+    "max": 4
+  },
+  "reverseScored": [
+    2,
+    3
+  ],
+  "reverseMax": 4,
+  "questions": [
+    {
+      "id": "q1",
+      "text": "How often have you felt that you were unable to control the important things in your life?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "How often have you felt confident about your ability to handle your personal problems?",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "How often have you felt that things were going your way?",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "How often have you felt difficulties were piling up so high that you could not overcome them?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_with_reverse",
+    "minScore": 0,
+    "maxScore": 16
+  },
+  "bands": [
+    {
+      "label": "Low stress",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "label": "Moderate stress",
+      "min": 6,
+      "max": 10
+    },
+    {
+      "label": "High stress",
+      "min": 11,
+      "max": 16
+    }
+  ],
+  "recommendedActions": {
+    "Low stress": "No intervention needed.",
+    "Moderate stress": "Monitor. Consider stress management.",
+    "High stress": "Professional support recommended."
+  },
+  "safetyNotes": [
+    "Ultra-brief version. Use PSS-10 for more detail."
+  ]
+}

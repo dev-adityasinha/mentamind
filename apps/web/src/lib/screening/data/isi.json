@@ -1,0 +1,233 @@
+{
+  "id": "isi",
+  "title": "Insomnia Assessment",
+  "shortTitle": "ISI",
+  "description": "Screens severity of insomnia symptoms over the past two weeks.",
+  "timeFrame": "Over the last 2 weeks",
+  "totalQuestions": 7,
+  "responseScale": {
+    "min": 0,
+    "max": 4
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Difficulty falling asleep",
+      "options": [
+        {
+          "value": 0,
+          "label": "None"
+        },
+        {
+          "value": 1,
+          "label": "Mild"
+        },
+        {
+          "value": 2,
+          "label": "Moderate"
+        },
+        {
+          "value": 3,
+          "label": "Severe"
+        },
+        {
+          "value": 4,
+          "label": "Very severe"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Difficulty staying asleep",
+      "options": [
+        {
+          "value": 0,
+          "label": "None"
+        },
+        {
+          "value": 1,
+          "label": "Mild"
+        },
+        {
+          "value": 2,
+          "label": "Moderate"
+        },
+        {
+          "value": 3,
+          "label": "Severe"
+        },
+        {
+          "value": 4,
+          "label": "Very severe"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Waking up too early",
+      "options": [
+        {
+          "value": 0,
+          "label": "None"
+        },
+        {
+          "value": 1,
+          "label": "Mild"
+        },
+        {
+          "value": 2,
+          "label": "Moderate"
+        },
+        {
+          "value": 3,
+          "label": "Severe"
+        },
+        {
+          "value": 4,
+          "label": "Very severe"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Satisfaction with current sleep pattern",
+      "options": [
+        {
+          "value": 0,
+          "label": "Very satisfied"
+        },
+        {
+          "value": 1,
+          "label": "Satisfied"
+        },
+        {
+          "value": 2,
+          "label": "Neutral"
+        },
+        {
+          "value": 3,
+          "label": "Dissatisfied"
+        },
+        {
+          "value": 4,
+          "label": "Very dissatisfied"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Impact of sleep problems on daily functioning",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all interfering"
+        },
+        {
+          "value": 1,
+          "label": "A little"
+        },
+        {
+          "value": 2,
+          "label": "Somewhat"
+        },
+        {
+          "value": 3,
+          "label": "Much"
+        },
+        {
+          "value": 4,
+          "label": "Very much interfering"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "Noticeability of sleep problems to others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all noticeable"
+        },
+        {
+          "value": 1,
+          "label": "Barely"
+        },
+        {
+          "value": 2,
+          "label": "Somewhat"
+        },
+        {
+          "value": 3,
+          "label": "Much"
+        },
+        {
+          "value": 4,
+          "label": "Very much noticeable"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Worry or distress caused by sleep problems",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all worried"
+        },
+        {
+          "value": 1,
+          "label": "A little"
+        },
+        {
+          "value": 2,
+          "label": "Somewhat"
+        },
+        {
+          "value": 3,
+          "label": "Much"
+        },
+        {
+          "value": 4,
+          "label": "Very much worried"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 28
+  },
+  "bands": [
+    {
+      "label": "No clinically significant insomnia",
+      "min": 0,
+      "max": 7
+    },
+    {
+      "label": "Subthreshold insomnia",
+      "min": 8,
+      "max": 14
+    },
+    {
+      "label": "Moderate insomnia",
+      "min": 15,
+      "max": 21
+    },
+    {
+      "label": "Severe insomnia",
+      "min": 22,
+      "max": 28
+    }
+  ],
+  "recommendedActions": {
+    "No clinically significant insomnia": "Sleep hygiene education.",
+    "Subthreshold insomnia": "Behavioral sleep strategies and monitoring.",
+    "Moderate insomnia": "Professional sleep or mental health support recommended.",
+    "Severe insomnia": "High-priority escalation. Immediate professional support."
+  },
+  "safetyNotes": [
+    "Screening only \u2014 not a medical diagnosis.",
+    "Correlate with PHQ-9, GAD-7, burnout assessments."
+  ]
+}

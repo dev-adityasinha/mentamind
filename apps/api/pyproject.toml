@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mentamind-api"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi==0.111.0",
+    "uvicorn[standard]==0.30.1",
+    "sqlalchemy[asyncio]==2.0.31",
+    "asyncpg==0.29.0",
+    "alembic==1.13.1",
+    "pydantic-settings==2.3.4",
+    "python-jose[cryptography]==3.3.0",
+    "cryptography>=42.0",
+    "argon2-cffi==23.1.0",
+    "httpx==0.27.0",
+    "python-multipart==0.0.9",
+    "redis[hiredis]>=5.0",
+    "resend==2.1.0",
+    "python3-saml>=1.16.0",
+    "openai>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.2.2",
+    "pytest-asyncio==0.23.7",
+    "aiosqlite==0.20.0",
+    "fakeredis[lua]>=2.23",
+    "ruff==0.4.10",
+    "black==24.4.2",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+extend-exclude = "alembic/versions"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-m 'not integration'"
+markers = [
+    "integration: requires live Postgres and Redis; excluded from the fast unit suite",
+]

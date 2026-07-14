@@ -1,0 +1,315 @@
+{
+  "id": "pss-10",
+  "title": "Perceived Stress",
+  "shortTitle": "PSS-10",
+  "description": "Measures perception of stress over the past month. Items 4, 5, 7, 8 are reverse-scored.",
+  "timeFrame": "In the last month",
+  "totalQuestions": 10,
+  "responseScale": {
+    "min": 0,
+    "max": 4
+  },
+  "reverseScored": [
+    4,
+    5,
+    7,
+    8
+  ],
+  "reverseMax": 4,
+  "questions": [
+    {
+      "id": "q1",
+      "text": "How often have you been upset because of something that happened unexpectedly?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "How often have you felt that you were unable to control the important things in your life?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "How often have you felt nervous and stressed?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "How often have you felt confident about your ability to handle your personal problems?",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "How often have you felt that things were going your way?",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "How often have you found that you could not cope with all the things that you had to do?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "How often have you been able to control irritations in your life?",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "How often have you felt that you were on top of things?",
+      "reverse": true,
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "text": "How often have you been angered because of things that happened that were outside of your control?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "text": "How often have you felt difficulties were piling up so high that you could not overcome them?",
+      "options": [
+        {
+          "value": 0,
+          "label": "Never"
+        },
+        {
+          "value": 1,
+          "label": "Almost never"
+        },
+        {
+          "value": 2,
+          "label": "Sometimes"
+        },
+        {
+          "value": 3,
+          "label": "Fairly often"
+        },
+        {
+          "value": 4,
+          "label": "Very often"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_with_reverse",
+    "minScore": 0,
+    "maxScore": 40
+  },
+  "bands": [
+    {
+      "label": "Low stress",
+      "min": 0,
+      "max": 13
+    },
+    {
+      "label": "Moderate stress",
+      "min": 14,
+      "max": 26
+    },
+    {
+      "label": "High stress",
+      "min": 27,
+      "max": 40
+    }
+  ],
+  "recommendedActions": {
+    "Low stress": "Maintain current coping strategies.",
+    "Moderate stress": "Consider stress management activities. Monitor.",
+    "High stress": "Professional support recommended. Screen for anxiety/depression."
+  },
+  "safetyNotes": [
+    "Screening only \u2014 not a diagnosis."
+  ]
+}

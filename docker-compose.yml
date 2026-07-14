@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mentamind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mentamind}
+      POSTGRES_DB: ${POSTGRES_DB:-mentamind}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mentamind} -d ${POSTGRES_DB:-mentamind}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-mentamind}:${POSTGRES_PASSWORD:-mentamind}@postgres:5432/${POSTGRES_DB:-mentamind}
+      REDIS_URL: redis://redis:6379/0
+      API_SECRET_KEY: ${API_SECRET_KEY}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      SUPER_ADMIN_EMAIL: ${SUPER_ADMIN_EMAIL:-zaid@mentamind.in}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      API_URL: http://api:8000
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

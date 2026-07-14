@@ -1,0 +1,692 @@
+{
+  "id": "ies-r",
+  "title": "Trauma Impact",
+  "shortTitle": "IES-R",
+  "description": "Screens for PTSD-related symptoms in response to a specific traumatic event. Three subscales: Intrusion, Avoidance, Hyperarousal.",
+  "timeFrame": "Past 7 days",
+  "totalQuestions": 22,
+  "responseScale": {
+    "min": 0,
+    "max": 4
+  },
+  "subscales": [
+    {
+      "id": "intrusion",
+      "label": "Intrusion",
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "id": "avoidance",
+      "label": "Avoidance",
+      "items": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "hyperarousal",
+      "label": "Hyperarousal",
+      "items": [
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "intrusion",
+      "text": "Unwanted memories of the event",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "intrusion",
+      "text": "Disturbing dreams about the event",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "intrusion",
+      "text": "Feeling like the event was happening again",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "intrusion",
+      "text": "Strong emotional reactions to reminders",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "intrusion",
+      "text": "Physical reactions to reminders",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "avoidance",
+      "text": "Avoiding thoughts about the event",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "avoidance",
+      "text": "Avoiding reminders of the event",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "avoidance",
+      "text": "Emotional numbness",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "avoidance",
+      "text": "Loss of interest in activities",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "avoidance",
+      "text": "Feeling detached from others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "subscale": "avoidance",
+      "text": "Difficulty experiencing positive emotions",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "subscale": "avoidance",
+      "text": "Trying not to talk about the event",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "subscale": "hyperarousal",
+      "text": "Trouble falling or staying asleep",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "subscale": "hyperarousal",
+      "text": "Irritability or anger",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "subscale": "hyperarousal",
+      "text": "Difficulty concentrating",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q16",
+      "subscale": "hyperarousal",
+      "text": "Being overly alert or watchful",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q17",
+      "subscale": "hyperarousal",
+      "text": "Feeling jumpy or easily startled",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q18",
+      "subscale": "hyperarousal",
+      "text": "Strong bodily stress reactions",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q19",
+      "subscale": "hyperarousal",
+      "text": "Feeling tense",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q20",
+      "subscale": "hyperarousal",
+      "text": "Avoiding emotional closeness",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q21",
+      "subscale": "hyperarousal",
+      "text": "Intrusive thoughts when trying not to think",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q22",
+      "subscale": "hyperarousal",
+      "text": "Strong emotional waves related to the event",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "A little bit"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "Quite a bit"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 88
+  },
+  "bands": [
+    {
+      "label": "Minimal",
+      "min": 0,
+      "max": 23
+    },
+    {
+      "label": "Mild",
+      "min": 24,
+      "max": 32
+    },
+    {
+      "label": "Moderate",
+      "min": 33,
+      "max": 36
+    },
+    {
+      "label": "Severe",
+      "min": 37,
+      "max": 88
+    }
+  ],
+  "recommendedActions": {
+    "Minimal": "Monitor. General coping strategies.",
+    "Mild": "Consider support. Trauma-informed check-in.",
+    "Moderate": "Professional trauma-informed support recommended.",
+    "Severe": "Urgent professional support. High PTSD risk."
+  },
+  "escalation": {
+    "trigger": "Total \u2265 37 OR high intrusion + high hyperarousal",
+    "action": "Flag high trauma impact. Recommend trauma-informed professional support."
+  },
+  "safetyNotes": [
+    "Avoid diagnostic labels.",
+    "Screening only.",
+    "IES-R does NOT diagnose PTSD."
+  ]
+}

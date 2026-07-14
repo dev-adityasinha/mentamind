@@ -1,0 +1,502 @@
+{
+  "id": "academic-stress",
+  "title": "Academic Stress",
+  "shortTitle": "ASS",
+  "description": "India-context academic stress screener for students, covering exam pressure, expectations, workload, burnout, and career anxiety.",
+  "timeFrame": "Over the last 1 month",
+  "totalQuestions": 15,
+  "responseScale": {
+    "min": 0,
+    "max": 4
+  },
+  "subscales": [
+    {
+      "id": "exam_pressure",
+      "label": "Exam & Performance Pressure",
+      "items": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "social_pressure",
+      "label": "Expectations & Social Pressure",
+      "items": [
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "id": "workload",
+      "label": "Workload & Time Pressure",
+      "items": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "burnout",
+      "label": "Burnout & Exhaustion",
+      "items": [
+        10,
+        11,
+        12
+      ]
+    },
+    {
+      "id": "career_anxiety",
+      "label": "Career & Future Anxiety",
+      "items": [
+        13,
+        14,
+        15
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "q1",
+      "subscale": "exam_pressure",
+      "text": "Fear of exams",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "subscale": "exam_pressure",
+      "text": "Pressure to score high marks",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "subscale": "exam_pressure",
+      "text": "Fear of failure",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "subscale": "social_pressure",
+      "text": "Family expectations",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "subscale": "social_pressure",
+      "text": "Comparison with others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "subscale": "social_pressure",
+      "text": "Fear of disappointing others",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "subscale": "workload",
+      "text": "Academic workload",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "subscale": "workload",
+      "text": "Lack of time",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q9",
+      "subscale": "workload",
+      "text": "Difficulty balancing life and studies",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "subscale": "burnout",
+      "text": "Mental exhaustion",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q11",
+      "subscale": "burnout",
+      "text": "Loss of motivation",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "subscale": "burnout",
+      "text": "Feeling emotionally drained",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "subscale": "career_anxiety",
+      "text": "Worry about future career",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "subscale": "career_anxiety",
+      "text": "Fear of not meeting career expectations",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "subscale": "career_anxiety",
+      "text": "Feeling stuck academically",
+      "options": [
+        {
+          "value": 0,
+          "label": "Not at all"
+        },
+        {
+          "value": 1,
+          "label": "Slightly"
+        },
+        {
+          "value": 2,
+          "label": "Moderately"
+        },
+        {
+          "value": 3,
+          "label": "A lot"
+        },
+        {
+          "value": 4,
+          "label": "Extremely"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "minScore": 0,
+    "maxScore": 60
+  },
+  "bands": [
+    {
+      "label": "Low academic stress",
+      "min": 0,
+      "max": 15
+    },
+    {
+      "label": "Moderate academic stress",
+      "min": 16,
+      "max": 30
+    },
+    {
+      "label": "High academic stress",
+      "min": 31,
+      "max": 45
+    },
+    {
+      "label": "Severe academic stress",
+      "min": 46,
+      "max": 60
+    }
+  ],
+  "recommendedActions": {
+    "Low academic stress": "No intervention needed.",
+    "Moderate academic stress": "Study strategies and time management support.",
+    "High academic stress": "Counselling recommended. Screen for anxiety/depression.",
+    "Severe academic stress": "Urgent support. Human counsellor recommendation."
+  },
+  "safetyNotes": [
+    "Screening only \u2014 culturally adapted for Indian students."
+  ]
+}

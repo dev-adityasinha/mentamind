@@ -1,0 +1,206 @@
+{
+  "id": "who-5",
+  "title": "Well-Being Index",
+  "shortTitle": "WHO-5",
+  "description": "Measures subjective psychological well-being over the past two weeks. Raw score is multiplied by 4 to get a percentage (0-100).",
+  "timeFrame": "Over the last 2 weeks",
+  "totalQuestions": 5,
+  "responseScale": {
+    "min": 0,
+    "max": 5
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "I have felt cheerful and in good spirits",
+      "options": [
+        {
+          "value": 5,
+          "label": "All of the time"
+        },
+        {
+          "value": 4,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "More than half of the time"
+        },
+        {
+          "value": 2,
+          "label": "Less than half of the time"
+        },
+        {
+          "value": 1,
+          "label": "Some of the time"
+        },
+        {
+          "value": 0,
+          "label": "At no time"
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "I have felt calm and relaxed",
+      "options": [
+        {
+          "value": 5,
+          "label": "All of the time"
+        },
+        {
+          "value": 4,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "More than half of the time"
+        },
+        {
+          "value": 2,
+          "label": "Less than half of the time"
+        },
+        {
+          "value": 1,
+          "label": "Some of the time"
+        },
+        {
+          "value": 0,
+          "label": "At no time"
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "I have felt active and vigorous",
+      "options": [
+        {
+          "value": 5,
+          "label": "All of the time"
+        },
+        {
+          "value": 4,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "More than half of the time"
+        },
+        {
+          "value": 2,
+          "label": "Less than half of the time"
+        },
+        {
+          "value": 1,
+          "label": "Some of the time"
+        },
+        {
+          "value": 0,
+          "label": "At no time"
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "I woke up feeling fresh and rested",
+      "options": [
+        {
+          "value": 5,
+          "label": "All of the time"
+        },
+        {
+          "value": 4,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "More than half of the time"
+        },
+        {
+          "value": 2,
+          "label": "Less than half of the time"
+        },
+        {
+          "value": 1,
+          "label": "Some of the time"
+        },
+        {
+          "value": 0,
+          "label": "At no time"
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "My daily life has been filled with things that interest me",
+      "options": [
+        {
+          "value": 5,
+          "label": "All of the time"
+        },
+        {
+          "value": 4,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "More than half of the time"
+        },
+        {
+          "value": 2,
+          "label": "Less than half of the time"
+        },
+        {
+          "value": 1,
+          "label": "Some of the time"
+        },
+        {
+          "value": 0,
+          "label": "At no time"
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum_multiply",
+    "minScore": 0,
+    "maxScore": 25,
+    "percentageMultiplier": 4,
+    "percentageRange": [
+      0,
+      100
+    ]
+  },
+  "bands": [
+    {
+      "label": "Good well-being",
+      "min": 52,
+      "max": 100,
+      "rawMin": 13,
+      "rawMax": 25
+    },
+    {
+      "label": "Low well-being",
+      "min": 29,
+      "max": 51,
+      "rawMin": 8,
+      "rawMax": 12
+    },
+    {
+      "label": "Likely depression",
+      "min": 0,
+      "max": 28,
+      "rawMin": 0,
+      "rawMax": 7
+    }
+  ],
+  "recommendedActions": {
+    "Good well-being": "Maintain current habits. No intervention needed.",
+    "Low well-being": "Consider lifestyle changes. Monitor mood. Repeat in 2 weeks.",
+    "Likely depression": "Screen with PHQ-9 for depression. Professional consultation recommended."
+  },
+  "safetyNotes": [
+    "WHO-5 percentage score \u2264 28 suggests likely depression \u2014 follow up with PHQ-9.",
+    "This is a well-being measure, not a depression diagnostic."
+  ]
+}

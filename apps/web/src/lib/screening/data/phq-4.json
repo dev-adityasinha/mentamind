@@ -1,0 +1,252 @@
+{
+  "id": "phq-4",
+  "title": "Quick Mood Check",
+  "description": "A 4-item ultra-brief screening tool for detecting anxiety and depressive symptoms during initial contact or onboarding.",
+  "timeframe": "Over the last 2 weeks",
+  "instruction": "Please read each statement and choose the option that best describes how often you experienced the problem over the past two weeks.",
+  "questions": [
+    {
+      "id": "q1",
+      "index": 0,
+      "text": "Feeling nervous, anxious, or on edge",
+      "subscale": "anxiety",
+      "isReverseScored": false,
+      "isHighRisk": false,
+      "options": [
+        {
+          "value": 0,
+          "label": "I did not feel nervous, anxious, or on edge at all."
+        },
+        {
+          "value": 1,
+          "label": "I felt nervous, anxious, or on edge on several days."
+        },
+        {
+          "value": 2,
+          "label": "I felt nervous, anxious, or on edge on more than half of the days."
+        },
+        {
+          "value": 3,
+          "label": "I felt nervous, anxious, or on edge nearly every day."
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "index": 1,
+      "text": "Not being able to stop or control worrying",
+      "subscale": "anxiety",
+      "isReverseScored": false,
+      "isHighRisk": false,
+      "options": [
+        {
+          "value": 0,
+          "label": "I was able to control my worrying without difficulty."
+        },
+        {
+          "value": 1,
+          "label": "I had trouble controlling my worrying on several days."
+        },
+        {
+          "value": 2,
+          "label": "I had trouble controlling my worrying on more than half of the days."
+        },
+        {
+          "value": 3,
+          "label": "I had trouble controlling my worrying nearly every day."
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "index": 2,
+      "text": "Little interest or pleasure in doing things",
+      "subscale": "depression",
+      "isReverseScored": false,
+      "isHighRisk": false,
+      "options": [
+        {
+          "value": 0,
+          "label": "I did not lose interest or pleasure in activities."
+        },
+        {
+          "value": 1,
+          "label": "I lost interest or pleasure on several days."
+        },
+        {
+          "value": 2,
+          "label": "I lost interest or pleasure on more than half of the days."
+        },
+        {
+          "value": 3,
+          "label": "I lost interest or pleasure nearly every day."
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "index": 3,
+      "text": "Feeling down, depressed, or hopeless",
+      "subscale": "depression",
+      "isReverseScored": false,
+      "isHighRisk": false,
+      "options": [
+        {
+          "value": 0,
+          "label": "I did not feel down, depressed, or hopeless at all."
+        },
+        {
+          "value": 1,
+          "label": "I felt down, depressed, or hopeless on several days."
+        },
+        {
+          "value": 2,
+          "label": "I felt down, depressed, or hopeless on more than half of the days."
+        },
+        {
+          "value": 3,
+          "label": "I felt down, depressed, or hopeless nearly every day."
+        }
+      ]
+    }
+  ],
+  "response_scale": {
+    "min": 0,
+    "max": 3,
+    "labels": {
+      "0": "Not at all",
+      "1": "Several days",
+      "2": "More than half the days",
+      "3": "Nearly every day"
+    }
+  },
+  "scoring": {
+    "method": "subscale",
+    "range": {
+      "min": 0,
+      "max": 12
+    },
+    "reverse_items": [],
+    "subscales": [
+      {
+        "id": "anxiety",
+        "label": "Anxiety Subscale",
+        "questionIds": [
+          "q1",
+          "q2"
+        ],
+        "range": {
+          "min": 0,
+          "max": 6
+        },
+        "method": "sum",
+        "bands": [
+          {
+            "label": "Below threshold",
+            "min": 0,
+            "max": 2,
+            "action": "No further anxiety screening needed"
+          },
+          {
+            "label": "Above threshold",
+            "min": 3,
+            "max": 6,
+            "action": "Anxiety symptoms flagged \u2014 recommend GAD-7 assessment"
+          }
+        ]
+      },
+      {
+        "id": "depression",
+        "label": "Depression Subscale",
+        "questionIds": [
+          "q3",
+          "q4"
+        ],
+        "range": {
+          "min": 0,
+          "max": 6
+        },
+        "method": "sum",
+        "bands": [
+          {
+            "label": "Below threshold",
+            "min": 0,
+            "max": 2,
+            "action": "No further depression screening needed"
+          },
+          {
+            "label": "Above threshold",
+            "min": 3,
+            "max": 6,
+            "action": "Depressive symptoms flagged \u2014 recommend PHQ-9 assessment"
+          }
+        ]
+      }
+    ],
+    "bands": [
+      {
+        "label": "None",
+        "min": 0,
+        "max": 2,
+        "description": "No significant distress detected",
+        "action": "Continue normal onboarding"
+      },
+      {
+        "label": "Mild",
+        "min": 3,
+        "max": 5,
+        "description": "Mild distress level",
+        "action": "Recommend full screening"
+      },
+      {
+        "label": "Moderate",
+        "min": 6,
+        "max": 8,
+        "description": "Moderate distress level",
+        "action": "Prioritize mental health check-in"
+      },
+      {
+        "label": "Severe",
+        "min": 9,
+        "max": 12,
+        "description": "Severe distress level",
+        "action": "Urgent: prioritize comprehensive assessment"
+      }
+    ]
+  },
+  "display": {
+    "one_question_per_screen": true,
+    "show_progress": true
+  },
+  "high_risk_items": [],
+  "escalation_rules": [],
+  "recommended_actions": {
+    "none": [
+      "Continue normal onboarding flow"
+    ],
+    "mild": [
+      "Recommend full anxiety or depression screening"
+    ],
+    "moderate": [
+      "Prioritize mental health check-in",
+      "Suggest professional consultation"
+    ],
+    "severe": [
+      "Urgent comprehensive assessment recommended",
+      "Provide crisis resources"
+    ],
+    "anxiety_flagged": [
+      "Launch GAD-7 assessment"
+    ],
+    "depression_flagged": [
+      "Launch PHQ-9 assessment"
+    ]
+  },
+  "safety_notes": [
+    "PHQ-4 is a screening tool, not a diagnosis.",
+    "No suicide item present \u2014 low immediate risk, safe for onboarding.",
+    "Designed for speed and minimal user fatigue."
+  ],
+  "non_diagnostic_disclaimer": "This screening result is not a diagnosis. It is intended to help identify areas where further support may be beneficial. Please consult a licensed mental health professional for a comprehensive evaluation.",
+  "shortTitle": "PHQ-4"
+}
