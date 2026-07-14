@@ -41,7 +41,7 @@ async def submit_meditation_completion(
             total_minutes=0,
             total_sessions=0,
             current_streak=0,
-            longest_streak=0
+            longest_streak=0,
         )
         db.add(stats)
 
