@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth/context";
+import { NotificationDropdown } from "@/components/dashboard/NotificationDropdown";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isGhostMode, isTransitioningGhostMode, logout, exitGhostMode } = useAuth();
@@ -163,6 +164,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
               ) : (
                 <>
+                  {!showGhostChrome && <NotificationDropdown />}
                   <span className="text-sm text-text-muted hidden sm:block transition-opacity">
                     {showGhostChrome ? "" : user.display_name}
                   </span>
