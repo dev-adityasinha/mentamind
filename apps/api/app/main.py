@@ -17,6 +17,7 @@ from app.routers import (
     hr_dashboard,
     invitations,
     journal,
+    meditation,
     mood,
     notifications,
     onboarding,
@@ -124,6 +125,7 @@ app.include_router(hr_dashboard.router)
 app.include_router(settings_router.router)
 app.include_router(saml.router)
 app.include_router(chat.router)
+app.include_router(meditation.router)
 
 
 @app.get("/health")
