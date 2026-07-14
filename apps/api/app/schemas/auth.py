@@ -50,3 +50,25 @@ class ConsentUpdateRequest(BaseModel):
     ai_coaching: bool = False
     community: bool = False
     version: str = "v1.0"
+
+
+class RegisterRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    email: str = Field(..., min_length=1, max_length=320)
+    password: str = Field(..., min_length=8)
+    display_name: str = Field(..., min_length=1, max_length=255)
+    org_id: str | None = None  # Optional org_id if joining an existing org
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(..., min_length=8)
