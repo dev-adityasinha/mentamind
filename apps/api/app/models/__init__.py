@@ -1,6 +1,7 @@
 from app.models.ai_coach import AiCoachMessage, AiCoachSession
 from app.models.appointment import Appointment
 from app.models.audit_log import AuditLog
+from app.models.comment import Comment
 from app.models.consent_record import ConsentRecord
 from app.models.daily_completion import DailyCompletion
 from app.models.department import Department
@@ -14,6 +15,7 @@ from app.models.organization import Organization
 from app.models.post import Post, PostLike
 from app.models.psychologist_summary import PsychologistSummary
 from app.models.refresh_token import RefreshToken
+from app.models.report import ContentReport
 from app.models.test_score import TestScore
 from app.models.user import User
 from app.models.user_settings import UserSettings
@@ -42,4 +44,6 @@ __all__ = [
     "AuditLog",
     "Post",
     "PostLike",
+    "Comment",
+    "ContentReport",
 ]
