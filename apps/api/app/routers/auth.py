@@ -3,42 +3,42 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from jose import JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies.auth import get_current_user, require_ghost_user
-from app.models.organization import Organization, DataResidencyRegion
+from app.models.organization import DataResidencyRegion, Organization
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserRole
 from app.schemas.auth import (
     ConsentUpdateRequest,
+    ForgotPasswordRequest,
     GhostMergeRequest,
     LoginRequest,
     RefreshRequest,
     RegisterOrganizationRequest,
     RegisterRequest,
-    VerifyEmailRequest,
-    ForgotPasswordRequest,
     ResetPasswordRequest,
     SpawnGhostResponse,
     TokenResponse,
+    VerifyEmailRequest,
 )
 from app.services.auth_service import (
     create_access_token,
+    create_password_reset_token,
+    create_verification_token,
+    decode_password_reset_token,
+    decode_verification_token,
     generate_refresh_token,
     hash_email,
     hash_password,
     hash_token,
     verify_password,
-    create_verification_token,
-    decode_verification_token,
-    create_password_reset_token,
-    decode_password_reset_token,
 )
-from app.services.email import send_verification_email, send_password_reset_email
+from app.services.email import send_password_reset_email, send_verification_email
 from app.settings import settings
-from jose import JWTError
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -198,7 +198,7 @@ async def register_user(
         # Create a personal organization for the user
         org = Organization(
             name=f"{body.display_name.strip()}'s Organization",
-            data_residency_region=DataResidencyRegion.IN
+            data_residency_region=DataResidencyRegion.IN,
         )
         db.add(org)
         await db.flush()
@@ -217,6 +217,7 @@ async def register_user(
     await db.commit()
 
     import asyncio
+
     token = create_verification_token(body.email)
     asyncio.create_task(send_verification_email(body.email, token))
 
@@ -253,9 +254,10 @@ async def forgot_password(
     user = result.scalar_one_or_none()
     if user:
         import asyncio
+
         token = create_password_reset_token(body.email)
         asyncio.create_task(send_password_reset_email(body.email, token))
-    
+
     # Always return a generic message to prevent email enumeration
     return {"message": "If an account exists, a password reset link has been sent."}
 

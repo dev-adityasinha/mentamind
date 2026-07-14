@@ -8,6 +8,8 @@ from app.models.mood_log import InputMethod
 
 class MoodCreateRequest(BaseModel):
     mood_score: int = Field(..., ge=1, le=5)
+    energy_score: int | None = Field(default=None, ge=1, le=5)
+    stress_score: int | None = Field(default=None, ge=1, le=5)
     emotion_tags: list[str] = Field(default_factory=list, max_length=15)
     context_tag: str | None = Field(default=None, max_length=50)
     note: str | None = Field(default=None, max_length=1000)
@@ -19,6 +21,8 @@ class MoodCreateRequest(BaseModel):
 class MoodResponse(BaseModel):
     id: uuid.UUID
     mood_score: int
+    energy_score: int | None
+    stress_score: int | None
     emotion_tags: list[str]
     context_tag: str | None
     note: str | None

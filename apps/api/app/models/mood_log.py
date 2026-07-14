@@ -63,6 +63,12 @@ class MoodLog(Base):
         CheckConstraint(
             "mood_score >= 1 AND mood_score <= 5", name="ck_mood_logs_mood_score"
         ),
+        CheckConstraint(
+            "energy_score >= 1 AND energy_score <= 5", name="ck_mood_logs_energy_score"
+        ),
+        CheckConstraint(
+            "stress_score >= 1 AND stress_score <= 5", name="ck_mood_logs_stress_score"
+        ),
         Index("ix_mood_logs_user_id", "user_id"),
         Index("ix_mood_logs_org_id", "org_id"),
         Index("ix_mood_logs_user_logged_at", "user_id", "logged_at"),
@@ -77,6 +83,8 @@ class MoodLog(Base):
         ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
     )
     mood_score: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    energy_score: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
+    stress_score: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
     emotion_tags: Mapped[list[str]] = mapped_column(TextArrayType, nullable=False)
     context_tag: Mapped[str | None] = mapped_column(String(50), nullable=True)
     context_encrypted: Mapped[str | None] = mapped_column(String(1024), nullable=True)

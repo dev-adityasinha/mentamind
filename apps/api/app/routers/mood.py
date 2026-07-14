@@ -41,6 +41,8 @@ async def create_mood_log(
 
     if existing_log:
         existing_log.mood_score = request.mood_score
+        existing_log.energy_score = request.energy_score
+        existing_log.stress_score = request.stress_score
         existing_log.emotion_tags = request.emotion_tags
         existing_log.context_tag = request.context_tag
         existing_log.context_encrypted = note_encrypted
@@ -52,6 +54,8 @@ async def create_mood_log(
             user_id=current_user.id,
             org_id=current_user.org_id,
             mood_score=request.mood_score,
+            energy_score=request.energy_score,
+            stress_score=request.stress_score,
             emotion_tags=request.emotion_tags,
             context_tag=request.context_tag,
             context_encrypted=note_encrypted,
@@ -70,6 +74,8 @@ async def create_mood_log(
     return MoodResponse(
         id=log.id,
         mood_score=log.mood_score,
+        energy_score=log.energy_score,
+        stress_score=log.stress_score,
         emotion_tags=log.emotion_tags,
         context_tag=log.context_tag,
         note=request.note,
@@ -109,6 +115,8 @@ async def get_mood_history(
             MoodResponse(
                 id=log.id,
                 mood_score=log.mood_score,
+                energy_score=log.energy_score,
+                stress_score=log.stress_score,
                 emotion_tags=log.emotion_tags,
                 context_tag=log.context_tag,
                 note=note,
