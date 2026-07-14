@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <StatCard title="Total Users" value={stats?.total_users || 0} icon="👤" />
-                <StatCard title="Active Reports" value={stats?.active_reports || 0} icon="⚠️" highlight={stats && stats.active_reports > 0} />
+                <StatCard title="Active Reports" value={stats?.active_reports || 0} icon="⚠️" highlight={Boolean(stats && stats.active_reports > 0)} />
                 <StatCard title="Total Posts" value={stats?.total_posts || 0} icon="📝" />
                 <StatCard title="AI Sessions" value={stats?.total_ai_sessions || 0} icon="🤖" />
             </div>
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
                                         Reported Content (Author: {report.target_author_name || 'Anonymous'})
                                     </p>
                                     <p className="text-text-primary mb-4 italic">
-                                        "{report.target_content || 'Content not available (deleted?)'}"
+                                        &quot;{report.target_content || 'Content not available (deleted?)'}&quot;
                                     </p>
                                     
                                     <button 

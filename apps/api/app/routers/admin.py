@@ -21,6 +21,12 @@ from app.schemas.admin import (
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+@router.get("/ping")
+async def admin_ping(
+    user: Annotated[User, require_roles(UserRole.ADMIN, UserRole.HR_MANAGER)],
+) -> dict:
+    return {"pong": True, "user_id": str(user.id)}
+
 
 @router.get("/stats", response_model=AdminStatsResponse)
 async def get_admin_stats(

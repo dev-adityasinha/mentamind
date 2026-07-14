@@ -22,7 +22,9 @@ export interface AdminReport {
 }
 
 export async function fetchAdminStats(): Promise<AdminStats> {
-    return apiFetch('/admin/stats');
+    const res = await apiFetch('/admin/stats');
+    if (!res.ok) throw new Error('Failed to fetch admin stats');
+    return res.json();
 }
 
 export async function fetchAdminReports(status?: string, limit = 50, offset = 0): Promise<AdminReport[]> {
@@ -30,30 +32,36 @@ export async function fetchAdminReports(status?: string, limit = 50, offset = 0)
     if (status) params.append('status_filter', status);
     params.append('limit', limit.toString());
     params.append('offset', offset.toString());
-    return apiFetch(`/admin/reports?${params.toString()}`);
+    const res = await apiFetch(`/admin/reports?${params.toString()}`);
+    if (!res.ok) throw new Error('Failed to fetch reports');
+    return res.json();
 }
 
 export async function updateReportStatus(reportId: string, status: 'resolved' | 'dismissed'): Promise<void> {
-    return apiFetch(`/admin/reports/${reportId}`, {
+    const res = await apiFetch(`/admin/reports/${reportId}`, {
         method: 'PATCH',
         body: JSON.stringify({ status }),
     });
+    if (!res.ok) throw new Error('Failed to update report status');
 }
 
 export async function deleteAdminPost(postId: string): Promise<void> {
-    return apiFetch(`/admin/posts/${postId}`, {
+    const res = await apiFetch(`/admin/posts/${postId}`, {
         method: 'DELETE',
     });
+    if (!res.ok) throw new Error('Failed to delete post');
 }
 
 export async function deleteAdminComment(commentId: string): Promise<void> {
-    return apiFetch(`/admin/comments/${commentId}`, {
+    const res = await apiFetch(`/admin/comments/${commentId}`, {
         method: 'DELETE',
     });
+    if (!res.ok) throw new Error('Failed to delete comment');
 }
 
 export async function suspendUser(userId: string): Promise<void> {
-    return apiFetch(`/admin/users/${userId}/suspend`, {
+    const res = await apiFetch(`/admin/users/${userId}/suspend`, {
         method: 'PATCH',
     });
+    if (!res.ok) throw new Error('Failed to suspend user');
 }
