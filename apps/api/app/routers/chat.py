@@ -70,7 +70,7 @@ async def chat_websocket(
         # Match found! Broadcast to both
         payload = {"type": "matched", "session_id": str(session.id)}
         await chat_manager.send_personal_message(session.participant_1_id, payload)
-        
+
         # Also need to send it to the local user directly because they JUST connected
         # and redis pubsub might have a tiny delay or they are the one triggering
         # the match.
@@ -144,12 +144,12 @@ async def chat_websocket(
             elif msg_type == "read":
                 msg_id = uuid.UUID(data.get("message_id"))
                 session_id = uuid.UUID(data.get("session_id"))
-                
+
                 res = await db.execute(
                     select(ChatMessage).where(ChatMessage.id == msg_id)
                 )
                 chat_msg = res.scalar_one_or_none()
-                
+
                 if chat_msg and chat_msg.sender_id != user.id:
                     chat_msg.is_read = True
                     await db.commit()
@@ -184,7 +184,7 @@ async def chat_websocket(
                     sess.status = ChatSessionStatus.ENDED
                     sess.ended_at = datetime.now(UTC)
                     await db.commit()
-                    
+
                     target_id = (
                         sess.participant_2_id
                         if sess.participant_1_id == user.id
