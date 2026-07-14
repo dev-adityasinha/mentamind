@@ -44,11 +44,15 @@ class ChatSession(Base):
         default=lambda: datetime.now(UTC),
         server_default=func.now(),
     )
-    ended_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ended_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Relationships
     participant_1: Mapped[User] = relationship("User", foreign_keys=[participant_1_id])
-    participant_2: Mapped[User | None] = relationship("User", foreign_keys=[participant_2_id])
+    participant_2: Mapped[User | None] = relationship(
+        "User", foreign_keys=[participant_2_id]
+    )
     messages: Mapped[list[ChatMessage]] = relationship(
         "ChatMessage", back_populates="session", cascade="all, delete-orphan"
     )

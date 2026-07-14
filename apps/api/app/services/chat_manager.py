@@ -68,7 +68,9 @@ class ChatManager:
         }
         await redis.publish("chat:events", json.dumps(message))
 
-    async def find_partner(self, user_id: uuid.UUID, db: AsyncSession) -> ChatSession | None:
+    async def find_partner(
+        self, user_id: uuid.UUID, db: AsyncSession
+    ) -> ChatSession | None:
         """
         Matchmaking logic using Redis queue.
         If a partner is found, a ChatSession is created in Postgres and returned.

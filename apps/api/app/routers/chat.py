@@ -38,16 +38,21 @@ async def get_ws_user(
         user_id = uuid.UUID(payload.get("sub") or "")
         org_id = uuid.UUID(payload.get("org_id") or "")
     except (JWTError, ValueError):
-        # We don't raise HTTPException here because FastAPI handles WS exceptions differently,
-        # but modern FastAPI handles HTTPException gracefully by closing WS with a specific code.
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        # We don't raise HTTPException here because FastAPI handles WS exceptions
+        # differently, but modern FastAPI handles HTTPException gracefully by
+        # closing WS with a specific code.
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+        )
 
     result = await db.execute(
         select(User).where(User.id == user_id, User.org_id == org_id)
     )
     user = result.scalar_one_or_none()
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
     return user
 
 
@@ -67,7 +72,8 @@ async def chat_websocket(
         await chat_manager.send_personal_message(session.participant_1_id, payload)
         
         # Also need to send it to the local user directly because they JUST connected
-        # and redis pubsub might have a tiny delay or they are the one triggering the match.
+        # and redis pubsub might have a tiny delay or they are the one triggering
+        # the match.
         # It's fine to just send via WS
         if session.participant_2_id == user.id:
             await websocket.send_json(payload)

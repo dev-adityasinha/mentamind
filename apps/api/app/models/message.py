@@ -36,5 +36,7 @@ class ChatMessage(Base):
     )
 
     # Relationships
-    session: Mapped[ChatSession] = relationship("ChatSession", back_populates="messages")
+    session: Mapped[ChatSession] = relationship(
+        "ChatSession", back_populates="messages"
+    )
     sender: Mapped[User] = relationship("User", foreign_keys=[sender_id])
