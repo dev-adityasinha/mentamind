@@ -67,7 +67,7 @@ async def send_streak_alerts():
             select(User).where(User.deleted_at.is_(None))
         )
         users = active_users_result.scalars().all()
-        
+
         count = 0
         for user in users:
             logs_res = await session.execute(
@@ -88,7 +88,7 @@ async def send_streak_alerts():
                 )
                 session.add(notif)
                 count += 1
-        
+
         await session.commit()
         logger.info(f"Sent streak alerts to {count} users.")
 

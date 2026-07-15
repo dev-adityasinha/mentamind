@@ -38,21 +38,23 @@ class GroqAdapter(AIProviderAdapter):
             create_kwargs["tool_choice"] = kwargs["tool_choice"]
 
         response = await self.client.chat.completions.create(**create_kwargs)
-        
+
         msg = response.choices[0].message
         content = msg.content
         tool_calls = None
-        
+
         if msg.tool_calls:
             tool_calls = []
             for tc in msg.tool_calls:
-                tool_calls.append({
-                    "id": tc.id,
-                    "type": tc.type,
-                    "function": {
-                        "name": tc.function.name,
-                        "arguments": tc.function.arguments
+                tool_calls.append(
+                    {
+                        "id": tc.id,
+                        "type": tc.type,
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments,
+                        },
                     }
-                })
-                
+                )
+
         return content, tool_calls

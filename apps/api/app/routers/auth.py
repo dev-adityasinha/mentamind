@@ -45,7 +45,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=TokenResponse)
-@limiter.limit(f"{settings.auth_login_rate_limit_calls}/{settings.auth_login_rate_limit_window} seconds")
+@limiter.limit(
+    f"{settings.auth_login_rate_limit_calls}/{settings.auth_login_rate_limit_window} seconds"
+)
 async def login(
     request: Request,
     body: LoginRequest,
@@ -123,7 +125,9 @@ async def refresh(
     response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
 )
-@limiter.limit(f"{settings.auth_register_rate_limit_calls}/{settings.auth_register_rate_limit_window} seconds")
+@limiter.limit(
+    f"{settings.auth_register_rate_limit_calls}/{settings.auth_register_rate_limit_window} seconds"
+)
 async def register_organization(
     request: Request,
     body: RegisterOrganizationRequest,
@@ -181,7 +185,9 @@ async def register_organization(
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-@limiter.limit(f"{settings.auth_register_rate_limit_calls}/{settings.auth_register_rate_limit_window} seconds")
+@limiter.limit(
+    f"{settings.auth_register_rate_limit_calls}/{settings.auth_register_rate_limit_window} seconds"
+)
 async def register_user(
     request: Request,
     body: RegisterRequest,
@@ -249,7 +255,7 @@ async def verify_email(
 
     user.is_verified = True
     await db.commit()
-    
+
     return {"message": "Email verified successfully"}
 
 

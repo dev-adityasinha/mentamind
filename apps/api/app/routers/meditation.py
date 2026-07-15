@@ -26,13 +26,17 @@ from app.services.meditation_tracker import submit_meditation_completion
 try:
     from fastapi_cache.decorator import cache
 except ImportError:
+
     def cache(*args, **kwargs):
         def wrapper(func):
             @functools.wraps(func)
             async def inner(*args, **kwargs):
                 return await func(*args, **kwargs)
+
             return inner
+
         return wrapper
+
 
 router = APIRouter(prefix="/meditation", tags=["meditation"])
 

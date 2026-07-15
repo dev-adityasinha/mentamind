@@ -42,4 +42,4 @@ async def test_hr_manager_accepted_at_admin_ping(
 @pytest.mark.asyncio
 async def test_unauthenticated_request_rejected(client: AsyncClient) -> None:
     resp = await client.get("/admin/ping")
-    assert resp.status_code == 403
+    assert resp.status_code == 401

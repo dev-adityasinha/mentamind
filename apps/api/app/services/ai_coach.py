@@ -140,7 +140,7 @@ async def generate_coach_response(
                 try:
                     args = json.loads(tc["function"]["arguments"])
                     category = args.get("category", "").upper()
-                    
+
                     # fetch a meditation track by category
                     track_res = await db.execute(
                         select(MeditationTrack)
@@ -149,7 +149,7 @@ async def generate_coach_response(
                         .limit(1)
                     )
                     track = track_res.scalar_one_or_none()
-                    
+
                     if track:
                         ai_text = f"I've found a great meditation track for you: {track.title} ({track.duration_seconds // 60} mins). It's focused on {track.category.lower()}."
                     else:

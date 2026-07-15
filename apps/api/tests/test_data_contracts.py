@@ -118,9 +118,9 @@ async def test_mood_log_org_isolation(
             MoodLog.org_id == org_b.id,
         )
     )
-    assert (
-        result.scalar_one_or_none() is None
-    ), "MoodLog for org_a must not be visible under org_b's org_id filter"
+    assert result.scalar_one_or_none() is None, (
+        "MoodLog for org_a must not be visible under org_b's org_id filter"
+    )
 
 
 # ---------------------------------------------------------------------------

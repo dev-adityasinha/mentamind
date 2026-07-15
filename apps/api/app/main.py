@@ -12,6 +12,7 @@ from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
 try:
     from fastapi_cache import FastAPICache
     from fastapi_cache.backends.redis import RedisBackend
+
     HAS_CACHE = True
 except ImportError:
     HAS_CACHE = False
@@ -57,11 +58,15 @@ async def lifespan(application: FastAPI):
 
         validate_secret_keys()
         validate_encryption_key()
-    
+
     if HAS_CACHE:
-        r = redis.from_url(settings.redis_url, encoding="utf8", decode_responses=True)
-        FastAPICache.init(RedisBackend(r), prefix="mentamind-cache")
-    
+        if settings.environment == "test":
+            from fastapi_cache.backends.inmemory import InMemoryBackend
+            FastAPICache.init(InMemoryBackend(), prefix="mentamind-cache")
+        else:
+            r = redis.from_url(settings.redis_url, encoding="utf8", decode_responses=True)
+            FastAPICache.init(RedisBackend(r), prefix="mentamind-cache")
+
     yield
 
 
@@ -146,6 +151,7 @@ app.include_router(saml.router)
 app.include_router(chat.router)
 app.include_router(meditation.router)
 app.include_router(dashboard.router)
+
 
 @app.get("/health")
 async def health() -> dict:

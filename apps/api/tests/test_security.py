@@ -170,9 +170,9 @@ async def test_no_email_in_request_logs(
         )
 
     all_log_text = " ".join(caplog.messages)
-    assert (
-        sentinel_email not in all_log_text
-    ), f"Email address appeared in log output. Captured: {all_log_text!r}"
+    assert sentinel_email not in all_log_text, (
+        f"Email address appeared in log output. Captured: {all_log_text!r}"
+    )
 
 
 async def test_no_token_in_request_logs(
@@ -216,10 +216,10 @@ async def test_ghost_merge_rejects_unauthenticated(
         "password": "NewPass123!",
     }
 
-    # 1. No auth header at all → 403 (FastAPI's HTTPBearer raises 403 when
+    # 1. No auth header at all → 401
     #    the Authorization header is missing entirely)
     resp = await client.post("/auth/ghost/merge", json=merge_body)
-    assert resp.status_code == status.HTTP_403_FORBIDDEN, "No-auth rejected"
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED, "No-auth rejected"
 
     # 2. Real (non-ghost) user JWT → 403
     real_user, _ = await create_user(

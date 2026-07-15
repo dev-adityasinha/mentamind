@@ -20,12 +20,15 @@ from app.schemas.screening import (
 try:
     from fastapi_cache.decorator import cache
 except ImportError:
+
     def cache(*args, **kwargs):
         def wrapper(func):
             @functools.wraps(func)
             async def inner(*args, **kwargs):
                 return await func(*args, **kwargs)
+
             return inner
+
         return wrapper
 
 
@@ -96,6 +99,7 @@ async def get_assessment_templates(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     from sqlalchemy.orm import selectinload
+
     result = await db.execute(
         select(AssessmentTemplate)
         .where(AssessmentTemplate.is_active)
@@ -103,6 +107,7 @@ async def get_assessment_templates(
     )
     templates = result.scalars().all()
     return templates
+
 
 @router.post("/sessions")
 async def start_screening_session(
