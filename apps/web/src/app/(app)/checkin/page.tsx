@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { submitMoodLog } from "@/lib/api/mood";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import { MicrophoneButton } from "@/components/ui/MicrophoneButton";
 
 const MOODS = [
   { value: 1, label: "Terrible", emoji: "😭", color: "hover:bg-red-50 hover:border-red-200" },
@@ -185,12 +186,19 @@ export default function CheckInPage() {
             <p className="text-sm text-text-muted">
               Your notes are fully encrypted and only visible to you.
             </p>
-            <textarea
-              className="w-full rounded-md border border-border bg-surface p-3 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-1 focus:ring-focus min-h-[120px] resize-y"
-              placeholder="Jot down your thoughts..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
+            <div className="relative">
+              <textarea
+                className="w-full rounded-md border border-border bg-surface p-3 pr-12 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-1 focus:ring-focus min-h-[120px] resize-y"
+                placeholder="Jot down your thoughts..."
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
+              <div className="absolute top-2 right-2">
+                <MicrophoneButton
+                  onTranscript={(text) => setNote((prev) => prev ? prev + " " + text : text)}
+                />
+              </div>
+            </div>
             <div className="mt-8 flex justify-between">
               <Button variant="ghost" onClick={() => setStep(3)} disabled={isSubmitting}>
                 Back

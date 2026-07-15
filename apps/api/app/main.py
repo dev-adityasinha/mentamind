@@ -1,10 +1,20 @@
 import logging
 from contextlib import asynccontextmanager
 
+import redis.asyncio as redis
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 import app.models  # noqa: F401 - ensures all models are registered with Base.metadata
+from app.middleware.rate_limit import limiter, rate_limit_exceeded_handler
+
+try:
+    from fastapi_cache import FastAPICache
+    from fastapi_cache.backends.redis import RedisBackend
+    HAS_CACHE = True
+except ImportError:
+    HAS_CACHE = False
 from app.middleware.cors import CorsMiddleware
 from app.middleware.logging_mw import JSONFormatter, RequestLoggingMiddleware
 from app.middleware.security import SecurityHeadersMiddleware
@@ -13,6 +23,7 @@ from app.routers import (
     ai_coach,
     auth,
     chat,
+    dashboard,
     forum,
     hr_dashboard,
     invitations,
@@ -46,6 +57,11 @@ async def lifespan(application: FastAPI):
 
         validate_secret_keys()
         validate_encryption_key()
+    
+    if HAS_CACHE:
+        r = redis.from_url(settings.redis_url, encoding="utf8", decode_responses=True)
+        FastAPICache.init(RedisBackend(r), prefix="mentamind-cache")
+    
     yield
 
 
@@ -62,6 +78,9 @@ app = FastAPI(
     docs_url=_docs_url,
     redoc_url=_redoc_url,
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 
 _log = logging.getLogger("mentamind.error")
@@ -126,7 +145,7 @@ app.include_router(settings_router.router)
 app.include_router(saml.router)
 app.include_router(chat.router)
 app.include_router(meditation.router)
-
+app.include_router(dashboard.router)
 
 @app.get("/health")
 async def health() -> dict:

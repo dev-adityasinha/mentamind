@@ -15,6 +15,8 @@ import {
   type CoachSession,
   type CoachMessage,
 } from "@/lib/api/coach";
+import { MicrophoneButton } from "@/components/ui/MicrophoneButton";
+import { Volume2, VolumeX } from "lucide-react";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString("en-IN", {
@@ -44,7 +46,23 @@ export default function CoachPage() {
   const [sending, setSending] = useState(false);
   const [creatingSession, setCreatingSession] = useState(false);
   const [activeSession, setActiveSession] = useState<CoachSession | null>(null);
+  const [readAloud, setReadAloud] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Voice synthesis effect
+  useEffect(() => {
+    if (readAloud && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg.role === "assistant" && typeof window !== "undefined") {
+        const synth = window.speechSynthesis;
+        if (synth && !synth.speaking) {
+          const utterance = new SpeechSynthesisUtterance(lastMsg.content || "");
+          utterance.lang = "en-US";
+          synth.speak(utterance);
+        }
+      }
+    }
+  }, [messages, readAloud]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -238,11 +256,27 @@ export default function CoachPage() {
                       <span className="ml-2 text-xs text-text-muted">(ended)</span>
                     )}
                   </div>
-                  {activeSession && !activeSession.ended_at && (
-                    <Button variant="ghost" size="sm" onClick={handleEndSession}>
-                      End session
-                    </Button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReadAloud(!readAloud);
+                        if (readAloud && typeof window !== "undefined") {
+                          window.speechSynthesis?.cancel();
+                        }
+                      }}
+                      className="p-1.5 text-text-muted hover:text-brand transition-colors rounded-md hover:bg-surface-raised"
+                      aria-label={readAloud ? "Disable read aloud" : "Enable read aloud"}
+                      title="Read AI messages aloud"
+                    >
+                      {readAloud ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                    </button>
+                    {activeSession && !activeSession.ended_at && (
+                      <Button variant="ghost" size="sm" onClick={handleEndSession}>
+                        End session
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Messages */}
@@ -282,7 +316,10 @@ export default function CoachPage() {
                 {/* Input */}
                 {activeSession && !activeSession.ended_at && (
                   <div className="border-t border-border p-4">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
+                      <MicrophoneButton
+                        onTranscript={(text) => setInput((prev) => prev ? prev + " " + text : text)}
+                      />
                       <input
                         type="text"
                         value={input}

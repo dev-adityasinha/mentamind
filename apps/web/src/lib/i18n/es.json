@@ -1,0 +1,13 @@
+{
+  "dashboard.welcome": "Bienvenido de nuevo",
+  "dashboard.ai_coach": "Entrenador IA",
+  "dashboard.check_in": "Registro Diario",
+  "dashboard.meditation": "Meditación",
+  "dashboard.community": "Comunidad",
+  "dashboard.journal": "Diario",
+  "dashboard.screening": "Evaluaciones",
+  "dashboard.settings": "Ajustes",
+  "settings.language": "Idioma",
+  "settings.language.en": "English",
+  "settings.language.es": "Español"
+}

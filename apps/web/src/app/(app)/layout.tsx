@@ -6,9 +6,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/auth/context";
 import { NotificationDropdown } from "@/components/dashboard/NotificationDropdown";
+import { useI18n } from "@/lib/i18n/Context";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, isGhostMode, isTransitioningGhostMode, logout, exitGhostMode } = useAuth();
+  const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -69,7 +71,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     : "text-text-secondary hover:text-text-primary"
                 }`}
               >
-                Home
+                {t("dashboard.welcome") === "dashboard.welcome" ? "Home" : t("dashboard.welcome").split(" ")[0]}
               </Link>
               {!isGhostMode && !isTransitioningGhostMode && (
                 <Link
@@ -80,8 +82,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  Journal
-                </Link>
+                {t("dashboard.journal")}
+              </Link>
               )}
               {!isGhostMode && !isTransitioningGhostMode && (
                 <Link
@@ -92,8 +94,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  Coach
-                </Link>
+                {t("dashboard.ai_coach")}
+              </Link>
               )}
               {!isGhostMode && !isTransitioningGhostMode && (
                 <Link
@@ -104,8 +106,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  Screening
-                </Link>
+                {t("dashboard.screening")}
+              </Link>
               )}
               {!isGhostMode && !isTransitioningGhostMode && (
                 <Link
@@ -116,8 +118,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  Settings
-                </Link>
+                {t("dashboard.settings")}
+              </Link>
               )}
               {!isGhostMode && !isTransitioningGhostMode && (user.role === "admin" || user.role === "hr_manager") && (
                 <Link
@@ -152,8 +154,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                       : "text-text-secondary hover:text-text-primary"
                   }`}
                 >
-                  Forum
-                </Link>
+                {t("dashboard.community")}
+              </Link>
               )}
             </nav>
             <div className="flex items-center gap-4">

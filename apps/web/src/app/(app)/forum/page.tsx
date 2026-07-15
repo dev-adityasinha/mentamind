@@ -331,7 +331,7 @@ export default function ForumPage() {
 
   useEffect(() => {
     loadPosts(true);
-  }, [activeCategory, sortMethod]);
+  }, [activeCategory, sortMethod, loadPosts]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

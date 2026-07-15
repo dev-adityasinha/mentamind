@@ -1,3 +1,4 @@
+import functools
 import uuid
 from typing import Annotated
 
@@ -22,10 +23,22 @@ from app.schemas.meditation import (
 )
 from app.services.meditation_tracker import submit_meditation_completion
 
+try:
+    from fastapi_cache.decorator import cache
+except ImportError:
+    def cache(*args, **kwargs):
+        def wrapper(func):
+            @functools.wraps(func)
+            async def inner(*args, **kwargs):
+                return await func(*args, **kwargs)
+            return inner
+        return wrapper
+
 router = APIRouter(prefix="/meditation", tags=["meditation"])
 
 
 @router.get("/tracks", response_model=list[MeditationTrackResponse])
+@cache(expire=3600)
 async def list_tracks(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],

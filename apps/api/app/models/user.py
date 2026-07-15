@@ -41,6 +41,7 @@ class User(Base):
     email_hash: Mapped[str | None] = mapped_column(
         String(64), unique=True, nullable=True
     )
+    is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     display_name: Mapped[str] = mapped_column(
         String(255), nullable=False, default="Anonymous"
     )

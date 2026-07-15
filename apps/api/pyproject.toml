@@ -23,6 +23,8 @@ dependencies = [
     "python3-saml>=1.16.0",
     "openai>=2.0.0",
     "apscheduler==3.10.4",
+    "slowapi==0.1.9",
+    "fastapi-cache2[redis]",
 ]
 
 [project.optional-dependencies]
