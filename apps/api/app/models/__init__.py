@@ -14,7 +14,7 @@ from app.models.message import ChatMessage
 from app.models.mood_log import MoodLog
 from app.models.notification_event import NotificationEvent
 from app.models.organization import Organization
-from app.models.post import Post, PostLike
+from app.models.post import Post, PostLike, PostMood, PostTag
 from app.models.psychologist_summary import PsychologistSummary
 from app.models.refresh_token import RefreshToken
 from app.models.report import ContentReport
@@ -48,6 +48,8 @@ __all__ = [
     "AuditLog",
     "Post",
     "PostLike",
+    "PostTag",
+    "PostMood",
     "Comment",
     "ContentReport",
     "ChatSession",

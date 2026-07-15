@@ -24,6 +24,7 @@ from app.models.user import User
 from app.schemas.chat import ChatMessageResponse, ChatSessionResponse
 from app.services.auth_service import decode_access_token
 from app.services.chat_manager import chat_manager
+from app.services.encryption import decrypt, encrypt
 
 logger = logging.getLogger(__name__)
 
@@ -98,8 +99,14 @@ async def chat_websocket(
                 sess = res.scalar_one_or_none()
 
                 if sess and sess.status == ChatSessionStatus.ACTIVE:
+                    try:
+                        enc_content = encrypt(content, associated_data=session_id.bytes)
+                    except Exception as e:
+                        logger.error(f"Encryption failed: {e}")
+                        continue
+
                     new_msg = ChatMessage(
-                        session_id=session_id, sender_id=user.id, content=content
+                        session_id=session_id, sender_id=user.id, content=enc_content
                     )
                     db.add(new_msg)
                     await db.commit()
@@ -245,4 +252,13 @@ async def get_messages(
 
     messages = list(res.scalars().all())
     messages.reverse()
+
+    # Decrypt messages
+    for msg in messages:
+        try:
+            msg.content = decrypt(msg.content, associated_data=session_id.bytes)
+        except Exception as e:
+            logger.error(f"Failed to decrypt message {msg.id}: {e}")
+            msg.content = "[encrypted message unavailable]"
+
     return messages
