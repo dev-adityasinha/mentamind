@@ -88,6 +88,8 @@ jobs:
     defaults:
       run:
         working-directory: apps/api
+    env:
+      ENVIRONMENT: test
     steps:
       - uses: actions/checkout@v4
 
@@ -137,7 +139,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+asyncpg://mentamind:mentamind@localhost:5432/mentamind
       REDIS_URL: redis://localhost:6379/0
-      ENVIRONMENT: development
+      ENVIRONMENT: test
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
       API_SECRET_KEY: ${{ secrets.API_SECRET_KEY }}
