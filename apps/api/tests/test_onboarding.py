@@ -271,9 +271,9 @@ async def test_consent_grant_withdraw_grant_writes_three_records(
     records = resp.json()
 
     analytics_records = [r for r in records if r["consent_type"] == "analytics"]
-    assert len(analytics_records) == 3, (
-        "grant -> withdraw -> grant must produce exactly 3 analytics records"
-    )
+    assert (
+        len(analytics_records) == 3
+    ), "grant -> withdraw -> grant must produce exactly 3 analytics records"
     actions = [r["action"] for r in analytics_records]
     assert actions == ["granted", "withdrawn", "granted"]
 

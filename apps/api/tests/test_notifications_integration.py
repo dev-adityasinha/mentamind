@@ -140,9 +140,9 @@ async def test_rate_cap_atomic_under_concurrency(
         f"Expected exactly {cap} SENT under concurrency, got {sent}. "
         "This indicates a non-atomic rate cap implementation."
     )
-    assert limited == concurrent - cap, (
-        f"Expected {concurrent - cap} RATE_LIMITED, got {limited}."
-    )
+    assert (
+        limited == concurrent - cap
+    ), f"Expected {concurrent - cap} RATE_LIMITED, got {limited}."
 
     # Clean up test data so re-runs stay hermetic.
     await real_redis.delete(rate_key)

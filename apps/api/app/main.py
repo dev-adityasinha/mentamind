@@ -62,9 +62,12 @@ async def lifespan(application: FastAPI):
     if HAS_CACHE:
         if settings.environment == "test":
             from fastapi_cache.backends.inmemory import InMemoryBackend
+
             FastAPICache.init(InMemoryBackend(), prefix="mentamind-cache")
         else:
-            r = redis.from_url(settings.redis_url, encoding="utf8", decode_responses=True)
+            r = redis.from_url(
+                settings.redis_url, encoding="utf8", decode_responses=True
+            )
             FastAPICache.init(RedisBackend(r), prefix="mentamind-cache")
 
     yield

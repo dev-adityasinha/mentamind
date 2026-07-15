@@ -170,9 +170,9 @@ async def test_no_email_in_request_logs(
         )
 
     all_log_text = " ".join(caplog.messages)
-    assert sentinel_email not in all_log_text, (
-        f"Email address appeared in log output. Captured: {all_log_text!r}"
-    )
+    assert (
+        sentinel_email not in all_log_text
+    ), f"Email address appeared in log output. Captured: {all_log_text!r}"
 
 
 async def test_no_token_in_request_logs(

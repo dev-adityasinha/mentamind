@@ -26,7 +26,9 @@ async def get_dashboard_summary(
 
     # Pending chat requests count
     chats_res = await db.execute(
-        select(func.count(ChatSession.id)).where(ChatSession.status == ChatSessionStatus.WAITING)
+        select(func.count(ChatSession.id)).where(
+            ChatSession.status == ChatSessionStatus.WAITING
+        )
     )
     chats_count = chats_res.scalar() or 0
 
