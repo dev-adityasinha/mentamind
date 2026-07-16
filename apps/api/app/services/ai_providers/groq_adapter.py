@@ -61,7 +61,9 @@ class GroqAdapter(AIProviderAdapter):
 
         if content:
             # Parse leaked function tags e.g. <function=recommend_meditation>{"category": "relaxation"}</function>
-            matches = re.finditer(r'<function=([^>]+)>(.*?)</function>', content, flags=re.DOTALL)
+            matches = re.finditer(
+                r"<function=([^>]+)>(.*?)</function>", content, flags=re.DOTALL
+            )
             for match in matches:
                 name = match.group(1).strip()
                 args = match.group(2).strip()
@@ -77,8 +79,10 @@ class GroqAdapter(AIProviderAdapter):
                         },
                     }
                 )
-            
+
             # Remove the tags from the final content
-            content = re.sub(r'<function=[^>]+>.*?</function>', '', content, flags=re.DOTALL).strip()
+            content = re.sub(
+                r"<function=[^>]+>.*?</function>", "", content, flags=re.DOTALL
+            ).strip()
 
         return content, tool_calls

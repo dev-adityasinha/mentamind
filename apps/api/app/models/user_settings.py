@@ -22,7 +22,9 @@ class UserSettings(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
     )
-    theme: Mapped[ThemeMode] = mapped_column(PgEnum(ThemeMode), nullable=False, default=ThemeMode.SYSTEM)
+    theme: Mapped[ThemeMode] = mapped_column(
+        PgEnum(ThemeMode), nullable=False, default=ThemeMode.SYSTEM
+    )
     reminder_time: Mapped[str | None] = mapped_column(String(5), nullable=True)
     notifications_enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
     email_notifications: Mapped[bool] = mapped_column(default=True, nullable=False)
