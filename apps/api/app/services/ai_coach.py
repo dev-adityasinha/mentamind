@@ -58,7 +58,7 @@ async def generate_coach_response(
         )
         latest_mood = mood_res.scalar_one_or_none()
         if latest_mood:
-            context_str += f"\nUser's latest mood is: {latest_mood.score}/10, energy: {latest_mood.energy_score}/10, stress: {latest_mood.stress_score}/10."
+            context_str += f"\nUser's latest mood is: {latest_mood.mood_score}/5, energy: {latest_mood.energy_score}/5, stress: {latest_mood.stress_score}/5."
 
         test_res = await db.execute(
             select(TestScore)

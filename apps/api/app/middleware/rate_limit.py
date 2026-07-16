@@ -11,8 +11,8 @@ from slowapi.util import get_remote_address
 # but for MVP in-memory or a basic redis connection is sufficient.
 from app.settings import settings
 
-# Using memory storage for tests to avoid Redis dependency
-if settings.environment == "test":
+# Using memory storage for tests and development to avoid Redis dependency locally
+if settings.environment in ("test", "development"):
     redis_client = None
     limiter = Limiter(key_func=get_remote_address, storage_uri="memory://")
 else:

@@ -60,7 +60,7 @@ async def lifespan(application: FastAPI):
         validate_encryption_key()
 
     if HAS_CACHE:
-        if settings.environment == "test":
+        if settings.environment in ("test", "development"):
             from fastapi_cache.backends.inmemory import InMemoryBackend
 
             FastAPICache.init(InMemoryBackend(), prefix="mentamind-cache")
