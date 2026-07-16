@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "@/components/ui/Toast";
@@ -16,6 +16,7 @@ import {
   type UpdateSettingsData,
 } from "@/lib/api/settings";
 import { useI18n } from "@/lib/i18n/Context";
+import { useTheme } from "next-themes";
 
 const THEMES = [
   { value: "system", label: "System" },
@@ -29,10 +30,11 @@ const LANGUAGES = [
 ] as const;
 
 export default function SettingsPage() {
-  const { user, isLoading: authLoading, logout } = useAuth();
-  const { addToast } = useToast();
   const router = useRouter();
+  const { logout, isLoading: authLoading } = useAuth();
+  const { addToast } = useToast();
   const { setLocale, t } = useI18n();
+  const { setTheme } = useTheme();
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,20 +43,25 @@ export default function SettingsPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const hasLoadedRef = useRef(false);
+
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || hasLoadedRef.current) return;
     async function load() {
       try {
+        hasLoadedRef.current = true;
         const data = await getSettings();
         setSettings(data);
+        setTheme(data.theme);
       } catch {
         addToast("Failed to load settings", "error");
+        hasLoadedRef.current = false;
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, [authLoading, addToast]);
+  }, [authLoading, addToast, setTheme]);
 
   const handleSave = useCallback(async () => {
     if (!settings) return;
@@ -165,7 +172,11 @@ export default function SettingsPage() {
                 <button
                   key={t.value}
                   type="button"
-                  onClick={() => setSettings((s) => (s ? { ...s, theme: t.value } : s))}
+                  onClick={() => {
+                    setSettings((s) => (s ? { ...s, theme: t.value } : s));
+                    setTheme(t.value);
+                    updateSettings({ theme: t.value }).catch(() => {});
+                  }}
                   className={`rounded-lg border px-4 py-2 text-sm transition-colors ${
                     settings.theme === t.value
                       ? "border-brand bg-brand-subtle text-brand"
@@ -185,6 +196,7 @@ export default function SettingsPage() {
                 const val = e.target.value as "en" | "es";
                 setSettings((s) => (s ? { ...s, language: val } : s));
                 setLocale(val);
+                updateSettings({ language: val }).catch(() => {});
               }}
               className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
             >

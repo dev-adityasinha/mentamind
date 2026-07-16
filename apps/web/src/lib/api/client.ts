@@ -11,12 +11,22 @@ function getApiBase(): string {
 
 let _accessToken: string | null = null;
 
-export function setAccessToken(token: string): void {
+export function setAccessToken(token: string | null) {
   _accessToken = token;
+  if (typeof window !== "undefined") {
+    if (token) {
+      localStorage.setItem("has_session", "true");
+    } else {
+      localStorage.removeItem("has_session");
+    }
+  }
 }
 
 export function clearAccessToken(): void {
   _accessToken = null;
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("has_session");
+  }
 }
 
 export function getAccessToken(): string | null {
@@ -70,14 +80,30 @@ function doFetch(
   return fetch(`${getApiBase()}${path}`, { ...init, headers });
 }
 
-async function attemptRefresh(): Promise<boolean> {
-  try {
-    const res = await fetch("/api/auth/refresh", { method: "POST" });
-    if (!res.ok) return false;
-    const data = (await res.json()) as { access_token: string };
-    setAccessToken(data.access_token);
-    return true;
-  } catch {
-    return false;
-  }
+let refreshPromise: Promise<boolean> | null = null;
+
+export function attemptRefresh(): Promise<boolean> {
+  if (typeof window === "undefined") return Promise.resolve(false);
+  if (!localStorage.getItem("has_session")) return Promise.resolve(false);
+  
+  if (refreshPromise) return refreshPromise;
+  
+  refreshPromise = (async () => {
+    try {
+      const res = await fetch("/api/auth/refresh", { method: "POST" });
+      if (!res.ok) {
+        setAccessToken(null);
+        return false;
+      }
+      const data = (await res.json()) as { access_token: string };
+      setAccessToken(data.access_token);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+  
+  return refreshPromise;
 }

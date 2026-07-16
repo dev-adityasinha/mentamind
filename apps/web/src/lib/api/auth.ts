@@ -27,8 +27,12 @@ async function bffPost<T>(path: string, body: unknown): Promise<T> {
   });
   const data = (await res.json().catch(() => ({}))) as Record<string, unknown>;
   if (!res.ok) {
-    const detail =
-      typeof data.detail === "string" ? data.detail : "Request failed";
+    let detail = "Request failed";
+    if (typeof data.detail === "string") {
+      detail = data.detail;
+    } else if (Array.isArray(data.detail) && data.detail.length > 0) {
+      detail = data.detail.map((err: any) => err.msg || "Invalid value").join(", ");
+    }
     throw new ApiError(res.status, detail);
   }
   return data as T;

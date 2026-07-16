@@ -6,11 +6,13 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useRef,
 } from "react";
 import { loginApi, logoutApi, registerOrganizationApi } from "@/lib/api/auth";
 import {
   clearAccessToken,
   setAccessToken,
+  attemptRefresh,
 } from "@/lib/api/client";
 import { getMe } from "@/lib/api/users";
 import type { AuthContextValue, RegisterOrgData, User } from "./types";
@@ -33,21 +35,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let ignore = false;
+
     async function init() {
       try {
-        const res = await fetch("/api/auth/refresh", { method: "POST" });
-        if (res.ok) {
-          const data = (await res.json()) as { access_token: string };
-          setAccessToken(data.access_token);
+        const success = await attemptRefresh();
+        if (ignore) return;
+        if (success) {
           await loadUser();
         }
-      } catch {
-        // No session available.
       } finally {
-        setIsLoading(false);
+        if (!ignore) setIsLoading(false);
       }
     }
     void init();
+
+    return () => {
+      ignore = true;
+    };
   }, [loadUser]);
 
   const login = useCallback(

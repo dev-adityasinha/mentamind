@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.post import PostCategory
 
@@ -47,6 +47,19 @@ class PostResponse(PostBase):
     reply_count: int
     created_at: datetime
     updated_at: datetime
+
+    @field_validator('tags', 'moods', mode='before')
+    @classmethod
+    def extract_strings(cls, v):
+        if not v:
+            return []
+        if isinstance(v[0], str):
+            return v
+        if hasattr(v[0], 'tag'):
+            return [item.tag for item in v]
+        if hasattr(v[0], 'mood'):
+            return [item.mood for item in v]
+        return v
 
     model_config = ConfigDict(from_attributes=True)
 

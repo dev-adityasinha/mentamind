@@ -12,6 +12,11 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
+  const onTranscriptRef = useRef(onTranscript);
+  useEffect(() => {
+    onTranscriptRef.current = onTranscript;
+  }, [onTranscript]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition =
@@ -31,7 +36,7 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
             }
           }
           if (currentTranscript) {
-            onTranscript(currentTranscript.trim());
+            onTranscriptRef.current(currentTranscript.trim());
           }
         };
 
@@ -47,9 +52,15 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
         };
 
         recognitionRef.current = recognition;
+
+        return () => {
+          try {
+            recognition.stop();
+          } catch (e) {}
+        };
       }
     }
-  }, [onTranscript]);
+  }, []);
 
   const toggleListening = () => {
     if (isListening) {

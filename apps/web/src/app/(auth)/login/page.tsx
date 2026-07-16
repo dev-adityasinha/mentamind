@@ -55,12 +55,15 @@ export default function LoginPage() {
       await login(email, password);
       router.replace("/onboarding");
     } catch (err) {
-      if (err instanceof ApiError && err.status === 429) {
-        setErrors({ form: "Too many attempts. Please wait a moment and try again." });
+      if (err instanceof ApiError) {
+        if (err.status === 429) {
+          setErrors({ form: "Too many attempts. Please wait a moment and try again." });
+        } else {
+          setErrors({ form: err.message });
+        }
       } else {
-        setErrors({ form: "Invalid email or password." });
+        setErrors({ form: "An unexpected error occurred during login." });
       }
-      emailRef.current?.focus();
     } finally {
       setIsLoading(false);
     }
