@@ -21,7 +21,6 @@ class GeminiAdapter(AIProviderAdapter):
         user_id: uuid.UUID,
         **kwargs: Any,
     ) -> tuple[str | None, list[dict] | None]:
-
         gemini_contents = []
         for msg in messages:
             if msg["role"] == "user":

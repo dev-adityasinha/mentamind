@@ -48,16 +48,16 @@ class PostResponse(PostBase):
     created_at: datetime
     updated_at: datetime
 
-    @field_validator('tags', 'moods', mode='before')
+    @field_validator("tags", "moods", mode="before")
     @classmethod
     def extract_strings(cls, v):
         if not v:
             return []
         if isinstance(v[0], str):
             return v
-        if hasattr(v[0], 'tag'):
+        if hasattr(v[0], "tag"):
             return [item.tag for item in v]
-        if hasattr(v[0], 'mood'):
+        if hasattr(v[0], "mood"):
             return [item.mood for item in v]
         return v
 
