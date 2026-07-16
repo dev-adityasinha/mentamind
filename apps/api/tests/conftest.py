@@ -47,6 +47,16 @@ def _override_redis(fake_redis: FakeAsyncRedis):
     app.dependency_overrides.pop(get_redis_dep, None)
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    """Reset the global slowapi Limiter storage to prevent 429 across tests."""
+    from app.middleware.rate_limit import limiter
+
+    # This works for the MemoryStorage used in testing
+    limiter._storage.reset()
+    yield
+
+
 @pytest.fixture(scope="session", autouse=True)
 def _patch_encryption_key():
     """Inject a valid ENCRYPTION_KEY into settings for the entire test session."""

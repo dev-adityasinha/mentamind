@@ -1,5 +1,6 @@
 from app.models.ai_coach import AiCoachMessage, AiCoachSession
 from app.models.appointment import Appointment
+from app.models.assessment_bank import AssessmentQuestion, AssessmentTemplate
 from app.models.audit_log import AuditLog
 from app.models.chat import ChatSession
 from app.models.comment import Comment
@@ -28,6 +29,8 @@ __all__ = [
     "Department",
     "User",
     "UserSettings",
+    "AssessmentTemplate",
+    "AssessmentQuestion",
     "RefreshToken",
     "MoodLog",
     "WellnessScore",

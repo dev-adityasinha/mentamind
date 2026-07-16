@@ -95,7 +95,7 @@ def _check_environment(force: bool) -> None:
         sys.exit(1)
     if force and env not in _FORCE_ALLOWED:
         log.error(
-            "seed --force refused: ENVIRONMENT=%r. " "--force is only permitted in: %s",
+            "seed --force refused: ENVIRONMENT=%r. --force is only permitted in: %s",
             env,
             sorted(_FORCE_ALLOWED),
         )

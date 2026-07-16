@@ -62,8 +62,35 @@ async def send_streak_alerts():
     Simulates sending streak alerts to users.
     """
     logger.info("Running streak alerts task...")
-    # Simulation logic
-    pass
+    async with async_session_maker() as session:
+        active_users_result = await session.execute(
+            select(User).where(User.deleted_at.is_(None))
+        )
+        users = active_users_result.scalars().all()
+
+        count = 0
+        for user in users:
+            logs_res = await session.execute(
+                select(MoodLog)
+                .where(MoodLog.user_id == user.id)
+                .order_by(MoodLog.created_at.desc())
+                .limit(3)
+            )
+            logs = logs_res.scalars().all()
+            if len(logs) == 3:
+                # simple mock streak logic: exactly 3 latest logs
+                notif = NotificationEvent(
+                    user_id=user.id,
+                    org_id=user.org_id,
+                    category=NotificationCategory.STREAK_MILESTONE,
+                    title="3 Log Streak!",
+                    body_encrypted="You're on a roll! You've logged your mood 3 times. Keep it up!",
+                )
+                session.add(notif)
+                count += 1
+
+        await session.commit()
+        logger.info(f"Sent streak alerts to {count} users.")
 
 
 async def main():

@@ -1,0 +1,13 @@
+{
+  "dashboard.welcome": "Welcome back",
+  "dashboard.ai_coach": "AI Coach",
+  "dashboard.check_in": "Daily Check-in",
+  "dashboard.meditation": "Meditation",
+  "dashboard.community": "Community",
+  "dashboard.journal": "Journal",
+  "dashboard.screening": "Assessments",
+  "dashboard.settings": "Settings",
+  "settings.language": "Language",
+  "settings.language.en": "English",
+  "settings.language.es": "Español"
+}

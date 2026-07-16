@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ScreeningTimeline } from "@/components/dashboard/ScreeningTimeline";
 import { getScreeningHistory, ScreeningDetailResponse } from "@/lib/api/screening";
+import { apiFetch } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/context";
 import { Button } from "@/components/ui/Button";
 import questionnaireMap from "@/lib/screening/data/questionnaire-map.json";
@@ -37,6 +38,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const router = useRouter();
   const [screenings, setScreenings] = useState<ScreeningDetailResponse[]>([]);
+  const [summary, setSummary] = useState({ community_posts: 0, pending_chats: 0, ai_checkins: 0 });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +46,11 @@ export default function HomePage() {
       try {
         const screeningData = await getScreeningHistory(90).catch(() => []);
         setScreenings(screeningData);
+        
+        const summaryData = await apiFetch("/dashboard/summary").then(res => res.json()).catch(() => null);
+        if (summaryData) {
+          setSummary(summaryData);
+        }
       } catch (err) {
         console.error("Failed to load dashboard data", err);
       } finally {
@@ -218,7 +225,7 @@ export default function HomePage() {
               </svg>
               Community Highlights
             </h2>
-            <p className="text-sm text-text-secondary mb-4">See what others are discussing in the AnonyMenta forum.</p>
+            <p className="text-sm text-text-secondary mb-4">{summary.community_posts > 0 ? `${summary.community_posts} new posts in the AnonyMenta forum.` : 'See what others are discussing in the AnonyMenta forum.'}</p>
           </div>
           <Button variant="secondary" onClick={() => router.push("/forum")} className="w-full justify-center">View Forum</Button>
         </div>
@@ -233,7 +240,7 @@ export default function HomePage() {
               </span>
               Pending Chats
             </h2>
-            <p className="text-sm text-text-secondary mb-4">You have active anonymous chat sessions waiting.</p>
+            <p className="text-sm text-text-secondary mb-4">{summary.pending_chats > 0 ? `You have ${summary.pending_chats} active anonymous chat sessions waiting.` : 'No pending chat sessions.'}</p>
           </div>
           <Button variant="secondary" onClick={() => router.push("/chat")} className="w-full justify-center">Join Chat</Button>
         </div>
@@ -247,7 +254,7 @@ export default function HomePage() {
               </svg>
               AI Check-in Summary
             </h2>
-            <p className="text-sm text-text-secondary mb-4">Your AI coach noticed a positive trend in your mood this week.</p>
+            <p className="text-sm text-text-secondary mb-4">{summary.ai_checkins > 0 ? `You have completed ${summary.ai_checkins} AI coaching sessions.` : 'Start a session with your AI coach to see a summary here.'}</p>
           </div>
           <Button variant="secondary" onClick={() => router.push("/coach")} className="w-full justify-center">Talk to Coach</Button>
         </div>

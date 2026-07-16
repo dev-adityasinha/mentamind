@@ -2,13 +2,14 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from jose import JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies.auth import get_current_user, require_ghost_user
+from app.middleware.rate_limit import limiter
 from app.models.organization import DataResidencyRegion, Organization
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserRole
@@ -44,7 +45,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit(
+    f"{settings.auth_login_rate_limit_calls}/{settings.auth_login_rate_limit_window} seconds"
+)
 async def login(
+    request: Request,
     body: LoginRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> TokenResponse:
@@ -120,7 +125,11 @@ async def refresh(
     response_model=TokenResponse,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit(
+    f"{settings.auth_register_rate_limit_calls}/{settings.auth_register_rate_limit_window} seconds"
+)
 async def register_organization(
+    request: Request,
     body: RegisterOrganizationRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> TokenResponse:
@@ -176,7 +185,11 @@ async def register_organization(
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
+@limiter.limit(
+    f"{settings.auth_register_rate_limit_calls}/{settings.auth_register_rate_limit_window} seconds"
+)
 async def register_user(
+    request: Request,
     body: RegisterRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
@@ -240,12 +253,16 @@ async def verify_email(
     if not user:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found")
 
-    # In a real app we might update an `is_verified` flag here
+    user.is_verified = True
+    await db.commit()
+
     return {"message": "Email verified successfully"}
 
 
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
 async def forgot_password(
+    request: Request,
     body: ForgotPasswordRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
@@ -263,7 +280,9 @@ async def forgot_password(
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
+@limiter.limit("5/minute")
 async def reset_password(
+    request: Request,
     body: ResetPasswordRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:

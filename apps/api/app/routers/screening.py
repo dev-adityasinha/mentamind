@@ -1,3 +1,4 @@
+import functools
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -7,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies.auth import forbid_anonymous, get_current_user
+from app.models.assessment_bank import AssessmentTemplate
 from app.models.test_score import TestScore
 from app.models.user import User
 from app.schemas.screening import (
@@ -14,6 +16,20 @@ from app.schemas.screening import (
     ScreeningResultRequest,
     ScreeningResultResponse,
 )
+
+try:
+    from fastapi_cache.decorator import cache
+except ImportError:
+
+    def cache(*args, **kwargs):
+        def wrapper(func):
+            @functools.wraps(func)
+            async def inner(*args, **kwargs):
+                return await func(*args, **kwargs)
+
+            return inner
+
+        return wrapper
 
 
 def calculate_screening(test_id: str, answers: list[int]) -> dict:
@@ -74,6 +90,23 @@ def calculate_screening(test_id: str, answers: list[int]) -> dict:
 
 
 router = APIRouter(prefix="/screening", tags=["screening"])
+
+
+@router.get("/assessments")
+@cache(expire=3600)
+async def get_assessment_templates(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    from sqlalchemy.orm import selectinload
+
+    result = await db.execute(
+        select(AssessmentTemplate)
+        .where(AssessmentTemplate.is_active)
+        .options(selectinload(AssessmentTemplate.questions))
+    )
+    templates = result.scalars().all()
+    return templates
 
 
 @router.post("/sessions")

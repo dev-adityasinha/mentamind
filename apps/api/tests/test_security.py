@@ -216,10 +216,10 @@ async def test_ghost_merge_rejects_unauthenticated(
         "password": "NewPass123!",
     }
 
-    # 1. No auth header at all → 403 (FastAPI's HTTPBearer raises 403 when
+    # 1. No auth header at all → 401
     #    the Authorization header is missing entirely)
     resp = await client.post("/auth/ghost/merge", json=merge_body)
-    assert resp.status_code == status.HTTP_403_FORBIDDEN, "No-auth rejected"
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED, "No-auth rejected"
 
     # 2. Real (non-ghost) user JWT → 403
     real_user, _ = await create_user(

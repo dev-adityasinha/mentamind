@@ -15,6 +15,7 @@ import {
   type UserSettings,
   type UpdateSettingsData,
 } from "@/lib/api/settings";
+import { useI18n } from "@/lib/i18n/Context";
 
 const THEMES = [
   { value: "system", label: "System" },
@@ -24,17 +25,14 @@ const THEMES = [
 
 const LANGUAGES = [
   { value: "en", label: "English" },
-  { value: "hi", label: "Hindi" },
-  { value: "ta", label: "Tamil" },
-  { value: "te", label: "Telugu" },
-  { value: "bn", label: "Bengali" },
-  { value: "mr", label: "Marathi" },
+  { value: "es", label: "Español" },
 ] as const;
 
 export default function SettingsPage() {
   const { user, isLoading: authLoading, logout } = useAuth();
   const { addToast } = useToast();
   const router = useRouter();
+  const { setLocale, t } = useI18n();
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -183,7 +181,11 @@ export default function SettingsPage() {
             <label className="text-sm font-medium text-text-secondary">Language</label>
             <select
               value={settings.language}
-              onChange={(e) => setSettings((s) => (s ? { ...s, language: e.target.value } : s))}
+              onChange={(e) => {
+                const val = e.target.value as "en" | "es";
+                setSettings((s) => (s ? { ...s, language: val } : s));
+                setLocale(val);
+              }}
               className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
             >
               {LANGUAGES.map((l) => (

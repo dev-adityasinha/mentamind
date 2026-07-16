@@ -40,7 +40,7 @@ class EmotionAnalysis(Base):
     )
     session_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     source: Mapped[EmotionSource] = mapped_column(
-        nullable=False, default=EmotionSource.CHECKIN
+        PgEnum(EmotionSource), nullable=False, default=EmotionSource.CHECKIN
     )
     primary_emotions: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
     secondary_emotions: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)

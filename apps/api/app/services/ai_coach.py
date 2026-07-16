@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import uuid
 from datetime import UTC, datetime
 
@@ -7,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ai_coach import AiCoachMessage, AiCoachSession
+from app.models.meditation import MeditationTrack
 from app.models.mood_log import MoodLog
 from app.models.test_score import TestScore
 from app.schemas.ai_coach import CoachMessageResponse
@@ -56,7 +58,7 @@ async def generate_coach_response(
         )
         latest_mood = mood_res.scalar_one_or_none()
         if latest_mood:
-            context_str += f"\nUser's latest mood is: {latest_mood.score}/10, energy: {latest_mood.energy_score}/10, stress: {latest_mood.stress_score}/10."
+            context_str += f"\nUser's latest mood is: {latest_mood.mood_score}/5, energy: {latest_mood.energy_score}/5, stress: {latest_mood.stress_score}/5."
 
         test_res = await db.execute(
             select(TestScore)
@@ -116,7 +118,7 @@ async def generate_coach_response(
     ]
 
     try:
-        ai_text = await provider.generate_response(
+        ai_text, tool_calls = await provider.generate_response(
             messages=messages,
             system_prompt=final_system_prompt,
             user_id=user_id,
@@ -125,11 +127,38 @@ async def generate_coach_response(
     except Exception:
         # Fallback if tool calling or something else fails
         try:
-            ai_text = await provider.generate_response(
+            ai_text, tool_calls = await provider.generate_response(
                 messages=messages, system_prompt=final_system_prompt, user_id=user_id
             )
         except Exception:
             ai_text = "I'm here for you. What's on your mind?"
+            tool_calls = None
+
+    if tool_calls and db:
+        for tc in tool_calls:
+            if tc["function"]["name"] == "recommend_meditation":
+                try:
+                    args = json.loads(tc["function"]["arguments"])
+                    category = args.get("category", "").upper()
+
+                    # fetch a meditation track by category
+                    track_res = await db.execute(
+                        select(MeditationTrack)
+                        .where(MeditationTrack.category == category)
+                        .order_by(MeditationTrack.created_at.desc())
+                        .limit(1)
+                    )
+                    track = track_res.scalar_one_or_none()
+
+                    if track:
+                        ai_text = f"I've found a great meditation track for you: {track.title} ({track.duration_seconds // 60} mins). It's focused on {track.category.lower()}."
+                    else:
+                        ai_text = f"I couldn't find a specific meditation track for {category.lower()} right now, but I encourage you to take a few deep breaths."
+                except Exception:
+                    pass
+
+    if not ai_text:
+        ai_text = "I'm here for you. What's on your mind?"
 
     # Simple naive tool call parsing since we don't have full ToolCall handling in the base interface for simplicity
     # If the AI hallucinates a tool call as text, we try to catch it or just provide the text.

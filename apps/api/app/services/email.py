@@ -35,17 +35,15 @@ async def send_invitation_email(to_email: str, token: str, role: str) -> None:
                 "html": f"""
             <h2>Welcome to Mentamind!</h2>
             <p>You have been invited to join as a <strong>{
-                role.replace('_', ' ').title()
-            }</strong>.</p>
+                    role.replace("_", " ").title()
+                }</strong>.</p>
             <p>Click the link below to accept your invitation:</p>
             <p><a href="{invite_url}">{invite_url}</a></p>
             <p>This link will expire in {settings.invitation_expire_days} days.</p>
             """,
             }
         )
-        logger.info(
-            f"Invitation email sent to {to_email}. " f"Resend ID: {r.get('id')}"
-        )
+        logger.info(f"Invitation email sent to {to_email}. Resend ID: {r.get('id')}")
     except Exception as e:
         logger.error(f"Failed to send email to {to_email}: {e}")
 

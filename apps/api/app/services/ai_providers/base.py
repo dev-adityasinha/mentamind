@@ -11,7 +11,7 @@ class AIProviderAdapter(ABC):
         system_prompt: str,
         user_id: uuid.UUID,
         **kwargs: Any,
-    ) -> str:
+    ) -> tuple[str | None, list[dict] | None]:
         """
         Generate a response from the AI provider.
         """
