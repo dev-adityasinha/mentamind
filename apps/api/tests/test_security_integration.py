@@ -25,7 +25,7 @@ async def real_redis() -> aioredis.Redis:
     except Exception as exc:
         pytest.skip(f"Redis not reachable at {url!r}: {exc}")
     yield r
-    await r.aclose()
+    await r.close()
 
 
 @pytest.mark.asyncio
