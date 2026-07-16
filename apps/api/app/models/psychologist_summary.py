@@ -41,7 +41,7 @@ class PsychologistSummary(Base):
     )
     session_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     trigger_source: Mapped[TriggerSource] = mapped_column(
-        nullable=False, default=TriggerSource.CHECKIN
+        PgEnum(TriggerSource), nullable=False, default=TriggerSource.CHECKIN
     )
     summary: Mapped[str] = mapped_column(String, nullable=False)
     recommendations: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
