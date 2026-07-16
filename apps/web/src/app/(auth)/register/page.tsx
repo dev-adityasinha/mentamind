@@ -82,12 +82,10 @@ export default function RegisterPage() {
       router.replace("/onboarding");
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 409) {
-          setErrors({ email: "An account with this email already exists." });
-        } else if (err.status === 429) {
+        if (err.status === 429) {
           setErrors({ form: "Too many sign-up attempts. Please wait and try again." });
         } else {
-          setErrors({ form: "Something went wrong. Please try again." });
+          setErrors({ form: err.message });
         }
       } else {
         setErrors({ form: "Something went wrong. Please try again." });

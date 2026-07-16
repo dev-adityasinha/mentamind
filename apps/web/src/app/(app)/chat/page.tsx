@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/lib/auth/context";
 import { Button } from "@/components/ui/Button";
+import { getAccessToken } from "@/lib/api/client";
 
 type Message = {
   id: string;
@@ -18,6 +19,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isWaiting, setIsWaiting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [partnerTyping, setPartnerTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -34,29 +36,25 @@ export default function ChatPage() {
     }
   }, [messages, socket, sessionId, user?.id]);
 
-  const joinRandomChat = async () => {
-    try {
-      const res = await fetch("/api/chat/join", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSessionId(data.session_id);
-        connectWebSocket(data.session_id);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  const joinRandomChat = () => {
+    connectWebSocket();
   };
 
-  const connectWebSocket = (sid: string) => {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const ws = new WebSocket(`${protocol}//localhost:8000/chat/ws/${sid}?token=${localStorage.getItem("token")}`);
+  const connectWebSocket = () => {
+    const token = getAccessToken();
+    if (!token) return;
+
+    const wsUrl = process.env.NEXT_PUBLIC_API_URL?.replace("http", "ws") || "ws://localhost:8000";
+    const ws = new WebSocket(`${wsUrl}/chat/ws?token=${token}`);
     
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if (data.type === "message") {
+      if (data.type === "waiting") {
+        setIsWaiting(true);
+      } else if (data.type === "matched") {
+        setIsWaiting(false);
+        setSessionId(data.session_id);
+      } else if (data.type === "message") {
         setMessages(prev => [...prev, { ...data.message, is_read: false }]);
       } else if (data.type === "typing") {
         setPartnerTyping(true);
@@ -91,7 +89,11 @@ export default function ChatPage() {
         <div className="flex flex-col items-center justify-center h-full space-y-4">
           <h2 className="text-xl font-semibold text-text-primary">Anonymous Chat</h2>
           <p className="text-text-secondary">Connect with someone who understands.</p>
-          <Button onClick={joinRandomChat} variant="primary">Join a Chat</Button>
+          {isWaiting ? (
+            <p className="text-brand font-medium animate-pulse">Waiting for a partner...</p>
+          ) : (
+            <Button onClick={joinRandomChat} variant="primary">Join a Chat</Button>
+          )}
         </div>
       ) : (
         <>

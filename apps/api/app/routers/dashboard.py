@@ -19,7 +19,6 @@ async def get_dashboard_summary(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
-
     # Unread community posts count (mock logic: posts created recently)
     community_res = await db.execute(select(func.count(Post.id)))
     community_count = community_res.scalar() or 0

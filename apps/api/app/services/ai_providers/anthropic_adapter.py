@@ -20,7 +20,6 @@ class AnthropicAdapter(AIProviderAdapter):
         user_id: uuid.UUID,
         **kwargs: Any,
     ) -> tuple[str | None, list[dict] | None]:
-
         anthropic_messages = []
         for msg in messages:
             if msg["role"] in ["user", "assistant"]:
