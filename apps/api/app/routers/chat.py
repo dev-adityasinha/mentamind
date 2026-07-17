@@ -131,6 +131,9 @@ async def chat_websocket(
                     if target_id:
                         await chat_manager.send_personal_message(target_id, payload)
 
+                    # Send back to sender so they see their own message
+                    await websocket.send_json(payload)
+
             elif msg_type == "typing":
                 session_id = uuid.UUID(data.get("session_id"))
                 res = await db.execute(
