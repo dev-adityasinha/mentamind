@@ -177,10 +177,7 @@ export default function InvitesPage() {
                     <option value="employee">Employee</option>
                     <option value="manager">Manager</option>
                     <option value="hr_manager">HR Manager</option>
-                    <option value="wellness_officer">Wellness Officer</option>
                     <option value="admin">Admin</option>
-                    <option value="counselor">Counselor</option>
-                    <option value="student">Student</option>
                   </select>
                 </FormField>
               </div>
