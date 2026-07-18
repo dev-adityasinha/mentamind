@@ -1,0 +1,65 @@
+services:
+  # ---- FastAPI backend ----
+  - type: web
+    name: mentamind-api
+    runtime: docker
+    dockerfilePath: apps/api/Dockerfile
+    dockerContext: apps/api
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    # Run migrations, then bind uvicorn to Render's injected $PORT.
+    dockerCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      # Async driver prefix required by SQLAlchemy/asyncpg. Render's fromDatabase
+      # supplies a postgresql:// URL; we transform the scheme at startup (see note).
+      - key: DATABASE_URL
+        fromDatabase:
+          name: mentamind-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: mentamind-redis
+          property: connectionString
+      - key: API_SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      # ENCRYPTION_KEY must be base64-encoded 32 bytes; generate manually and paste.
+      - key: ENCRYPTION_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: SUPER_ADMIN_EMAIL
+        sync: false
+      - key: BEHIND_PROXY
+        value: "true"
+      - key: MEDIA_DIR
+        value: /app/media
+      - key: MEDIA_BASE_URL
+        sync: false
+      # Optional integrations — leave unset to disable, or paste keys.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+
+  # ---- Redis (Render Key Value) ----
+  - type: keyvalue
+    name: mentamind-redis
+    plan: free
+    region: oregon
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
+
+databases:
+  - name: mentamind-db
+    plan: free
+    region: oregon
+    databaseName: mentamind
+    user: mentamind

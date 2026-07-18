@@ -1,3 +1,4 @@
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -78,6 +79,26 @@ class Settings(BaseSettings):
 
     # Background reminder scheduler (mood / meditation / assessment reminders).
     reminders_enabled: bool = True
+
+    @field_validator("database_url")
+    @classmethod
+    def _ensure_async_driver(cls, v: str) -> str:
+        """Normalize the DB URL to the asyncpg driver.
+
+        Managed hosts (e.g. Render, Heroku) hand out URLs with a bare
+        ``postgresql://`` or legacy ``postgres://`` scheme. SQLAlchemy's async
+        engine and this app's Alembic env both require the ``+asyncpg`` driver,
+        so we rewrite the scheme when the driver is absent. URLs that already
+        specify a driver (``postgresql+asyncpg://`` / ``postgresql+psycopg://``)
+        are left untouched.
+        """
+        if v.startswith("postgresql+"):
+            return v
+        if v.startswith("postgresql://"):
+            return "postgresql+asyncpg://" + v[len("postgresql://") :]
+        if v.startswith("postgres://"):
+            return "postgresql+asyncpg://" + v[len("postgres://") :]
+        return v
 
 
 settings = Settings()
