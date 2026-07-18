@@ -1,27 +1,44 @@
 import functools
+import os
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user, require_roles
 from app.models.meditation import (
     MeditationCategory,
     MeditationDifficulty,
+    MeditationFavorite,
     MeditationStats,
     MeditationTrack,
 )
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.schemas.meditation import (
+    AudioUploadResponse,
+    MeditationFavoriteCreate,
+    MeditationFavoriteResponse,
     MeditationHistoryCreate,
     MeditationHistoryResponse,
     MeditationStatsResponse,
+    MeditationTrackCreate,
     MeditationTrackResponse,
+    MeditationTrackUpdate,
 )
 from app.services.meditation_tracker import submit_meditation_completion
+from app.settings import settings
 
 try:
     from fastapi_cache.decorator import cache
@@ -40,9 +57,23 @@ except ImportError:
 
 router = APIRouter(prefix="/meditation", tags=["meditation"])
 
+# Only admins / HR managers may manage the library.
+_require_manager = require_roles(UserRole.ADMIN, UserRole.HR_MANAGER)
+
+# Allowed audio content types -> file extension.
+_ALLOWED_AUDIO_TYPES: dict[str, str] = {
+    "audio/mpeg": ".mp3",
+    "audio/mp3": ".mp3",
+    "audio/wav": ".wav",
+    "audio/x-wav": ".wav",
+    "audio/ogg": ".ogg",
+    "audio/mp4": ".m4a",
+    "audio/aac": ".aac",
+    "audio/webm": ".webm",
+}
+
 
 @router.get("/tracks", response_model=list[MeditationTrackResponse])
-@cache(expire=3600)
 async def list_tracks(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -78,6 +109,142 @@ async def get_track(
             status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
         )
     return track
+
+
+# ---------------------------------------------------------------------------
+# Library management (admin only)
+# ---------------------------------------------------------------------------
+
+
+@router.post(
+    "/tracks",
+    response_model=MeditationTrackResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_track(
+    body: MeditationTrackCreate,
+    admin_user: Annotated[User, _require_manager],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> MeditationTrack:
+    """Create a new meditation session in the library."""
+    track = MeditationTrack(
+        title=body.title,
+        description=body.description,
+        audio_url=body.audio_url,
+        duration_minutes=body.duration_minutes,
+        category=body.category,
+        difficulty=body.difficulty,
+    )
+    db.add(track)
+    await db.commit()
+    await db.refresh(track)
+    return track
+
+
+@router.patch("/tracks/{track_id}", response_model=MeditationTrackResponse)
+async def update_track(
+    track_id: uuid.UUID,
+    body: MeditationTrackUpdate,
+    admin_user: Annotated[User, _require_manager],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> MeditationTrack:
+    """Update an existing meditation session."""
+    track = await db.get(MeditationTrack, track_id)
+    if not track:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
+        )
+
+    data = body.model_dump(exclude_unset=True)
+    for field, value in data.items():
+        setattr(track, field, value)
+
+    await db.commit()
+    await db.refresh(track)
+    return track
+
+
+@router.delete("/tracks/{track_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_track(
+    track_id: uuid.UUID,
+    admin_user: Annotated[User, _require_manager],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    """Delete a meditation session from the library."""
+    track = await db.get(MeditationTrack, track_id)
+    if not track:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
+        )
+    await db.delete(track)
+    await db.commit()
+
+
+@router.post(
+    "/upload-audio",
+    response_model=AudioUploadResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def upload_audio(
+    admin_user: Annotated[User, _require_manager],
+    file: Annotated[UploadFile, File(...)],
+) -> AudioUploadResponse:
+    """Upload an audio file to the app's media store and return its public URL.
+
+    Admin-only. Validates the content type and size, then streams the file to
+    the configured media directory. The returned URL can be used as a track's
+    audio_url (via POST /tracks or PATCH /tracks/{id}).
+    """
+    ext = _ALLOWED_AUDIO_TYPES.get((file.content_type or "").lower())
+    if ext is None:
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail=("Unsupported audio type. Allowed: mp3, wav, ogg, m4a, aac, webm."),
+        )
+
+    media_dir = settings.media_dir
+    os.makedirs(media_dir, exist_ok=True)
+
+    filename = f"{uuid.uuid4().hex}{ext}"
+    dest_path = os.path.join(media_dir, filename)
+
+    max_bytes = settings.max_audio_upload_mb * 1024 * 1024
+    written = 0
+    try:
+        with open(dest_path, "wb") as out:
+            # Stream in chunks so we never hold the whole file in memory and can
+            # abort early if it exceeds the configured size limit.
+            while chunk := await file.read(1024 * 1024):
+                written += len(chunk)
+                if written > max_bytes:
+                    out.close()
+                    os.remove(dest_path)
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail=(
+                            f"File exceeds the {settings.max_audio_upload_mb}MB limit."
+                        ),
+                    )
+                out.write(chunk)
+    except HTTPException:
+        raise
+    except Exception as exc:  # pragma: no cover - defensive cleanup
+        if os.path.exists(dest_path):
+            os.remove(dest_path)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to store the uploaded file.",
+        ) from exc
+    finally:
+        await file.close()
+
+    audio_url = f"{settings.media_base_url.rstrip('/')}/{filename}"
+    return AudioUploadResponse(audio_url=audio_url)
+
+
+# ---------------------------------------------------------------------------
+# Progress
+# ---------------------------------------------------------------------------
 
 
 @router.post(
@@ -138,6 +305,96 @@ async def get_my_stats(
             total_sessions=0,
             current_streak=0,
             longest_streak=0,
+            weekly_streak=0,
+            longest_weekly_streak=0,
             last_meditated_at=None,
         )
     return stats
+
+
+# ---------------------------------------------------------------------------
+# Favorites
+# ---------------------------------------------------------------------------
+
+
+@router.get("/favorites", response_model=list[MeditationFavoriteResponse])
+async def list_favorites(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[MeditationFavorite]:
+    """List the current user's favorited meditation tracks."""
+    result = await db.execute(
+        select(MeditationFavorite)
+        .options(selectinload(MeditationFavorite.track))
+        .where(MeditationFavorite.user_id == current_user.id)
+        .order_by(MeditationFavorite.created_at.desc())
+    )
+    return result.scalars().all()
+
+
+@router.post(
+    "/favorites",
+    response_model=MeditationFavoriteResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_favorite(
+    body: MeditationFavoriteCreate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> MeditationFavorite:
+    """Favorite a meditation track (idempotent)."""
+    track = await db.get(MeditationTrack, body.track_id)
+    if not track:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
+        )
+
+    # If already favorited, return the existing record instead of erroring.
+    existing = await db.execute(
+        select(MeditationFavorite)
+        .options(selectinload(MeditationFavorite.track))
+        .where(
+            MeditationFavorite.user_id == current_user.id,
+            MeditationFavorite.track_id == body.track_id,
+        )
+    )
+    found = existing.scalar_one_or_none()
+    if found:
+        return found
+
+    favorite = MeditationFavorite(
+        user_id=current_user.id,
+        track_id=body.track_id,
+    )
+    db.add(favorite)
+    await db.commit()
+
+    # Reload with the track relationship eagerly loaded for serialization.
+    result = await db.execute(
+        select(MeditationFavorite)
+        .options(selectinload(MeditationFavorite.track))
+        .where(MeditationFavorite.id == favorite.id)
+    )
+    return result.scalar_one()
+
+
+@router.delete("/favorites/{track_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_favorite(
+    track_id: uuid.UUID,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    """Remove a track from the current user's favorites."""
+    result = await db.execute(
+        select(MeditationFavorite).where(
+            MeditationFavorite.user_id == current_user.id,
+            MeditationFavorite.track_id == track_id,
+        )
+    )
+    favorite = result.scalar_one_or_none()
+    if not favorite:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Favorite not found"
+        )
+    await db.delete(favorite)
+    await db.commit()

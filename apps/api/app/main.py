@@ -1,9 +1,11 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 
 import app.models  # noqa: F401 - ensures all models are registered with Base.metadata
@@ -70,7 +72,29 @@ async def lifespan(application: FastAPI):
             )
             FastAPICache.init(RedisBackend(r), prefix="mentamind-cache")
 
-    yield
+    # Background reminder scheduler (mood / meditation / assessment reminders).
+    # Disabled under tests to avoid side effects; toggle via REMINDERS_ENABLED.
+    scheduler = None
+    if settings.environment != "test" and settings.reminders_enabled:
+        try:
+            from app.services.reminder_scheduler import create_scheduler
+
+            scheduler = create_scheduler()
+            scheduler.start()
+            logging.getLogger("mentamind.scheduler").info(
+                '{"event": "scheduler_started"}'
+            )
+        except Exception:
+            logging.getLogger("mentamind.scheduler").exception(
+                "Failed to start reminder scheduler"
+            )
+            scheduler = None
+
+    try:
+        yield
+    finally:
+        if scheduler is not None:
+            scheduler.shutdown(wait=False)
 
 
 # Docs disabled in production. The CSP is `default-src 'none'`, which blocks
@@ -136,24 +160,60 @@ app.add_middleware(
     expose_headers=["X-Request-ID"],
 )
 
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(admin.router)
-app.include_router(onboarding.router)
-app.include_router(notifications.router)
-app.include_router(invitations.router)
-app.include_router(mood.router)
-app.include_router(wellness.router)
-app.include_router(forum.router)
-app.include_router(screening.router)
-app.include_router(ai_coach.router)
-app.include_router(journal.router)
-app.include_router(hr_dashboard.router)
-app.include_router(settings_router.router)
-app.include_router(saml.router)
-app.include_router(chat.router)
-app.include_router(meditation.router)
-app.include_router(dashboard.router)
+_ALL_ROUTERS = [
+    auth.router,
+    users.router,
+    admin.router,
+    onboarding.router,
+    notifications.router,
+    invitations.router,
+    mood.router,
+    wellness.router,
+    forum.router,
+    screening.router,
+    ai_coach.router,
+    journal.router,
+    hr_dashboard.router,
+    settings_router.router,
+    saml.router,
+    chat.router,
+    meditation.router,
+    dashboard.router,
+]
+
+# API versioning: every router is exposed under the versioned prefix "/v1".
+# The unversioned paths are also kept mounted so existing clients / BFF routes
+# keep working during the transition (both "/mood" and "/v1/mood" resolve).
+API_V1_PREFIX = "/v1"
+for _router in _ALL_ROUTERS:
+    app.include_router(_router, prefix=API_V1_PREFIX)
+for _router in _ALL_ROUTERS:
+    app.include_router(_router)
+
+
+# Serve uploaded media (e.g. meditation audio) as static files. The configured
+# directory is created at startup; if it cannot be created (e.g. a read-only or
+# permission-restricted path in CI/test environments), fall back to a writable
+# temp directory so importing the app never crashes.
+def _resolve_media_dir() -> str:
+    candidate = settings.media_dir
+    try:
+        os.makedirs(candidate, exist_ok=True)
+        return candidate
+    except OSError:
+        import tempfile
+
+        fallback = os.path.join(tempfile.gettempdir(), "mentamind-media")
+        os.makedirs(fallback, exist_ok=True)
+        logging.getLogger("mentamind").warning(
+            '{"event": "media_dir_fallback", "configured": "%s", "using": "%s"}',
+            candidate,
+            fallback,
+        )
+        return fallback
+
+
+app.mount("/media", StaticFiles(directory=_resolve_media_dir()), name="media")
 
 
 @app.get("/health")

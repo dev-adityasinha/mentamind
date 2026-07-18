@@ -31,3 +31,30 @@ class MoodResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class MoodAnalyticsBucket(BaseModel):
+    """One period (week or month) of aggregated mood data."""
+
+    period: str  # e.g. "2026-W29" for a week, or "2026-07" for a month
+    period_start: str  # ISO date of the first day in the period
+    entries: int
+    avg_mood: float | None
+    avg_energy: float | None
+    avg_stress: float | None
+
+
+class EmotionCount(BaseModel):
+    emotion: str
+    count: int
+
+
+class MoodAnalyticsResponse(BaseModel):
+    period: str  # "weekly" or "monthly"
+    range_days: int
+    total_entries: int
+    avg_mood: float | None
+    avg_energy: float | None
+    avg_stress: float | None
+    buckets: list[MoodAnalyticsBucket]
+    top_emotions: list[EmotionCount]

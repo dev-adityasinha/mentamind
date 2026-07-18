@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -11,6 +11,19 @@ from app.models.user_settings import UserSettings
 from app.schemas.user import UserProfileResponse, UserProfileUpdateRequest, UserResponse
 
 router = APIRouter(tags=["users"])
+
+
+def _profile_dict(user: User, settings: UserSettings | None) -> dict:
+    return {
+        "id": user.id,
+        "display_name": user.display_name,
+        "username": user.username,
+        "age": settings.age if settings else None,
+        "gender": settings.gender if settings else None,
+        "country": settings.country if settings else None,
+        "avatar_url": settings.avatar_url if settings else None,
+        "mental_health_goals": settings.mental_health_goals if settings else [],
+    }
 
 
 @router.get("/me", response_model=UserResponse)
@@ -28,15 +41,7 @@ async def get_my_profile(
     )
     settings = result.scalar_one_or_none()
 
-    return {
-        "id": current_user.id,
-        "display_name": current_user.display_name,
-        "age": settings.age if settings else None,
-        "gender": settings.gender if settings else None,
-        "country": settings.country if settings else None,
-        "avatar_url": settings.avatar_url if settings else None,
-        "mental_health_goals": settings.mental_health_goals if settings else [],
-    }
+    return _profile_dict(current_user, settings)
 
 
 @router.patch("/me/profile", response_model=UserProfileResponse)
@@ -47,6 +52,23 @@ async def update_my_profile(
 ) -> dict:
     if body.display_name is not None:
         current_user.display_name = body.display_name.strip()
+        db.add(current_user)
+
+    if body.username is not None:
+        new_username = body.username.strip()
+        # Enforce uniqueness (case-insensitive) before writing.
+        clash = await db.execute(
+            select(User.id).where(
+                func.lower(User.username) == new_username.lower(),
+                User.id != current_user.id,
+            )
+        )
+        if clash.scalar_one_or_none() is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="That username is already taken.",
+            )
+        current_user.username = new_username
         db.add(current_user)
 
     result = await db.execute(
@@ -71,16 +93,9 @@ async def update_my_profile(
 
     await db.commit()
     await db.refresh(settings)
+    await db.refresh(current_user)
 
-    return {
-        "id": current_user.id,
-        "display_name": current_user.display_name,
-        "age": settings.age,
-        "gender": settings.gender,
-        "country": settings.country,
-        "avatar_url": settings.avatar_url,
-        "mental_health_goals": settings.mental_health_goals,
-    }
+    return _profile_dict(current_user, settings)
 
 
 _can_view_users = require_roles(UserRole.ADMIN, UserRole.HR_MANAGER)

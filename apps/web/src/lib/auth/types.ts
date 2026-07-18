@@ -5,7 +5,10 @@ export type UserRole =
   | "wellness_officer"
   | "admin"
   | "counselor"
-  | "student";
+  | "student"
+  | "moderator"
+  | "therapist"
+  | "anonymous";
 
 export interface User {
   id: string;

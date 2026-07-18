@@ -73,7 +73,9 @@ function doFetch(
   skipAuth: boolean | undefined,
 ): Promise<Response> {
   const headers = new Headers(init.headers);
-  headers.set("Content-Type", "application/json");
+  if (!(init.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
   if (!skipAuth && _accessToken) {
     headers.set("Authorization", `Bearer ${_accessToken}`);
   }

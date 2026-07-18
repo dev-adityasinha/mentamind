@@ -3,7 +3,16 @@ import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, func
+from sqlalchemy import (
+    DateTime,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -99,11 +108,49 @@ class MeditationStats(Base):
     total_minutes: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     total_sessions: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
+    # Daily streaks (consecutive calendar days with at least one session).
     current_streak: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     longest_streak: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    # Weekly streaks (consecutive calendar weeks with at least one session).
+    weekly_streak: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False, server_default="0"
+    )
+    longest_weekly_streak: Mapped[int] = mapped_column(
+        Integer, default=0, nullable=False, server_default="0"
+    )
 
     last_meditated_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
 
     user: Mapped["User"] = relationship("User", foreign_keys=[user_id])  # type: ignore
+
+
+class MeditationFavorite(Base):
+    """A user's favorited meditation track."""
+
+    __tablename__ = "meditation_favorites"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id", "track_id", name="uq_meditation_favorite_user_track"
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    track_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("meditation_tracks.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        server_default=func.now(),
+    )
+
+    track: Mapped[MeditationTrack] = relationship("MeditationTrack")
