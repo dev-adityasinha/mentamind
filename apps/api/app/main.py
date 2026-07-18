@@ -190,10 +190,30 @@ for _router in _ALL_ROUTERS:
 for _router in _ALL_ROUTERS:
     app.include_router(_router)
 
-# Serve uploaded media (e.g. meditation audio) as static files. The directory
-# is created at startup so the mount never fails on a fresh container/volume.
-os.makedirs(settings.media_dir, exist_ok=True)
-app.mount("/media", StaticFiles(directory=settings.media_dir), name="media")
+
+# Serve uploaded media (e.g. meditation audio) as static files. The configured
+# directory is created at startup; if it cannot be created (e.g. a read-only or
+# permission-restricted path in CI/test environments), fall back to a writable
+# temp directory so importing the app never crashes.
+def _resolve_media_dir() -> str:
+    candidate = settings.media_dir
+    try:
+        os.makedirs(candidate, exist_ok=True)
+        return candidate
+    except OSError:
+        import tempfile
+
+        fallback = os.path.join(tempfile.gettempdir(), "mentamind-media")
+        os.makedirs(fallback, exist_ok=True)
+        logging.getLogger("mentamind").warning(
+            '{"event": "media_dir_fallback", "configured": "%s", "using": "%s"}',
+            candidate,
+            fallback,
+        )
+        return fallback
+
+
+app.mount("/media", StaticFiles(directory=_resolve_media_dir()), name="media")
 
 
 @app.get("/health")

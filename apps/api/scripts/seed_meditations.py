@@ -100,8 +100,7 @@ SEED_TRACKS: list[tuple] = [
     ),
     (
         "Ocean Lullaby",
-        "Waves and a quiet narrator ease you into deep, restful sleep by the "
-        "sea.",
+        "Waves and a quiet narrator ease you into deep, restful sleep by the " "sea.",
         30,
         MeditationCategory.SLEEP,
         MeditationDifficulty.BEGINNER,
@@ -109,8 +108,7 @@ SEED_TRACKS: list[tuple] = [
     ),
     (
         "Starlit Meadow",
-        "Lie back under a sky full of stars in this dreamy, drifting sleep "
-        "story.",
+        "Lie back under a sky full of stars in this dreamy, drifting sleep " "story.",
         18,
         MeditationCategory.SLEEP,
         MeditationDifficulty.BEGINNER,
@@ -183,8 +181,7 @@ SEED_TRACKS: list[tuple] = [
     ),
     (
         "Letting Go of Tension",
-        "Breathe out stress and physical tension with this restorative "
-        "practice.",
+        "Breathe out stress and physical tension with this restorative " "practice.",
         14,
         MeditationCategory.STRESS,
         MeditationDifficulty.INTERMEDIATE,
