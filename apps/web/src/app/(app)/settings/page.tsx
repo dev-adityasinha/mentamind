@@ -55,6 +55,7 @@ export default function SettingsPage() {
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [editingProfile, setEditingProfile] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -111,6 +112,7 @@ export default function SettingsPage() {
         mental_health_goals: profile.mental_health_goals,
       });
       setProfile(updated);
+      setEditingProfile(false);
       addToast("Profile saved!", "success");
     } catch (err) {
       addToast(
@@ -121,6 +123,17 @@ export default function SettingsPage() {
       setSavingProfile(false);
     }
   }, [profile, addToast]);
+
+  const handleCancelProfile = useCallback(async () => {
+    try {
+      const fresh = await getMyProfile();
+      setProfile(fresh);
+    } catch {
+      // Keep the current values if the reload fails; the user can retry.
+    } finally {
+      setEditingProfile(false);
+    }
+  }, []);
 
   const handleExport = useCallback(async () => {
     setExporting(true);
@@ -225,7 +238,8 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setProfile((p) => (p ? { ...p, display_name: e.target.value } : p))
                   }
-                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  disabled={!editingProfile}
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20 disabled:cursor-not-allowed disabled:opacity-60"
                   placeholder="Jane Smith"
                 />
               </div>
@@ -237,7 +251,8 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setProfile((p) => (p ? { ...p, username: e.target.value } : p))
                   }
-                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  disabled={!editingProfile}
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20 disabled:cursor-not-allowed disabled:opacity-60"
                   placeholder="jane_smith"
                 />
                 <p className="mt-1 text-xs text-text-muted">
@@ -256,7 +271,8 @@ export default function SettingsPage() {
                       p ? { ...p, age: e.target.value ? Number(e.target.value) : null } : p,
                     )
                   }
-                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  disabled={!editingProfile}
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20 disabled:cursor-not-allowed disabled:opacity-60"
                   placeholder="—"
                 />
               </div>
@@ -267,7 +283,8 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setProfile((p) => (p ? { ...p, gender: e.target.value || null } : p))
                   }
-                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  disabled={!editingProfile}
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value="">Prefer not to say</option>
                   <option value="female">Female</option>
@@ -287,7 +304,8 @@ export default function SettingsPage() {
                       p ? { ...p, country: e.target.value.toUpperCase() || null } : p,
                     )
                   }
-                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  disabled={!editingProfile}
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20 disabled:cursor-not-allowed disabled:opacity-60"
                   placeholder="IN"
                 />
                 <p className="mt-1 text-xs text-text-muted">2-letter country code.</p>
@@ -300,7 +318,8 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setProfile((p) => (p ? { ...p, avatar_url: e.target.value || null } : p))
                   }
-                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  disabled={!editingProfile}
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20 disabled:cursor-not-allowed disabled:opacity-60"
                   placeholder="https://…"
                 />
               </div>
@@ -317,6 +336,7 @@ export default function SettingsPage() {
                     <button
                       key={goal}
                       type="button"
+                      disabled={!editingProfile}
                       onClick={() =>
                         setProfile((p) =>
                           p
@@ -329,10 +349,10 @@ export default function SettingsPage() {
                             : p,
                         )
                       }
-                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
                         selected
                           ? "border-brand bg-brand-subtle text-brand"
-                          : "border-border bg-surface text-text-secondary hover:bg-surface-raised"
+                          : "border-border bg-surface text-text-secondary enabled:hover:bg-surface-raised"
                       }`}
                     >
                       {goal}
@@ -342,10 +362,29 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="flex justify-end">
-              <Button variant="primary" onClick={handleSaveProfile} isLoading={savingProfile}>
-                Save profile
-              </Button>
+            <div className="flex justify-end gap-3">
+              {editingProfile ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={handleCancelProfile}
+                    disabled={savingProfile}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleSaveProfile}
+                    isLoading={savingProfile}
+                  >
+                    Save profile
+                  </Button>
+                </>
+              ) : (
+                <Button variant="primary" onClick={() => setEditingProfile(true)}>
+                  Edit
+                </Button>
+              )}
             </div>
           </div>
         </Card>

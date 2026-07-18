@@ -36,6 +36,19 @@ router = APIRouter(prefix="/invitations", tags=["invitations"])
 
 _can_invite = require_roles(UserRole.ADMIN, UserRole.HR_MANAGER)
 
+# Roles that may be assigned via an organization invitation. Other UserRole
+# members (e.g. WELLNESS_OFFICER, COUNSELOR, STUDENT, MODERATOR, THERAPIST,
+# ANONYMOUS) are intentionally excluded and cannot be invited, so a crafted
+# request cannot bypass the UI's role selector.
+INVITABLE_ROLES = frozenset(
+    {
+        UserRole.EMPLOYEE,
+        UserRole.MANAGER,
+        UserRole.HR_MANAGER,
+        UserRole.ADMIN,
+    }
+)
+
 
 def _decrypt_email(inv: Invitation) -> str:
     return decrypt(inv.email_encrypted, inv.org_id.bytes)
@@ -51,6 +64,13 @@ async def create_invitation(
     current_user: User = _can_invite,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ) -> InvitationCreateResponse:
+    # Reject roles that are not invitable, regardless of what the client sent.
+    if body.role not in INVITABLE_ROLES:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            f"Role '{body.role.value}' cannot be assigned via invitation",
+        )
+
     # Only the super-admin may grant the admin role.
     if body.role == UserRole.ADMIN:
         if current_user.email_hash != hash_email(settings.super_admin_email):

@@ -4,10 +4,7 @@ export type InviteRole =
   | "employee"
   | "manager"
   | "hr_manager"
-  | "wellness_officer"
-  | "admin"
-  | "counselor"
-  | "student";
+  | "admin";
 
 export interface Invitation {
   id: string;
