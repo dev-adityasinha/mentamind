@@ -42,6 +42,11 @@ function PostCard({
   const [reportReason, setReportReason] = useState("");
   const [showReport, setShowReport] = useState(false);
 
+  // Sync likes if updated from polling
+  useEffect(() => {
+    setLikes(post.likes);
+  }, [post.likes]);
+
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
@@ -189,9 +194,14 @@ function CommentsModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    fetchComments(post.id)
-      .then(setComments)
-      .finally(() => setIsLoading(false));
+    const fetchIt = () => {
+      fetchComments(post.id)
+        .then(setComments)
+        .finally(() => setIsLoading(false));
+    };
+    fetchIt();
+    const interval = setInterval(fetchIt, 5000);
+    return () => clearInterval(interval);
   }, [post.id]);
 
   const handleSubmit = async () => {
@@ -332,6 +342,41 @@ export default function ForumPage() {
   useEffect(() => {
     loadPosts(true);
   }, [activeCategory, sortMethod, loadPosts]);
+
+  // Polling for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPosts(null, 20, activeCategory || undefined, searchQuery || undefined, sortMethod)
+        .then(res => {
+          setPosts(prevPosts => {
+            const newPosts = [...prevPosts];
+            res.posts.forEach(freshPost => {
+              const index = newPosts.findIndex(p => p.id === freshPost.id);
+              if (index !== -1) {
+                newPosts[index] = { 
+                  ...newPosts[index], 
+                  likes: freshPost.likes, 
+                  reply_count: freshPost.reply_count 
+                };
+              } else if (!searchQuery && sortMethod === "recent" && !prevPosts.find(p => p.id === freshPost.id)) {
+                // Prepend new posts if we are sorting by recent and no search query is active
+                newPosts.unshift(freshPost);
+              }
+            });
+            // Sort again if trending
+            if (sortMethod === "trending") {
+              newPosts.sort((a, b) => b.likes - a.likes || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            } else {
+              newPosts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            }
+            return newPosts;
+          });
+        })
+        .catch(console.error);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [activeCategory, searchQuery, sortMethod]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();

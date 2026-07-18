@@ -39,7 +39,6 @@ async def get_posts(
     query = (
         select(Post)
         .options(selectinload(Post.tags), selectinload(Post.moods))
-        .where(Post.org_id == current_user.org_id)
     )
 
     if category:
@@ -139,7 +138,7 @@ async def toggle_post_like(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     post = await db.get(Post, post_id)
-    if not post or post.org_id != current_user.org_id:
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
     existing = await db.execute(
@@ -169,7 +168,7 @@ async def delete_post(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     post = await db.get(Post, post_id)
-    if not post or post.org_id != current_user.org_id:
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
     if post.author_id != current_user.id:
@@ -189,7 +188,7 @@ async def get_comments(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     post = await db.get(Post, post_id)
-    if not post or post.org_id != current_user.org_id:
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
     result = await db.execute(
@@ -214,7 +213,7 @@ async def create_comment(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     post = await db.get(Post, post_id)
-    if not post or post.org_id != current_user.org_id:
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
     if body.parent_id:
@@ -278,7 +277,7 @@ async def report_post_alias(
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     post = await db.get(Post, post_id)
-    if not post or post.org_id != current_user.org_id:
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
     report = ContentReport(
