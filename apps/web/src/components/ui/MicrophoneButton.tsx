@@ -17,12 +17,15 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
     onTranscriptRef.current = onTranscript;
   }, [onTranscript]);
 
+  const [isSupported, setIsSupported] = useState(false);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
       if (SpeechRecognition) {
+        setIsSupported(true);
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
@@ -46,8 +49,6 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
         };
 
         recognition.onend = () => {
-          // If we want it to keep listening while isListening is true, we could restart
-          // but for this MVP we'll just stop
           setIsListening(false);
         };
 
@@ -72,9 +73,21 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
     }
   };
 
-  if (!recognitionRef.current && typeof window !== "undefined") {
-    return null; // Browser doesn't support speech recognition
+  if (!isSupported && typeof window !== "undefined") {
+    // Wait for mount to determine support to avoid hydration mismatch,
+    // but initially we shouldn't render anything if it's not supported.
+    // Actually, on server, we can return a disabled button or just wait.
   }
+
+  // To avoid hydration mismatch, we might just render it disabled initially if we wanted,
+  // but let's just conditionally render it if it's supported.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+  if (!isSupported) return null;
 
   return (
     <button

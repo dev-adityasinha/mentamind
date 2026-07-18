@@ -134,15 +134,25 @@ async def register_organization(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> TokenResponse:
     # Check if organization name already exists
-    existing_org = await db.execute(
+    existing_orgs = await db.execute(
         select(Organization).where(Organization.name == body.org_name.strip())
     )
-    if existing_org.scalar_one_or_none():
-        raise HTTPException(
-            status.HTTP_409_CONFLICT,
-            "An organization with this name already exists. "
-            "Please choose a different name.",
+    for existing_org in existing_orgs.scalars().all():
+        active_users = await db.execute(
+            select(User).where(
+                User.org_id == existing_org.id, User.deleted_at.is_(None)
+            )
         )
+        if active_users.scalars().first():
+            raise HTTPException(
+                status.HTTP_409_CONFLICT,
+                "An organization with this name already exists. "
+                "Please choose a different name.",
+            )
+        else:
+            existing_org.name = f"{existing_org.name}_deleted_{uuid.uuid4().hex[:8]}"
+            db.add(existing_org)
+    await db.flush()
 
     email_hash = hash_email(body.email)
     existing = await db.execute(select(User).where(User.email_hash == email_hash))
@@ -435,6 +445,7 @@ async def delete_account(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> None:
     """Delete user account and anonymize personal data (GDPR Art. 17)."""
+    org_id = current_user.org_id
     current_user.deleted_at = datetime.now(UTC)
     current_user.email_hash = None
     current_user.password_hash = None
@@ -443,4 +454,16 @@ async def delete_account(
     current_user.saml_attributes = {}
     current_user.encryption_key_id = None
     current_user.anonymous_session_id = None
+    await db.flush()
+
+    # Check if there are any active users left in the organization
+    active_users = await db.execute(
+        select(User).where(User.org_id == org_id, User.deleted_at.is_(None))
+    )
+    if not active_users.scalars().first():
+        org = await db.get(Organization, org_id)
+        if org:
+            org.name = f"{org.name}_deleted_{uuid.uuid4().hex[:8]}"
+            db.add(org)
+
     await db.commit()
