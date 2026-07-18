@@ -38,6 +38,69 @@ SYSTEM_PROMPT = (
 )
 
 
+# Standard, evidence-based breathing patterns keyed by goal.
+_BREATHING_EXERCISES = {
+    "calm": (
+        "Let's try box breathing to settle your nervous system:\n"
+        "1. Breathe in through your nose for 4 counts.\n"
+        "2. Hold for 4 counts.\n"
+        "3. Breathe out slowly for 4 counts.\n"
+        "4. Hold for 4 counts.\n"
+        "Repeat for 4 rounds. I'm right here with you."
+    ),
+    "sleep": (
+        "The 4-7-8 breath is great for winding down before sleep:\n"
+        "1. Breathe in quietly through your nose for 4 counts.\n"
+        "2. Hold your breath for 7 counts.\n"
+        "3. Exhale fully through your mouth for 8 counts.\n"
+        "Repeat 4 times, letting each exhale relax you a little more."
+    ),
+    "focus": (
+        "Try coherent breathing to steady your focus:\n"
+        "1. Breathe in gently for 5 counts.\n"
+        "2. Breathe out gently for 5 counts.\n"
+        "Keep a smooth, even rhythm for about 2 minutes. "
+        "It balances your system and clears mental fog."
+    ),
+}
+
+
+def _breathing_exercise(goal: str) -> str:
+    return _BREATHING_EXERCISES.get(goal, _BREATHING_EXERCISES["calm"])
+
+
+async def _explain_latest_assessment(
+    db: AsyncSession, user_id: uuid.UUID
+) -> str | None:
+    """Fetch the user's most recent assessment and explain it in plain language."""
+    res = await db.execute(
+        select(TestScore)
+        .where(TestScore.user_id == user_id)
+        .order_by(TestScore.created_at.desc())
+        .limit(1)
+    )
+    latest = res.scalar_one_or_none()
+    if latest is None:
+        return None
+
+    name_map = {
+        "phq-9": "PHQ-9 (depression)",
+        "gad-7": "GAD-7 (anxiety)",
+        "pss-10": "Perceived Stress Scale",
+        "burnout": "Burnout assessment",
+    }
+    friendly = name_map.get(latest.test_id.lower(), latest.test_id)
+    severity = latest.severity or "recorded"
+    taken = latest.created_at.date().isoformat()
+    return (
+        f"Your most recent {friendly}, taken on {taken}, came out as "
+        f"“{severity}” (score {latest.score}). This is a snapshot of how you "
+        f"were feeling then, not a diagnosis. If that result worries you, it "
+        f"can help to talk it through with a professional — and I'm happy to "
+        f"suggest some coping tools in the meantime. How are you feeling about it?"
+    )
+
+
 async def generate_coach_response(
     session: AiCoachSession,
     user_id: uuid.UUID,
@@ -114,7 +177,41 @@ async def generate_coach_response(
                     "required": ["category"],
                 },
             },
-        }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "recommend_breathing",
+                "description": (
+                    "Recommends a specific, evidence-based breathing exercise "
+                    "to help the user calm down, focus, or fall asleep."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "goal": {
+                            "type": "string",
+                            "description": (
+                                "What the breathing should help with: "
+                                "'calm', 'sleep', or 'focus'."
+                            ),
+                        }
+                    },
+                    "required": ["goal"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "explain_assessment",
+                "description": (
+                    "Explains the user's most recent psychological assessment "
+                    "result (e.g. PHQ-9, GAD-7) in plain, supportive language."
+                ),
+                "parameters": {"type": "object", "properties": {}},
+            },
+        },
     ]
 
     try:
@@ -136,26 +233,50 @@ async def generate_coach_response(
 
     if tool_calls and db:
         for tc in tool_calls:
-            if tc["function"]["name"] == "recommend_meditation":
-                try:
-                    args = json.loads(tc["function"]["arguments"])
-                    category = args.get("category", "").upper()
+            name = tc["function"]["name"]
+            try:
+                args = json.loads(tc["function"].get("arguments") or "{}")
+            except Exception:
+                args = {}
 
-                    # fetch a meditation track by category
-                    track_res = await db.execute(
-                        select(MeditationTrack)
-                        .where(MeditationTrack.category == category)
-                        .order_by(MeditationTrack.created_at.desc())
-                        .limit(1)
+            if name == "recommend_meditation":
+                # Category enum values are lowercase (guided, sleep, ...).
+                category = str(args.get("category", "")).strip().lower()
+                track_res = await db.execute(
+                    select(MeditationTrack)
+                    .where(MeditationTrack.category == category)
+                    .order_by(MeditationTrack.created_at.desc())
+                    .limit(1)
+                )
+                track = track_res.scalar_one_or_none()
+                if track:
+                    ai_text = (
+                        f"I've found a meditation that might help: "
+                        f"“{track.title}” ({track.duration_minutes} min) "
+                        f"in our {track.category} collection. "
+                        f"You can start it from the Meditation page whenever you're ready."
                     )
-                    track = track_res.scalar_one_or_none()
+                else:
+                    ai_text = (
+                        "I don't have a saved session for that just yet, but a "
+                        "simple grounding practice can help — want me to walk "
+                        "you through some slow breathing?"
+                    )
 
-                    if track:
-                        ai_text = f"I've found a great meditation track for you: {track.title} ({track.duration_seconds // 60} mins). It's focused on {track.category.lower()}."
-                    else:
-                        ai_text = f"I couldn't find a specific meditation track for {category.lower()} right now, but I encourage you to take a few deep breaths."
-                except Exception:
-                    pass
+            elif name == "recommend_breathing":
+                goal = str(args.get("goal", "calm")).strip().lower()
+                ai_text = _breathing_exercise(goal)
+
+            elif name == "explain_assessment":
+                explanation = await _explain_latest_assessment(db, user_id)
+                if explanation:
+                    ai_text = explanation
+                else:
+                    ai_text = (
+                        "You haven't completed an assessment yet. When you do, I "
+                        "can walk you through what the results mean. You can take "
+                        "one from the Assessments page."
+                    )
 
     if not ai_text:
         ai_text = "I'm here for you. What's on your mind?"

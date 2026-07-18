@@ -87,6 +87,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               )}
               {!isGhostMode && !isTransitioningGhostMode && (
                 <Link
+                  href="/meditation"
+                  className={`text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm ${
+                    pathname?.startsWith("/meditation")
+                      ? "text-brand font-medium"
+                      : "text-text-secondary hover:text-text-primary"
+                  }`}
+                >
+                {t("dashboard.meditation")}
+              </Link>
+              )}
+              {!isGhostMode && !isTransitioningGhostMode && (
+                <Link
                   href="/coach"
                   className={`text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm ${
                     pathname?.startsWith("/coach")
@@ -143,6 +155,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   }`}
                 >
                   HR Dashboard
+                </Link>
+              )}
+              {!isGhostMode && !isTransitioningGhostMode && (user.role === "admin" || user.role === "hr_manager" || user.role === "moderator") && (
+                <Link
+                  href="/admin"
+                  className={`text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus rounded-sm ${
+                    pathname === "/admin" || (pathname?.startsWith("/admin/") && !pathname?.startsWith("/admin/hr"))
+                      ? "text-brand font-medium"
+                      : "text-text-secondary hover:text-text-primary"
+                  }`}
+                >
+                  {user.role === "moderator" ? "Moderation" : "Admin"}
                 </Link>
               )}
               {(isGhostMode || isTransitioningGhostMode) && (

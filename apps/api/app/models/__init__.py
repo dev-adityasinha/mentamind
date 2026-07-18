@@ -10,7 +10,12 @@ from app.models.department import Department
 from app.models.emotion_analysis import EmotionAnalysis
 from app.models.invitation import Invitation
 from app.models.journal import JournalEntry
-from app.models.meditation import MeditationHistory, MeditationStats, MeditationTrack
+from app.models.meditation import (
+    MeditationFavorite,
+    MeditationHistory,
+    MeditationStats,
+    MeditationTrack,
+)
 from app.models.message import ChatMessage
 from app.models.mood_log import MoodLog
 from app.models.notification_event import NotificationEvent
@@ -45,6 +50,7 @@ __all__ = [
     "MeditationHistory",
     "MeditationStats",
     "MeditationTrack",
+    "MeditationFavorite",
     "JournalEntry",
     "AiCoachSession",
     "AiCoachMessage",

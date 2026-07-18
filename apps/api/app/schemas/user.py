@@ -1,15 +1,19 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.models.user import UserRole
+
+# Usernames: 3-30 chars, letters/digits/underscore/hyphen, must start alnum.
+USERNAME_PATTERN = r"^[a-zA-Z0-9][a-zA-Z0-9_-]{2,29}$"
 
 
 class UserResponse(BaseModel):
     id: uuid.UUID
     org_id: uuid.UUID
     display_name: str
+    username: str | None = None
     role: UserRole
     consent_analytics: bool
     consent_ai_coaching: bool
@@ -23,6 +27,7 @@ class UserResponse(BaseModel):
 class UserProfileResponse(BaseModel):
     id: uuid.UUID
     display_name: str
+    username: str | None = None
     age: int | None = None
     gender: str | None = None
     country: str | None = None
@@ -34,7 +39,8 @@ class UserProfileResponse(BaseModel):
 
 class UserProfileUpdateRequest(BaseModel):
     display_name: str | None = None
-    age: int | None = None
+    username: str | None = Field(default=None, pattern=USERNAME_PATTERN)
+    age: int | None = Field(default=None, ge=13, le=120)
     gender: str | None = None
     country: str | None = None
     avatar_url: str | None = None

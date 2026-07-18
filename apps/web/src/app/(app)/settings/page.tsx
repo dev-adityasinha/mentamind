@@ -15,8 +15,25 @@ import {
   type UserSettings,
   type UpdateSettingsData,
 } from "@/lib/api/settings";
+import {
+  getMyProfile,
+  updateMyProfile,
+  type UserProfile,
+} from "@/lib/api/users";
+import { ApiError } from "@/lib/api/client";
 import { useI18n } from "@/lib/i18n/Context";
 import { useTheme } from "next-themes";
+
+const GOAL_OPTIONS = [
+  "Reduce stress",
+  "Sleep better",
+  "Manage anxiety",
+  "Build focus",
+  "Improve mood",
+  "Work-life balance",
+  "Practice gratitude",
+  "Feel more connected",
+];
 
 const THEMES = [
   { value: "system", label: "System" },
@@ -37,6 +54,8 @@ export default function SettingsPage() {
   const { setTheme } = useTheme();
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -50,8 +69,9 @@ export default function SettingsPage() {
     async function load() {
       try {
         hasLoadedRef.current = true;
-        const data = await getSettings();
+        const [data, prof] = await Promise.all([getSettings(), getMyProfile()]);
         setSettings(data);
+        setProfile(prof);
         setTheme(data.theme);
       } catch {
         addToast("Failed to load settings", "error");
@@ -76,6 +96,31 @@ export default function SettingsPage() {
       setSaving(false);
     }
   }, [settings, addToast]);
+
+  const handleSaveProfile = useCallback(async () => {
+    if (!profile) return;
+    setSavingProfile(true);
+    try {
+      const updated = await updateMyProfile({
+        display_name: profile.display_name?.trim() || undefined,
+        username: profile.username?.trim() || undefined,
+        age: profile.age,
+        gender: profile.gender,
+        country: profile.country,
+        avatar_url: profile.avatar_url,
+        mental_health_goals: profile.mental_health_goals,
+      });
+      setProfile(updated);
+      addToast("Profile saved!", "success");
+    } catch (err) {
+      addToast(
+        err instanceof ApiError ? err.message : "Failed to save profile",
+        "error",
+      );
+    } finally {
+      setSavingProfile(false);
+    }
+  }, [profile, addToast]);
 
   const handleExport = useCallback(async () => {
     setExporting(true);
@@ -160,6 +205,151 @@ export default function SettingsPage() {
         <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
         <p className="mt-1 text-sm text-text-muted">Manage your preferences and privacy.</p>
       </div>
+
+      {/* Profile */}
+      {profile && (
+        <Card>
+          <div className="p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-text-primary">Profile</h2>
+            <p className="text-sm text-text-muted">
+              This information personalises your experience. Only your display
+              name and (if set) username are visible to others.
+            </p>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="text-sm font-medium text-text-secondary">Display name</label>
+                <input
+                  type="text"
+                  value={profile.display_name ?? ""}
+                  onChange={(e) =>
+                    setProfile((p) => (p ? { ...p, display_name: e.target.value } : p))
+                  }
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  placeholder="Jane Smith"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-secondary">Username</label>
+                <input
+                  type="text"
+                  value={profile.username ?? ""}
+                  onChange={(e) =>
+                    setProfile((p) => (p ? { ...p, username: e.target.value } : p))
+                  }
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  placeholder="jane_smith"
+                />
+                <p className="mt-1 text-xs text-text-muted">
+                  3–30 characters: letters, numbers, _ or -.
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-secondary">Age</label>
+                <input
+                  type="number"
+                  min={13}
+                  max={120}
+                  value={profile.age ?? ""}
+                  onChange={(e) =>
+                    setProfile((p) =>
+                      p ? { ...p, age: e.target.value ? Number(e.target.value) : null } : p,
+                    )
+                  }
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  placeholder="—"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-secondary">Gender</label>
+                <select
+                  value={profile.gender ?? ""}
+                  onChange={(e) =>
+                    setProfile((p) => (p ? { ...p, gender: e.target.value || null } : p))
+                  }
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                >
+                  <option value="">Prefer not to say</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="non-binary">Non-binary</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-secondary">Country</label>
+                <input
+                  type="text"
+                  maxLength={2}
+                  value={profile.country ?? ""}
+                  onChange={(e) =>
+                    setProfile((p) =>
+                      p ? { ...p, country: e.target.value.toUpperCase() || null } : p,
+                    )
+                  }
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  placeholder="IN"
+                />
+                <p className="mt-1 text-xs text-text-muted">2-letter country code.</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-secondary">Avatar URL</label>
+                <input
+                  type="url"
+                  value={profile.avatar_url ?? ""}
+                  onChange={(e) =>
+                    setProfile((p) => (p ? { ...p, avatar_url: e.target.value || null } : p))
+                  }
+                  className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary focus:border-focus focus:outline-none focus:ring-2 focus:ring-focus/20"
+                  placeholder="https://…"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-text-secondary">
+                Mental health goals
+              </label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {GOAL_OPTIONS.map((goal) => {
+                  const selected = profile.mental_health_goals.includes(goal);
+                  return (
+                    <button
+                      key={goal}
+                      type="button"
+                      onClick={() =>
+                        setProfile((p) =>
+                          p
+                            ? {
+                                ...p,
+                                mental_health_goals: selected
+                                  ? p.mental_health_goals.filter((g) => g !== goal)
+                                  : [...p.mental_health_goals, goal],
+                              }
+                            : p,
+                        )
+                      }
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        selected
+                          ? "border-brand bg-brand-subtle text-brand"
+                          : "border-border bg-surface text-text-secondary hover:bg-surface-raised"
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button variant="primary" onClick={handleSaveProfile} isLoading={savingProfile}>
+                Save profile
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Appearance */}
       <Card>

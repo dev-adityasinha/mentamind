@@ -22,6 +22,7 @@ from app.schemas.forum import (
     PostReportRequest,
     PostResponse,
 )
+from app.services.encryption import encrypt
 
 router = APIRouter(prefix="/forum", tags=["forum"])
 
@@ -232,14 +233,19 @@ async def create_comment(
     db.add(comment)
     post.reply_count += 1
 
-    # Trigger notification for the post author if they are not anonymous and it's someone else commenting
+    # Trigger notification for the post author if they are not anonymous and
+    # it's someone else commenting. The body is encrypted with the recipient's
+    # id as associated data, matching how the notifications router decrypts it.
     if post.author_id and post.author_id != current_user.id and not post.is_anonymous:
         notif = NotificationEvent(
             user_id=post.author_id,
             org_id=post.org_id,
             category=NotificationCategory.COMMUNITY_REPLY,
             title="New Reply",
-            body_encrypted="Someone replied to your community post.",
+            body_encrypted=encrypt(
+                "Someone replied to your community post.",
+                associated_data=str(post.author_id).encode(),
+            ),
         )
         db.add(notif)
 

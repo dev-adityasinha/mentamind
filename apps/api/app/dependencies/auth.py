@@ -46,6 +46,11 @@ async def get_current_user(
     user = result.scalar_one_or_none()
     if user is None:
         raise exc
+    if user.is_banned:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account has been banned.",
+        )
     return user
 
 

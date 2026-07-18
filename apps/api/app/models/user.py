@@ -31,6 +31,7 @@ class User(Base):
         Index("ix_users_email_hash", "email_hash", unique=True),
         Index("ix_users_anonymous_session_id", "anonymous_session_id", unique=True),
         Index("ix_users_saml_subject_id", "saml_subject_id", unique=True),
+        Index("ix_users_username", "username", unique=True),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -45,6 +46,9 @@ class User(Base):
     display_name: Mapped[str] = mapped_column(
         String(255), nullable=False, default="Anonymous"
     )
+    # Unique handle chosen by the user. Nullable so pre-existing and anonymous
+    # accounts remain valid; uniqueness is enforced per the index below.
+    username: Mapped[str | None] = mapped_column(String(50), nullable=True)
     role: Mapped[UserRole] = mapped_column(
         PgEnum(UserRole), nullable=False, default=UserRole.ANONYMOUS
     )
@@ -97,3 +101,13 @@ class User(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+
+    # Moderation: ban is a reversible access block, distinct from deleted_at
+    # (which is a permanent GDPR soft-delete).
+    is_banned: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    banned_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    ban_reason: Mapped[str | None] = mapped_column(String(512), nullable=True)

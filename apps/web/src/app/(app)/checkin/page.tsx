@@ -21,9 +21,18 @@ const EMOTIONS = [
 ];
 
 const CONTEXTS = [
-  "Workload", "Sleep", "Health", "Relationships", 
+  "Workload", "Sleep", "Health", "Relationships",
   "Finances", "Personal Life", "Family", "Commute"
 ];
+
+const ENERGY_LABELS: Record<number, string> = {
+  1: "Drained", 2: "Low", 3: "Steady", 4: "Energised", 5: "Buzzing",
+};
+const STRESS_LABELS: Record<number, string> = {
+  1: "Very calm", 2: "Relaxed", 3: "Neutral", 4: "Tense", 5: "Very stressed",
+};
+
+const TOTAL_STEPS = 5;
 
 export default function CheckInPage() {
   const router = useRouter();
@@ -33,6 +42,8 @@ export default function CheckInPage() {
 
   const [score, setScore] = useState<number | null>(null);
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+  const [energy, setEnergy] = useState<number | null>(null);
+  const [stress, setStress] = useState<number | null>(null);
   const [context, setContext] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
@@ -42,6 +53,8 @@ export default function CheckInPage() {
     try {
       await submitMoodLog({
         mood_score: score,
+        energy_score: energy,
+        stress_score: stress,
         emotion_tags: selectedEmotions,
         context_tag: context || undefined,
         note: note || undefined,
@@ -61,7 +74,9 @@ export default function CheckInPage() {
       <div className="rounded-xl border border-border bg-surface p-6 shadow-sm sm:p-10">
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-text-primary">Daily Check-in</h1>
-          <span className="text-sm font-medium text-text-muted">Step {step} of 4</span>
+          <span className="text-sm font-medium text-text-muted">
+            Step {step} of {TOTAL_STEPS}
+          </span>
         </div>
 
         {step === 1 && (
@@ -92,11 +107,7 @@ export default function CheckInPage() {
               ))}
             </div>
             <div className="mt-8 flex justify-end">
-              <Button
-                variant="primary"
-                disabled={!score}
-                onClick={() => setStep(2)}
-              >
+              <Button variant="primary" disabled={!score} onClick={() => setStep(2)}>
                 Next
               </Button>
             </div>
@@ -132,9 +143,7 @@ export default function CheckInPage() {
               ))}
             </div>
             <div className="mt-8 flex justify-between">
-              <Button variant="ghost" onClick={() => setStep(1)}>
-                Back
-              </Button>
+              <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
               <Button variant="primary" onClick={() => setStep(3)}>
                 {selectedEmotions.length > 0 ? "Next" : "Skip"}
               </Button>
@@ -143,6 +152,39 @@ export default function CheckInPage() {
         )}
 
         {step === 3 && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+            <div>
+              <h2 className="text-lg font-medium text-text-primary text-center">
+                How is your energy and stress?
+              </h2>
+              <p className="text-center text-sm text-text-muted mt-1">
+                Rate each from 1 to 5
+              </p>
+            </div>
+
+            <RatingRow
+              label="Energy"
+              value={energy}
+              onChange={setEnergy}
+              labels={ENERGY_LABELS}
+            />
+            <RatingRow
+              label="Stress"
+              value={stress}
+              onChange={setStress}
+              labels={STRESS_LABELS}
+            />
+
+            <div className="mt-8 flex justify-between">
+              <Button variant="ghost" onClick={() => setStep(2)}>Back</Button>
+              <Button variant="primary" onClick={() => setStep(4)}>
+                {energy || stress ? "Next" : "Skip"}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <h2 className="text-lg font-medium text-text-primary text-center">
               What&apos;s the main context?
@@ -155,7 +197,7 @@ export default function CheckInPage() {
                   type="button"
                   onClick={() => {
                     setContext(c);
-                    setTimeout(() => setStep(4), 300);
+                    setTimeout(() => setStep(5), 300);
                   }}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
                     context === c
@@ -168,17 +210,15 @@ export default function CheckInPage() {
               ))}
             </div>
             <div className="mt-8 flex justify-between">
-              <Button variant="ghost" onClick={() => setStep(2)}>
-                Back
-              </Button>
-              <Button variant="primary" onClick={() => setStep(4)}>
+              <Button variant="ghost" onClick={() => setStep(3)}>Back</Button>
+              <Button variant="primary" onClick={() => setStep(5)}>
                 {context ? "Next" : "Skip"}
               </Button>
             </div>
           </div>
         )}
 
-        {step === 4 && (
+        {step === 5 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
             <h2 className="text-lg font-medium text-text-primary">
               Anything else you&apos;d like to note?
@@ -195,12 +235,12 @@ export default function CheckInPage() {
               />
               <div className="absolute top-2 right-2">
                 <MicrophoneButton
-                  onTranscript={(text) => setNote((prev) => prev ? prev + " " + text : text)}
+                  onTranscript={(text) => setNote((prev) => (prev ? prev + " " + text : text))}
                 />
               </div>
             </div>
             <div className="mt-8 flex justify-between">
-              <Button variant="ghost" onClick={() => setStep(3)} disabled={isSubmitting}>
+              <Button variant="ghost" onClick={() => setStep(4)} disabled={isSubmitting}>
                 Back
               </Button>
               <Button
@@ -214,6 +254,46 @@ export default function CheckInPage() {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function RatingRow({
+  label,
+  value,
+  onChange,
+  labels,
+}: {
+  label: string;
+  value: number | null;
+  onChange: (v: number) => void;
+  labels: Record<number, string>;
+}) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-sm font-medium text-text-secondary">{label}</span>
+        <span className="text-xs text-text-muted">
+          {value ? labels[value] : "Not set"}
+        </span>
+      </div>
+      <div className="grid grid-cols-5 gap-2">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => onChange(n)}
+            aria-label={`${label} ${n}: ${labels[n]}`}
+            className={`h-11 rounded-lg border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+              value === n
+                ? "border-brand bg-brand-subtle text-brand"
+                : "border-border bg-surface text-text-secondary hover:bg-surface-raised"
+            }`}
+          >
+            {n}
+          </button>
+        ))}
       </div>
     </div>
   );
