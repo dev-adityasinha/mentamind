@@ -210,7 +210,7 @@ export default function HomePage() {
         <span className="text-sm font-medium text-text-primary">Talk to AI Coach</span>
       </button>
 
-      {/* Pending Chats */}
+      {/* Anonymous Chat */}
       <button
         type="button"
         onClick={() => router.push("/chat")}
@@ -221,7 +221,7 @@ export default function HomePage() {
           <span className="relative inline-flex rounded-full h-3 w-3 bg-brand"></span>
         </span>
         <span className="text-sm font-medium text-text-primary">
-          {summary.pending_chats > 0 ? `${summary.pending_chats} pending chats` : "Pending Chats"}
+          Anonymous Chat
         </span>
       </button>
 
