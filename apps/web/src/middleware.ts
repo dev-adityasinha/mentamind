@@ -5,7 +5,7 @@ const PUBLIC_PREFIXES = ["/login", "/register", "/join", "/api/", "/logo/"];
 export function middleware(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
 
-  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+  if (pathname === "/" || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 

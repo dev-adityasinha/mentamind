@@ -73,14 +73,7 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
     }
   };
 
-  if (!isSupported && typeof window !== "undefined") {
-    // Wait for mount to determine support to avoid hydration mismatch,
-    // but initially we shouldn't render anything if it's not supported.
-    // Actually, on server, we can return a disabled button or just wait.
-  }
-
-  // To avoid hydration mismatch, we might just render it disabled initially if we wanted,
-  // but let's just conditionally render it if it's supported.
+  // Wait for mount to determine support to avoid hydration mismatch.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -95,7 +88,9 @@ export function MicrophoneButton({ onTranscript, className }: MicrophoneButtonPr
       onClick={toggleListening}
       aria-label={isListening ? "Stop listening" : "Start listening"}
       className={`p-2 rounded-full transition-colors focus-visible:ring-2 ${
-        isListening ? "bg-red-500 text-white animate-pulse" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+        isListening
+          ? "bg-red-500 text-white animate-pulse"
+          : "bg-surface-raised text-text-secondary hover:bg-border"
       } ${className}`}
     >
       {isListening ? <Mic size={20} /> : <MicOff size={20} />}

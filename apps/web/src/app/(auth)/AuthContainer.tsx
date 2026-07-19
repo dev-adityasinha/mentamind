@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -10,19 +11,23 @@ export function AuthContainer({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Left panel */}
-      <div className="flex flex-col gap-4 p-6 md:p-10 bg-bg">
+      <div className="relative isolate flex flex-col gap-4 p-6 md:p-10 bg-bg overflow-hidden">
+        <div
+          className="pointer-events-none absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-0 dark:opacity-[0.18] blur-[100px] -z-10 transition-opacity"
+          style={{ background: "radial-gradient(circle, #1d4ed8 0%, transparent 70%)" }}
+        />
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium text-text-primary">
+          <Link href="/" className="flex items-center gap-2 font-medium text-text-primary">
             <Image src="/logo/mentamind.webp" alt="Mentamind Logo" width={24} height={24} className="object-contain" />
             Mentamind
-          </a>
+          </Link>
         </div>
 
         <div className="flex flex-1 items-center justify-center py-8 overflow-hidden">
           <div className="w-full max-w-sm relative">
             <motion.div
               layout
-              className="relative w-full rounded-xl border border-border bg-surface shadow-sm overflow-hidden"
+              className="relative w-full rounded-xl border border-border bg-surface shadow-sm backdrop-blur-md glass-shimmer overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, type: "spring", bounce: 0 }}
