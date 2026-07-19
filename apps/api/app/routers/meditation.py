@@ -1,5 +1,4 @@
 import functools
-import os
 import uuid
 from typing import Annotated
 
@@ -37,6 +36,7 @@ from app.schemas.meditation import (
     MeditationTrackResponse,
     MeditationTrackUpdate,
 )
+from app.services.media_storage import MediaStorageError, store_audio
 from app.services.meditation_tracker import submit_meditation_completion
 from app.settings import settings
 
@@ -195,50 +195,40 @@ async def upload_audio(
     the configured media directory. The returned URL can be used as a track's
     audio_url (via POST /tracks or PATCH /tracks/{id}).
     """
-    ext = _ALLOWED_AUDIO_TYPES.get((file.content_type or "").lower())
+    content_type = (file.content_type or "").lower()
+    ext = _ALLOWED_AUDIO_TYPES.get(content_type)
     if ext is None:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
             detail=("Unsupported audio type. Allowed: mp3, wav, ogg, m4a, aac, webm."),
         )
 
-    media_dir = settings.media_dir
-    os.makedirs(media_dir, exist_ok=True)
+    # Read the upload into memory in chunks, enforcing the size cap before we
+    # hand the bytes to the configured storage backend (local disk or R2).
+    max_bytes = settings.max_audio_upload_mb * 1024 * 1024
+    buffer = bytearray()
+    try:
+        while chunk := await file.read(1024 * 1024):
+            buffer.extend(chunk)
+            if len(buffer) > max_bytes:
+                raise HTTPException(
+                    status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    detail=(
+                        f"File exceeds the {settings.max_audio_upload_mb}MB limit."
+                    ),
+                )
+    finally:
+        await file.close()
 
     filename = f"{uuid.uuid4().hex}{ext}"
-    dest_path = os.path.join(media_dir, filename)
-
-    max_bytes = settings.max_audio_upload_mb * 1024 * 1024
-    written = 0
     try:
-        with open(dest_path, "wb") as out:
-            # Stream in chunks so we never hold the whole file in memory and can
-            # abort early if it exceeds the configured size limit.
-            while chunk := await file.read(1024 * 1024):
-                written += len(chunk)
-                if written > max_bytes:
-                    out.close()
-                    os.remove(dest_path)
-                    raise HTTPException(
-                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                        detail=(
-                            f"File exceeds the {settings.max_audio_upload_mb}MB limit."
-                        ),
-                    )
-                out.write(chunk)
-    except HTTPException:
-        raise
-    except Exception as exc:  # pragma: no cover - defensive cleanup
-        if os.path.exists(dest_path):
-            os.remove(dest_path)
+        audio_url = await store_audio(bytes(buffer), filename, content_type)
+    except MediaStorageError as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to store the uploaded file.",
         ) from exc
-    finally:
-        await file.close()
 
-    audio_url = f"{settings.media_base_url.rstrip('/')}/{filename}"
     return AudioUploadResponse(audio_url=audio_url)
 
 

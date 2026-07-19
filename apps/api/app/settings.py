@@ -71,14 +71,27 @@ class Settings(BaseSettings):
     groq_model: str = "llama-3.3-70b-versatile"
     groq_base_url: str = "https://api.groq.com/openai/v1"
 
-    # Media storage (uploaded meditation audio, etc.).
-    # media_dir is where files are written on the API container's filesystem;
-    # mount a Docker volume here so uploads survive rebuilds.
+    # Media storage backend: "local" (filesystem) or "r2" (Cloudflare R2).
+    # Use "local" for development and "r2" in production, since a container's
+    # local disk is ephemeral and uploads would be lost on every deploy.
+    storage_backend: str = "local"
+
+    # Local backend (development).
+    # media_dir is where files are written on the API container's filesystem.
     media_dir: str = "/app/media"
-    # Public base URL the frontend uses to fetch stored media. In development
-    # this points at the API's own /media mount. In production set this to a
-    # CDN / object-store URL.
+    # Public base URL for the local /media mount. Set to the API's own origin.
     media_base_url: str = "http://localhost:8000/media"
+
+    # Cloudflare R2 backend (production). See services/media_storage.py for the
+    # one-time bucket + API-token setup steps.
+    r2_account_id: str = ""
+    r2_access_key_id: str = ""
+    r2_secret_access_key: str = ""
+    r2_bucket: str = ""
+    # Public HTTPS base URL of the bucket (R2.dev subdomain or a custom domain),
+    # e.g. https://pub-xxxx.r2.dev  — the uploaded filename is appended to this.
+    r2_public_base_url: str = ""
+
     # Max upload size for audio files, in megabytes.
     max_audio_upload_mb: int = 50
 
