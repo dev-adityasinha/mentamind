@@ -2,7 +2,10 @@ import type { User } from "@/lib/auth/types";
 import { ApiError, apiFetch } from "./client";
 
 export async function getMe(): Promise<User> {
-  const res = await apiFetch("/me");
+  // Never cache: this is the source of the current user's role, which gates
+  // the whole nav (Admin/HR/Invites links). A stale service-worker copy could
+  // return an outdated role and make role-gated links disappear.
+  const res = await apiFetch("/me", { cache: "no-store" });
   if (!res.ok) {
     throw new ApiError(res.status, "Failed to load user");
   }

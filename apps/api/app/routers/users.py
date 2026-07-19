@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -27,7 +27,12 @@ def _profile_dict(user: User, settings: UserSettings | None) -> dict:
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(current_user: Annotated[User, Depends(get_current_user)]) -> User:
+async def get_me(
+    response: Response,
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    # The current user's role gates the whole nav; never serve a cached copy.
+    response.headers["Cache-Control"] = "no-store"
     return current_user
 
 
