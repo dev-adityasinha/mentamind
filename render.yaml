@@ -52,9 +52,21 @@ services:
         value: /app/media
       - key: MEDIA_BASE_URL
         sync: false
-      # Optional integrations — leave unset to disable, or paste keys.
-      - key: RESEND_API_KEY
+      # ---- SMTP email (invitations, verification, password reset) ----
+      # If SMTP_USERNAME / SMTP_PASSWORD are unset, the app logs the email link
+      # instead of sending. For Gmail, use an App Password (not your login
+      # password) as SMTP_PASSWORD.
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
         sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        sync: false
+      # Optional integration — leave unset to disable, or paste key.
       - key: GROQ_API_KEY
         sync: false
 

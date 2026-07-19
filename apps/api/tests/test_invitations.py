@@ -26,14 +26,14 @@ async def test_create_invitation_happy_path(
     token = await _admin_token(db_session, org_a)
     resp = await client.post(
         "/invitations",
-        json={"email": "colleague@acme.com", "role": "employee"},
+        json={"email": "colleague@acme.com", "role": "user"},
         headers=_auth(token),
     )
     assert resp.status_code == 201
     data = resp.json()
     assert "token" in data
     assert len(data["token"]) > 20
-    assert data["invited_role"] == "employee"
+    assert data["invited_role"] == "user"
     assert data["status"] == "pending"
 
 
@@ -46,7 +46,7 @@ async def test_invite_token_not_stored_raw(
     token = await _admin_token(db_session, org_a)
     create_resp = await client.post(
         "/invitations",
-        json={"email": "hashcheck@acme.com", "role": "employee"},
+        json={"email": "hashcheck@acme.com", "role": "user"},
         headers=_auth(token),
     )
     assert create_resp.status_code == 201
@@ -70,12 +70,12 @@ async def test_list_invitations_only_own_org(
 
     await client.post(
         "/invitations",
-        json={"email": "a-only@acme.com", "role": "employee"},
+        json={"email": "a-only@acme.com", "role": "user"},
         headers=_auth(token_a),
     )
     await client.post(
         "/invitations",
-        json={"email": "b-only@beta.com", "role": "employee"},
+        json={"email": "b-only@beta.com", "role": "user"},
         headers=_auth(token_b),
     )
 
@@ -92,7 +92,7 @@ async def test_preview_valid_token(
     token = await _admin_token(db_session, org_a)
     create_resp = await client.post(
         "/invitations",
-        json={"email": "preview@acme.com", "role": "employee"},
+        json={"email": "preview@acme.com", "role": "user"},
         headers=_auth(token),
     )
     raw_token = create_resp.json()["token"]
@@ -116,7 +116,7 @@ async def test_accept_invitation_happy_path(
     admin_token = await _admin_token(db_session, org_a)
     create_resp = await client.post(
         "/invitations",
-        json={"email": "newmember@acme.com", "role": "employee"},
+        json={"email": "newmember@acme.com", "role": "user"},
         headers=_auth(admin_token),
     )
     raw_token = create_resp.json()["token"]
@@ -135,7 +135,7 @@ async def test_accept_invitation_happy_path(
 
     me = await client.get("/me", headers=_auth(tokens["access_token"]))
     assert me.status_code == 200
-    assert me.json()["role"] == "employee"
+    assert me.json()["role"] == "user"
 
 
 @pytest.mark.asyncio
@@ -145,7 +145,7 @@ async def test_accept_invitation_double_use(
     admin_token = await _admin_token(db_session, org_a)
     create_resp = await client.post(
         "/invitations",
-        json={"email": "doubleuse@acme.com", "role": "employee"},
+        json={"email": "doubleuse@acme.com", "role": "user"},
         headers=_auth(admin_token),
     )
     raw_token = create_resp.json()["token"]
@@ -172,7 +172,7 @@ async def test_accept_revoked_invitation(
     admin_token = await _admin_token(db_session, org_a)
     create_resp = await client.post(
         "/invitations",
-        json={"email": "revoked@acme.com", "role": "employee"},
+        json={"email": "revoked@acme.com", "role": "user"},
         headers=_auth(admin_token),
     )
     inv_id = create_resp.json()["id"]
@@ -206,7 +206,7 @@ async def test_revoke_cross_org_denied(
 
     create_resp = await client.post(
         "/invitations",
-        json={"email": "crossorg@acme.com", "role": "employee"},
+        json={"email": "crossorg@acme.com", "role": "user"},
         headers=_auth(token_a),
     )
     inv_id = create_resp.json()["id"]
@@ -224,7 +224,7 @@ async def test_employee_cannot_invite(
 
     resp = await client.post(
         "/invitations",
-        json={"email": "outsider@acme.com", "role": "employee"},
+        json={"email": "outsider@acme.com", "role": "user"},
         headers=_auth(token),
     )
     assert resp.status_code == 403
@@ -239,7 +239,7 @@ async def test_hr_manager_can_invite(
 
     resp = await client.post(
         "/invitations",
-        json={"email": f"hr-invite-{uuid.uuid4()}@acme.com", "role": "employee"},
+        json={"email": f"hr-invite-{uuid.uuid4()}@acme.com", "role": "user"},
         headers=_auth(token),
     )
     assert resp.status_code == 201
@@ -250,7 +250,7 @@ async def test_duplicate_pending_invite_rejected(
     client: AsyncClient, db_session: AsyncSession, org_a: Organization
 ) -> None:
     admin_token = await _admin_token(db_session, org_a)
-    payload = {"email": "dup@acme.com", "role": "employee"}
+    payload = {"email": "dup@acme.com", "role": "user"}
 
     r1 = await client.post("/invitations", json=payload, headers=_auth(admin_token))
     assert r1.status_code == 201
@@ -277,7 +277,7 @@ async def test_invite_assigned_correct_org(
     admin_token = await _admin_token(db_session, org_a)
     create_resp = await client.post(
         "/invitations",
-        json={"email": "orgcheck@acme.com", "role": "employee"},
+        json={"email": "orgcheck@acme.com", "role": "user"},
         headers=_auth(admin_token),
     )
     raw_token = create_resp.json()["token"]
