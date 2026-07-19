@@ -1,4 +1,4 @@
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -75,8 +75,12 @@ async def get_participation(
     )
     total_users = total.scalar() or 0
 
-    today = date.today()
-    month_start = today.replace(day=1)
+    # Start of the current month in UTC. MoodLog.logged_at is timezone-aware
+    # (DateTime(timezone=True)), so the boundary must be tz-aware too — comparing
+    # it against a naive date() coerces to server-local midnight and can miscount
+    # around month boundaries. Use UTC to match the rest of the codebase.
+    now = datetime.now(UTC)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     active = await db.execute(
         select(func.count(func.distinct(MoodLog.user_id))).where(
             MoodLog.org_id == current_user.org_id,
