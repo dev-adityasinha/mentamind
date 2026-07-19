@@ -2,7 +2,7 @@ import uuid as _uuid_mod
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -61,6 +61,7 @@ def _decrypt_email(inv: Invitation) -> str:
 )
 async def create_invitation(
     body: InvitationCreateRequest,
+    background_tasks: BackgroundTasks,
     current_user: User = _can_invite,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ) -> InvitationCreateResponse:
@@ -126,11 +127,14 @@ async def create_invitation(
     await db.commit()
     await db.refresh(inv)
 
-    import asyncio
-
+    # Send via FastAPI BackgroundTasks (runs after the response is sent, within
+    # the app lifecycle). asyncio.create_task here is unsafe: the task can be
+    # garbage-collected before it runs, so the email would silently never send.
     from app.services.email import send_invitation_email
 
-    asyncio.create_task(send_invitation_email(email_norm, raw_token, body.role.value))
+    background_tasks.add_task(
+        send_invitation_email, email_norm, raw_token, body.role.value
+    )
 
     return InvitationCreateResponse(
         id=inv.id,
@@ -195,6 +199,7 @@ async def revoke_invitation(
 @router.post("/{invitation_id}/resend", status_code=status.HTTP_204_NO_CONTENT)
 async def resend_invitation(
     invitation_id: str,
+    background_tasks: BackgroundTasks,
     current_user: User = _can_invite,
     db: Annotated[AsyncSession, Depends(get_db)] = None,
 ) -> None:
@@ -222,11 +227,11 @@ async def resend_invitation(
     await db.commit()
 
     email_norm = _decrypt_email(inv)
-    import asyncio
-
     from app.services.email import send_invitation_email
 
-    asyncio.create_task(send_invitation_email(email_norm, raw_token, inv.invited_role))
+    background_tasks.add_task(
+        send_invitation_email, email_norm, raw_token, inv.invited_role
+    )
 
 
 @router.post("/preview", response_model=InvitationPreviewResponse)
