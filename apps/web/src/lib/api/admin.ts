@@ -68,14 +68,18 @@ export type UserStatusFilter = 'active' | 'banned' | 'deleted';
 // Stats & Analytics (admin / HR only)
 // ---------------------------------------------------------------------------
 
+// Admin dashboard data changes as soon as a moderator acts (delete/resolve),
+// so these GETs must never be served from the HTTP cache or the PWA service
+// worker — otherwise counts show stale, already-deleted content. `no-store`
+// forces a fresh network fetch every time.
 export async function fetchAdminStats(): Promise<AdminStats> {
-    const res = await apiFetch('/admin/stats');
+    const res = await apiFetch('/admin/stats', { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch admin stats');
     return res.json();
 }
 
 export async function fetchAdminAnalytics(days = 30): Promise<AdminAnalytics> {
-    const res = await apiFetch(`/admin/analytics?days=${days}`);
+    const res = await apiFetch(`/admin/analytics?days=${days}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch analytics');
     return res.json();
 }
@@ -89,7 +93,7 @@ export async function fetchAdminReports(status?: string, limit = 50, offset = 0)
     if (status) params.append('status_filter', status);
     params.append('limit', limit.toString());
     params.append('offset', offset.toString());
-    const res = await apiFetch(`/admin/reports?${params.toString()}`);
+    const res = await apiFetch(`/admin/reports?${params.toString()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch reports');
     return res.json();
 }
@@ -124,7 +128,7 @@ export async function fetchAdminUsers(
     if (opts.status) params.append('status_filter', opts.status);
     params.append('limit', (opts.limit ?? 50).toString());
     params.append('offset', (opts.offset ?? 0).toString());
-    const res = await apiFetch(`/admin/users?${params.toString()}`);
+    const res = await apiFetch(`/admin/users?${params.toString()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error('Failed to fetch users');
     return res.json();
 }

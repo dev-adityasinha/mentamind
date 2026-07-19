@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import Date as SADate
 from sqlalchemy import cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -56,9 +56,14 @@ async def admin_ping(
 
 @router.get("/stats", response_model=AdminStatsResponse)
 async def get_admin_stats(
+    response: Response,
     admin_user: Annotated[User, require_roles(*_ADMINS)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> AdminStatsResponse:
+    # Never cache: these counts change the instant a moderator deletes content,
+    # and a stale (PWA/service-worker) copy would show already-deleted items.
+    response.headers["Cache-Control"] = "no-store"
+
     users_result = await db.execute(
         select(func.count(User.id)).where(User.deleted_at.is_(None))
     )
@@ -136,12 +141,14 @@ async def get_admin_stats(
 
 @router.get("/reports", response_model=list[AdminReportResponse])
 async def list_reports(
+    response: Response,
     admin_user: Annotated[User, require_roles(*_MODERATORS)],
     db: Annotated[AsyncSession, Depends(get_db)],
     status_filter: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> list[AdminReportResponse]:
+    response.headers["Cache-Control"] = "no-store"
     query = select(ContentReport).order_by(ContentReport.created_at.desc())
     if status_filter:
         query = query.where(ContentReport.status == status_filter)
@@ -281,6 +288,7 @@ async def suspend_user(
 
 @router.get("/users", response_model=AdminUserListResponse)
 async def list_admin_users(
+    response: Response,
     admin_user: Annotated[User, require_roles(*_ADMINS)],
     db: Annotated[AsyncSession, Depends(get_db)],
     search: str | None = Query(
@@ -293,6 +301,7 @@ async def list_admin_users(
     offset: int = Query(0, ge=0),
 ) -> AdminUserListResponse:
     """List / search users within the admin's organization."""
+    response.headers["Cache-Control"] = "no-store"
     base_filters = [User.org_id == admin_user.org_id]
 
     if search:
