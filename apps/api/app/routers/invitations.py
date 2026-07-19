@@ -37,14 +37,14 @@ router = APIRouter(prefix="/invitations", tags=["invitations"])
 _can_invite = require_roles(UserRole.ADMIN, UserRole.HR_MANAGER)
 
 # Roles that may be assigned via an organization invitation. Other UserRole
-# members (e.g. WELLNESS_OFFICER, COUNSELOR, STUDENT, MODERATOR, THERAPIST,
+# members (EMPLOYEE, MANAGER, HR_MANAGER, WELLNESS_OFFICER, COUNSELOR, STUDENT,
 # ANONYMOUS) are intentionally excluded and cannot be invited, so a crafted
 # request cannot bypass the UI's role selector.
 INVITABLE_ROLES = frozenset(
     {
-        UserRole.EMPLOYEE,
-        UserRole.MANAGER,
-        UserRole.HR_MANAGER,
+        UserRole.USER,
+        UserRole.MODERATOR,
+        UserRole.THERAPIST,
         UserRole.ADMIN,
     }
 )

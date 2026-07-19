@@ -12,6 +12,7 @@ from app.db_types import PgEnum
 
 class UserRole(StrEnum):
     ANONYMOUS = "anonymous"
+    USER = "user"
     EMPLOYEE = "employee"
     MANAGER = "manager"
     HR_MANAGER = "hr_manager"

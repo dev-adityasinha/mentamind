@@ -1,9 +1,9 @@
 import { apiFetch } from "./client";
 
 export type InviteRole =
-  | "employee"
-  | "manager"
-  | "hr_manager"
+  | "user"
+  | "moderator"
+  | "therapist"
   | "admin";
 
 export interface Invitation {
@@ -21,7 +21,7 @@ export interface CreateInviteResponse extends Invitation {
 
 export async function createInvite(
   email: string,
-  role: InviteRole = "employee",
+  role: InviteRole = "user",
 ): Promise<CreateInviteResponse> {
   const res = await apiFetch("/invitations", {
     method: "POST",

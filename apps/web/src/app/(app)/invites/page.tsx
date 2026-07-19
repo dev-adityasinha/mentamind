@@ -39,7 +39,7 @@ export default function InvitesPage() {
   const [listError, setListError] = useState<string | null>(null);
 
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<InviteRole>("employee");
+  const [role, setRole] = useState<InviteRole>("user");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -174,9 +174,9 @@ export default function InvitesPage() {
                     onChange={(e) => setRole(e.target.value as InviteRole)}
                     disabled={isCreating}
                   >
-                    <option value="employee">Employee</option>
-                    <option value="manager">Manager</option>
-                    <option value="hr_manager">HR Manager</option>
+                    <option value="user">User</option>
+                    <option value="moderator">Moderator</option>
+                    <option value="therapist">Therapist (Placeholder)</option>
                     <option value="admin">Admin</option>
                   </select>
                 </FormField>
