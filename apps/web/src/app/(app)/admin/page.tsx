@@ -82,7 +82,14 @@ export default function AdminDashboardPage() {
     return (
         <div className="min-h-screen bg-bg text-text-primary">
             <header className="mb-8 animate-fade-slide">
-                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand to-purple-500 mb-2">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/10 px-3 py-1 text-xs font-semibold text-brand">
+                    <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-brand"></span>
+                    </span>
+                    {isFullAdmin ? 'Admin workspace' : 'Moderation workspace'}
+                </div>
+                <h1 className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand via-purple-500 to-pink-500 mb-2">
                     {isFullAdmin ? 'Admin Panel' : 'Moderation'}
                 </h1>
                 <p className="text-text-secondary text-lg">
@@ -95,18 +102,18 @@ export default function AdminDashboardPage() {
             {/* Top-line stats (admins only) */}
             {isFullAdmin && (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-                    <StatCard title="Total Users" value={stats?.total_users ?? 0} icon="👤" />
-                    <StatCard title="Active (30d)" value={stats?.active_users ?? 0} icon="🟢" />
-                    <StatCard title="Banned" value={stats?.banned_users ?? 0} icon="🚫" highlight={Boolean(stats && stats.banned_users > 0)} />
-                    <StatCard title="Reports" value={stats?.active_reports ?? 0} icon="⚠️" highlight={Boolean(stats && stats.active_reports > 0)} />
-                    <StatCard title="Posts" value={stats?.total_posts ?? 0} icon="📝" />
-                    <StatCard title="Comments" value={stats?.total_comments ?? 0} icon="💬" />
+                    <StatCard title="Total Users" value={stats?.total_users ?? 0} icon="👤" accent="blue" />
+                    <StatCard title="Active (30d)" value={stats?.active_users ?? 0} icon="🟢" accent="green" />
+                    <StatCard title="Banned" value={stats?.banned_users ?? 0} icon="🚫" accent="red" highlight={Boolean(stats && stats.banned_users > 0)} />
+                    <StatCard title="Reports" value={stats?.active_reports ?? 0} icon="⚠️" accent="amber" highlight={Boolean(stats && stats.active_reports > 0)} />
+                    <StatCard title="Posts" value={stats?.total_posts ?? 0} icon="📝" accent="purple" />
+                    <StatCard title="Comments" value={stats?.total_comments ?? 0} icon="💬" accent="pink" />
                 </div>
             )}
 
             {/* Tabs (admins see all; moderators see moderation only) */}
             {isFullAdmin && (
-                <div className="flex gap-2 mb-6 border-b border-border">
+                <div className="mb-6 inline-flex flex-wrap gap-1 rounded-xl border border-border bg-surface-raised/60 p-1 shadow-sm">
                     <TabButton active={tab === 'users'} onClick={() => setTab('users')}>User Management</TabButton>
                     <TabButton active={tab === 'moderation'} onClick={() => setTab('moderation')}>Community Moderation</TabButton>
                     <TabButton active={tab === 'analytics'} onClick={() => setTab('analytics')}>Analytics</TabButton>
@@ -476,14 +483,34 @@ function Analytics({ stats }: { stats: AdminStats | null }) {
 /* Reusable UI                                                                */
 /* -------------------------------------------------------------------------- */
 
-function StatCard({ title, value, icon, highlight = false }: { title: string; value: number; icon: string; highlight?: boolean }) {
+type StatAccent = 'blue' | 'green' | 'red' | 'amber' | 'purple' | 'pink';
+
+const STAT_ACCENTS: Record<StatAccent, { chip: string; bar: string; glow: string }> = {
+    blue: { chip: 'bg-blue-500/15 text-blue-500', bar: 'from-blue-500/60', glow: 'hover:shadow-blue-500/10' },
+    green: { chip: 'bg-emerald-500/15 text-emerald-500', bar: 'from-emerald-500/60', glow: 'hover:shadow-emerald-500/10' },
+    red: { chip: 'bg-red-500/15 text-red-500', bar: 'from-red-500/60', glow: 'hover:shadow-red-500/10' },
+    amber: { chip: 'bg-amber-500/15 text-amber-500', bar: 'from-amber-500/60', glow: 'hover:shadow-amber-500/10' },
+    purple: { chip: 'bg-purple-500/15 text-purple-500', bar: 'from-purple-500/60', glow: 'hover:shadow-purple-500/10' },
+    pink: { chip: 'bg-pink-500/15 text-pink-500', bar: 'from-pink-500/60', glow: 'hover:shadow-pink-500/10' },
+};
+
+function StatCard({ title, value, icon, accent = 'blue', highlight = false }: { title: string; value: number; icon: string; accent?: StatAccent; highlight?: boolean }) {
+    const a = STAT_ACCENTS[accent];
     return (
-        <div className={`p-5 rounded-2xl border transition-transform hover:-translate-y-1 ${highlight ? 'bg-destructive/5 border-destructive/20' : 'bg-surface border-border shadow-lg'}`}>
-            <div className="flex items-center justify-between mb-2">
-                <h3 className="text-text-secondary text-sm font-medium">{title}</h3>
-                <span className="text-2xl">{icon}</span>
+        <div
+            className={`group relative overflow-hidden rounded-2xl border p-5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${a.glow} ${
+                highlight ? 'border-destructive/30 bg-destructive/5' : 'border-border bg-surface'
+            }`}
+        >
+            {/* accent bar along the top edge */}
+            <div className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r to-transparent ${a.bar}`} />
+            <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-medium text-text-secondary">{title}</h3>
+                <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg transition-transform duration-300 group-hover:scale-110 ${a.chip}`}>
+                    {icon}
+                </span>
             </div>
-            <p className={`text-3xl font-bold ${highlight ? 'text-destructive' : 'text-text-primary'}`}>
+            <p className={`text-3xl font-bold tracking-tight tabular-nums ${highlight ? 'text-destructive' : 'text-text-primary'}`}>
                 {value.toLocaleString()}
             </p>
         </div>
@@ -494,8 +521,10 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
     return (
         <button
             onClick={onClick}
-            className={`px-4 py-3 -mb-px text-sm font-medium border-b-2 transition-colors ${
-                active ? 'border-brand text-brand' : 'border-transparent text-text-secondary hover:text-text-primary'
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                active
+                    ? 'bg-brand text-white shadow-sm'
+                    : 'text-text-secondary hover:bg-surface hover:text-text-primary'
             }`}
         >
             {children}
