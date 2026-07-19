@@ -1,4 +1,4 @@
-from pydantic import field_validator
+from pydantic import Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,8 +23,13 @@ class Settings(BaseSettings):
     # Must be base64-encoded 32 bytes. Generate with: openssl rand -base64 32
     encryption_key: str = ""
 
-    # CORS: comma-separated list of allowed frontend origins.
-    cors_origins: list[str] = ["http://localhost:3000"]
+    # CORS: allowed frontend origins, stored as a raw string so pydantic-settings
+    # does NOT try to JSON-parse it (which crashes on a plain URL). Reads the
+    # CORS_ORIGINS env var via alias. Accepts a comma-separated string OR a JSON
+    # array. Consumers read `cors_origins` (the computed list below).
+    cors_origins_raw: str = Field(
+        default="http://localhost:3000", validation_alias="CORS_ORIGINS"
+    )
 
     # Set to True when the API runs behind a reverse proxy that sets X-Forwarded-For.
     # Only enable in controlled environments where the proxy is trusted.
@@ -79,6 +84,29 @@ class Settings(BaseSettings):
 
     # Background reminder scheduler (mood / meditation / assessment reminders).
     reminders_enabled: bool = True
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def cors_origins(self) -> list[str]:
+        """Parse the raw CORS value into a list of origins.
+
+        Accepts a JSON array (``["https://a.com"]``) or a comma-separated
+        string (``https://a.com, https://b.com``) or a single URL. Returns an
+        empty list only if the value is blank.
+        """
+        s = self.cors_origins_raw.strip()
+        if not s:
+            return []
+        if s.startswith("["):
+            import json
+
+            try:
+                parsed = json.loads(s)
+                if isinstance(parsed, list):
+                    return [str(i).strip() for i in parsed if str(i).strip()]
+            except json.JSONDecodeError:
+                pass
+        return [part.strip() for part in s.split(",") if part.strip()]
 
     @field_validator("database_url")
     @classmethod
