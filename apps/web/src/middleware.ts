@@ -18,5 +18,10 @@ export function middleware(req: NextRequest): NextResponse {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Exclude Next.js internals and PWA/service-worker assets. A service worker
+  // script must be served directly (not behind a redirect), so sw.js, the
+  // workbox runtime, and the web manifest must bypass the auth middleware.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|sw.js|workbox-.*|manifest.webmanifest|manifest.json).*)",
+  ],
 };

@@ -1,14 +1,16 @@
 import uuid
 from typing import Any
 
-from openai import AsyncOpenAI
-
 from app.services.ai_providers.base import AIProviderAdapter
 from app.settings import settings
 
 
 class GroqAdapter(AIProviderAdapter):
     def __init__(self):
+        # Imported lazily so the OpenAI SDK only loads when this adapter is
+        # actually instantiated, keeping startup memory low.
+        from openai import AsyncOpenAI
+
         self.client = AsyncOpenAI(
             api_key=settings.groq_api_key,
             base_url=settings.groq_base_url,
