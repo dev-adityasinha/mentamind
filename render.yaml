@@ -8,8 +8,9 @@ services:
     plan: free
     region: oregon
     healthCheckPath: /health
-    # Run migrations, then bind uvicorn to Render's injected $PORT.
-    dockerCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    # No dockerCommand override — the Dockerfile CMD (shell form) already runs
+    # `alembic upgrade head && uvicorn ... --port ${PORT}`. Overriding it here
+    # would pass the string in exec form, so /bin/sh can't interpret the `&&`.
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -39,6 +40,14 @@ services:
         sync: false
       - key: BEHIND_PROXY
         value: "true"
+      # Free-tier (512MB) memory safeguard: don't start the APScheduler
+      # reminder loop on boot. Flip to "true" on a larger instance to re-enable
+      # daily mood / meditation / assessment reminder emails.
+      - key: REMINDERS_ENABLED
+        value: "false"
+      # Force the lightweight AI provider so heavier SDKs never load.
+      - key: AI_PROVIDER
+        value: groq
       - key: MEDIA_DIR
         value: /app/media
       - key: MEDIA_BASE_URL
