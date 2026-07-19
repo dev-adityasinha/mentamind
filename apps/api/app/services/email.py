@@ -16,13 +16,19 @@ async def _send_email(to_email: str, subject: str, html: str) -> None:
     message.set_content("This email requires an HTML-capable client to view.")
     message.add_alternative(html, subtype="html")
 
+    # Port 465 uses implicit TLS (encrypted from connect); port 587 uses
+    # STARTTLS (connect plain, then upgrade). Pick the right mode for the port
+    # so the handshake succeeds either way.
+    use_implicit_tls = settings.smtp_port == 465
     await aiosmtplib.send(
         message,
         hostname=settings.smtp_host,
         port=settings.smtp_port,
         username=settings.smtp_username,
         password=settings.smtp_password,
-        start_tls=True,
+        use_tls=use_implicit_tls,
+        start_tls=not use_implicit_tls,
+        timeout=30,
     )
 
 
