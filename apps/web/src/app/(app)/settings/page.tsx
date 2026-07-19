@@ -51,7 +51,7 @@ export default function SettingsPage() {
   const { logout, isLoading: authLoading } = useAuth();
   const { addToast } = useToast();
   const { setLocale, t } = useI18n();
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -73,7 +73,10 @@ export default function SettingsPage() {
         const [data, prof] = await Promise.all([getSettings(), getMyProfile()]);
         setSettings(data);
         setProfile(prof);
-        setTheme(data.theme);
+        // NOTE: do NOT call setTheme(data.theme) here. next-themes already
+        // restores the user's chosen theme (from its own localStorage) on every
+        // page load. Overriding it with the server value forced the theme back
+        // to the DB default ("system") every time the Settings tab opened.
       } catch {
         addToast("Failed to load settings", "error");
         hasLoadedRef.current = false;
@@ -407,7 +410,7 @@ export default function SettingsPage() {
                     updateSettings({ theme: t.value }).catch(() => {});
                   }}
                   className={`rounded-lg border px-4 py-2 text-sm transition-colors ${
-                    settings.theme === t.value
+                    theme === t.value
                       ? "border-brand bg-brand-subtle text-brand"
                       : "border-border bg-surface text-text-secondary hover:bg-surface-raised"
                   }`}
