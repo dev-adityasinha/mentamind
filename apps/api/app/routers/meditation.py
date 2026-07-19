@@ -1,4 +1,5 @@
 import functools
+import logging
 import uuid
 from typing import Annotated
 
@@ -224,9 +225,14 @@ async def upload_audio(
     try:
         audio_url = await store_audio(bytes(buffer), filename, content_type)
     except MediaStorageError as exc:
+        # This endpoint is admin-only, so surfacing the storage error detail to
+        # the caller is safe and makes misconfiguration diagnosable. Also logged.
+        logging.getLogger("mentamind.media").error(
+            '{"event": "audio_upload_failed", "error": %r}', str(exc)
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to store the uploaded file.",
+            detail=f"Failed to store the uploaded file: {exc}",
         ) from exc
 
     return AudioUploadResponse(audio_url=audio_url)

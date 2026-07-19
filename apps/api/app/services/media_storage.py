@@ -78,6 +78,21 @@ def _store_r2(data: bytes, filename: str, content_type: str) -> str:
         ) from exc
 
     endpoint = f"https://{account_id}.r2.cloudflarestorage.com"
+
+    # Cloudflare R2 rejects the newer AWS SDK checksum headers. botocore >= 1.36
+    # defaults request_checksum_calculation to "when_supported", which adds an
+    # `x-amz-sdk-checksum-algorithm: CRC32` header that makes R2's PutObject fail.
+    # Force "when_required" to suppress it. Older botocore doesn't accept these
+    # kwargs, so fall back to a plain SigV4 config.
+    try:
+        cfg = Config(
+            signature_version="s3v4",
+            request_checksum_calculation="when_required",
+            response_checksum_validation="when_required",
+        )
+    except TypeError:  # pragma: no cover - older botocore without these options
+        cfg = Config(signature_version="s3v4")
+
     client = boto3.client(
         "s3",
         endpoint_url=endpoint,
@@ -85,7 +100,7 @@ def _store_r2(data: bytes, filename: str, content_type: str) -> str:
         aws_secret_access_key=secret_key,
         # R2 requires the 'auto' region and SigV4.
         region_name="auto",
-        config=Config(signature_version="s3v4"),
+        config=cfg,
     )
 
     try:
