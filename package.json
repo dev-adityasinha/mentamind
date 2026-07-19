@@ -11,6 +11,7 @@
     "test": "turbo run test"
   },
   "devDependencies": {
+    "playwright": "^1.61.1",
     "turbo": "^2.0.0"
   }
 }

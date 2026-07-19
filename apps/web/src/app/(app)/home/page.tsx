@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ScreeningTimeline } from "@/components/dashboard/ScreeningTimeline";
+import {
+  PenSquare,
+  BookOpen,
+  MessageCircle,
+  Users,
+  MessageSquareText,
+  Sparkles,
+} from "lucide-react";
 import { getScreeningHistory, ScreeningDetailResponse } from "@/lib/api/screening";
 import { apiFetch } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/context";
@@ -61,6 +68,7 @@ export default function HomePage() {
   }, []);
 
   const recentScreenings = screenings.slice(0, 5);
+  const latestScreening = screenings[0] ?? null;
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -78,187 +86,164 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[132px] gap-4">
+      {/* Hero */}
+      <div className="sm:col-span-2 lg:col-span-2 row-span-2 rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between overflow-hidden relative">
+        <div
+          className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full opacity-0 dark:opacity-40 blur-[80px] -z-10"
+          style={{ background: "radial-gradient(circle, #1d4ed8 0%, transparent 70%)" }}
+        />
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">
+          <h1 className="text-2xl md:text-3xl font-bold text-text-primary">
             {getGreeting()}, {user?.display_name?.split(" ")[0]}
           </h1>
           <p className="text-text-secondary mt-1">
             Here&apos;s your wellbeing overview for today.
           </p>
         </div>
-        <Button type="button" variant="primary" onClick={() => router.push("/tests")}>
+        <Button type="button" variant="primary" onClick={() => router.push("/tests")} className="w-fit">
           Take a Screening
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="flex flex-col rounded-xl border border-border bg-surface p-6 shadow-sm">
-          <h2 className="mb-4 text-sm font-medium text-text-primary">
-            Quick Actions
-          </h2>
-          <div className="flex flex-col gap-3 flex-1">
-            <button
-              type="button"
-              onClick={() => router.push("/tests")}
-              className="flex items-center gap-3 rounded-lg border border-border bg-bg px-4 py-3 text-left text-sm font-medium text-text-primary hover:border-border-strong hover:shadow-sm transition-all"
-            >
-              <svg className="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Take a Screening
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/checkin")}
-              className="flex items-center gap-3 rounded-lg border border-border bg-bg px-4 py-3 text-left text-sm font-medium text-text-primary hover:border-border-strong hover:shadow-sm transition-all"
-            >
-              <svg className="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Daily Check-In
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/journal")}
-              className="flex items-center gap-3 rounded-lg border border-border bg-bg px-4 py-3 text-left text-sm font-medium text-text-primary hover:border-border-strong hover:shadow-sm transition-all"
-            >
-              <svg className="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              Journal Entry
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/coach")}
-              className="flex items-center gap-3 rounded-lg border border-border bg-bg px-4 py-3 text-left text-sm font-medium text-text-primary hover:border-border-strong hover:shadow-sm transition-all"
-            >
-              <svg className="w-5 h-5 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              Talk to AI Coach
-            </button>
-          </div>
+      {/* Screening History */}
+      <button
+        type="button"
+        onClick={() => router.push("/tests")}
+        className="lg:col-span-1 row-span-2 rounded-2xl border border-border-strong bg-surface-raised text-text-primary p-6 glass-shimmer flex flex-col justify-between text-left hover:bg-border/40 transition-colors overflow-hidden"
+      >
+        <h2 className="text-sm font-medium">Screening History</h2>
+        <div>
+          <div className="text-4xl font-bold tabular-nums">{screenings.length}</div>
+          <p className="text-xs text-text-muted mt-1">
+            {screenings.length === 0 ? "No screenings yet" : "screenings taken"}
+          </p>
         </div>
-      </div>
-
-      {/* Screening Timeline */}
-      <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <h2 className="text-sm font-medium text-text-primary mb-4">Screening History</h2>
-        <ScreeningTimeline screenings={screenings} />
-      </div>
+        {latestScreening ? (
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className="h-1.5 w-1.5 shrink-0 rounded-full"
+              style={{ backgroundColor: TEST_LABELS[latestScreening.test_id]?.color || "var(--color-text-muted)" }}
+            />
+            <span className="text-xs truncate text-text-secondary">
+              {TEST_LABELS[latestScreening.test_id]?.title || latestScreening.test_id}
+            </span>
+            <SeverityBadge severity={latestScreening.severity} />
+          </div>
+        ) : (
+          <span className="text-xs text-brand">Take your first screening</span>
+        )}
+      </button>
 
       {/* Recent Screenings */}
-      <div className="rounded-xl border border-border bg-surface p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <div className="lg:col-span-1 rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between overflow-hidden">
+        <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-text-primary">Recent Screenings</h2>
           <button
             type="button"
             onClick={() => router.push("/tests")}
-            className="text-xs text-brand hover:text-brand-hover transition-colors"
+            className="text-xs text-brand hover:text-brand-hover transition-colors shrink-0"
           >
-            View all screenings
+            View all
           </button>
         </div>
-
         {recentScreenings.length === 0 ? (
-          <div className="text-center py-6">
-            <p className="text-sm text-text-muted mb-3">
-              No screenings completed yet. Take your first screening to see patterns over time.
-            </p>
-            <Button type="button" variant="secondary" onClick={() => router.push("/tests")}>
-              Start a Screening
-            </Button>
-          </div>
+          <p className="text-xs text-text-muted">
+            No screenings yet. Take your first to see patterns over time.
+          </p>
         ) : (
-          <div className="space-y-2">
-            {recentScreenings.map((s) => {
+          <div className="space-y-1.5 overflow-hidden">
+            {recentScreenings.slice(0, 2).map((s) => {
               const label = TEST_LABELS[s.test_id];
               const displayName = label?.title || label?.shortTitle || s.test_id;
               const dotColor = label?.color || "var(--color-text-muted)";
               return (
-                <div
-                  key={s.id}
-                  className="flex items-center justify-between rounded-lg border border-border bg-bg px-4 py-3"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span
-                      className="h-2 w-2 shrink-0 rounded-full"
-                      style={{ backgroundColor: dotColor }}
-                    />
-                    <span className="text-sm font-medium text-text-primary truncate">
-                      {displayName}
-                    </span>
-                    <span className="text-sm tabular-nums text-text-secondary">
-                      {s.score}
-                    </span>
-                    <SeverityBadge severity={s.severity} />
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-xs text-text-muted">
-                      {format(parseISO(s.created_at), "MMM d, yyyy")}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => router.push(`/tests/${s.test_id}`)}
-                      className="text-xs text-brand hover:text-brand-hover transition-colors"
-                    >
-                      Retake
-                    </button>
-                  </div>
+                <div key={s.id} className="flex items-center gap-2 min-w-0">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: dotColor }} />
+                  <span className="text-xs font-medium text-text-primary truncate">{displayName}</span>
+                  <SeverityBadge severity={s.severity} />
                 </div>
               );
             })}
           </div>
         )}
       </div>
-      
-      {/* Additional Dashboard Widgets */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {/* Community Posts */}
-        <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex flex-col justify-between">
-          <div>
-            <h2 className="text-sm font-medium text-text-primary mb-2 flex items-center gap-2">
-              <svg className="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-              </svg>
-              Community Highlights
-            </h2>
-            <p className="text-sm text-text-secondary mb-4">{summary.community_posts > 0 ? `${summary.community_posts} new posts in the AnonyMenta forum.` : 'See what others are discussing in the AnonyMenta forum.'}</p>
-          </div>
-          <Button variant="secondary" onClick={() => router.push("/forum")} className="w-full justify-center">View Forum</Button>
-        </div>
 
-        {/* Pending Chats */}
-        <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex flex-col justify-between">
-          <div>
-            <h2 className="text-sm font-medium text-text-primary mb-2 flex items-center gap-2">
-              <span className="relative flex h-3 w-3 mr-1">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-brand"></span>
-              </span>
-              Pending Chats
-            </h2>
-            <p className="text-sm text-text-secondary mb-4">{summary.pending_chats > 0 ? `You have ${summary.pending_chats} active anonymous chat sessions waiting.` : 'No pending chat sessions.'}</p>
-          </div>
-          <Button variant="secondary" onClick={() => router.push("/chat")} className="w-full justify-center">Join Chat</Button>
-        </div>
-
-        {/* AI Check-in Summary */}
-        <div className="rounded-xl border border-border bg-surface p-6 shadow-sm flex flex-col justify-between">
-          <div>
-            <h2 className="text-sm font-medium text-text-primary mb-2 flex items-center gap-2">
-              <svg className="w-4 h-4 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              AI Check-in Summary
-            </h2>
-            <p className="text-sm text-text-secondary mb-4">{summary.ai_checkins > 0 ? `You have completed ${summary.ai_checkins} AI coaching sessions.` : 'Start a session with your AI coach to see a summary here.'}</p>
-          </div>
-          <Button variant="secondary" onClick={() => router.push("/coach")} className="w-full justify-center">Talk to Coach</Button>
-        </div>
+      {/* AI Check-in Summary */}
+      <div className="lg:col-span-1 rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between overflow-hidden">
+        <h2 className="text-sm font-medium text-text-primary flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-brand shrink-0" />
+          AI Check-ins
+        </h2>
+        <p className="text-xs text-text-secondary">
+          {summary.ai_checkins > 0 ? `${summary.ai_checkins} sessions completed.` : "No sessions yet."}
+        </p>
       </div>
+
+      {/* Quick action: Daily Check-in */}
+      <button
+        type="button"
+        onClick={() => router.push("/checkin")}
+        className="rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between text-left hover:bg-surface-raised transition-colors"
+      >
+        <PenSquare className="w-5 h-5 text-brand" />
+        <span className="text-sm font-medium text-text-primary">Daily Check-In</span>
+      </button>
+
+      {/* Quick action: Journal */}
+      <button
+        type="button"
+        onClick={() => router.push("/journal")}
+        className="rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between text-left hover:bg-surface-raised transition-colors"
+      >
+        <BookOpen className="w-5 h-5 text-brand" />
+        <span className="text-sm font-medium text-text-primary">Journal Entry</span>
+      </button>
+
+      {/* Quick action: AI Coach */}
+      <button
+        type="button"
+        onClick={() => router.push("/coach")}
+        className="rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between text-left hover:bg-surface-raised transition-colors"
+      >
+        <MessageCircle className="w-5 h-5 text-brand" />
+        <span className="text-sm font-medium text-text-primary">Talk to AI Coach</span>
+      </button>
+
+      {/* Pending Chats */}
+      <button
+        type="button"
+        onClick={() => router.push("/chat")}
+        className="rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between text-left hover:bg-surface-raised transition-colors"
+      >
+        <span className="relative flex h-3 w-3">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-brand"></span>
+        </span>
+        <span className="text-sm font-medium text-text-primary">
+          {summary.pending_chats > 0 ? `${summary.pending_chats} pending chats` : "Pending Chats"}
+        </span>
+      </button>
+
+      {/* Community Highlights - wide banner */}
+      <button
+        type="button"
+        onClick={() => router.push("/forum")}
+        className="sm:col-span-2 lg:col-span-4 rounded-2xl border border-border bg-surface p-6 glass-shimmer flex items-center justify-between text-left hover:bg-surface-raised transition-colors gap-4"
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <Users className="w-5 h-5 text-brand shrink-0" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-medium text-text-primary">Community Highlights</h2>
+            <p className="text-xs text-text-secondary truncate">
+              {summary.community_posts > 0
+                ? `${summary.community_posts} new posts in the AnonyMenta forum.`
+                : "See what others are discussing in the AnonyMenta forum."}
+            </p>
+          </div>
+        </div>
+        <MessageSquareText className="w-5 h-5 text-text-muted shrink-0" />
+      </button>
     </div>
   );
 }
