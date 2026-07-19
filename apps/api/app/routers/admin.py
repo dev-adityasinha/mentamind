@@ -64,39 +64,64 @@ async def get_admin_stats(
     # and a stale (PWA/service-worker) copy would show already-deleted items.
     response.headers["Cache-Control"] = "no-store"
 
+    # All stats are scoped to the admin's own organization (multi-tenant). Models
+    # with an org_id column are filtered directly; models that only have a
+    # user_id / author_id / reporter_id are scoped via this org-user subquery.
+    org_id = admin_user.org_id
+    org_user_ids = select(User.id).where(User.org_id == org_id).scalar_subquery()
+
     users_result = await db.execute(
-        select(func.count(User.id)).where(User.deleted_at.is_(None))
+        select(func.count(User.id)).where(
+            User.org_id == org_id, User.deleted_at.is_(None)
+        )
     )
     total_users = users_result.scalar() or 0
 
-    posts_result = await db.execute(select(func.count(Post.id)))
+    posts_result = await db.execute(
+        select(func.count(Post.id)).where(Post.org_id == org_id)
+    )
     total_posts = posts_result.scalar() or 0
 
     reports_result = await db.execute(
-        select(func.count(ContentReport.id)).where(ContentReport.status == "pending")
+        select(func.count(ContentReport.id)).where(
+            ContentReport.status == "pending",
+            ContentReport.reporter_id.in_(org_user_ids),
+        )
     )
     active_reports = reports_result.scalar() or 0
 
-    ai_sessions_result = await db.execute(select(func.count(AiCoachSession.id)))
+    ai_sessions_result = await db.execute(
+        select(func.count(AiCoachSession.id)).where(
+            AiCoachSession.user_id.in_(org_user_ids)
+        )
+    )
     total_ai_sessions = ai_sessions_result.scalar() or 0
 
-    assessments_result = await db.execute(select(func.count(TestScore.id)))
+    assessments_result = await db.execute(
+        select(func.count(TestScore.id)).where(TestScore.user_id.in_(org_user_ids))
+    )
     total_assessments = assessments_result.scalar() or 0
 
     meditation_result = await db.execute(
-        select(func.sum(MeditationHistory.duration_minutes))
+        select(func.sum(MeditationHistory.duration_minutes)).where(
+            MeditationHistory.user_id.in_(org_user_ids)
+        )
     )
     total_meditation_minutes = meditation_result.scalar() or 0
 
     start_of_day = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
     daily_reg_result = await db.execute(
-        select(func.count(User.id)).where(User.created_at >= start_of_day)
+        select(func.count(User.id)).where(
+            User.org_id == org_id, User.created_at >= start_of_day
+        )
     )
     daily_registrations = daily_reg_result.scalar() or 0
 
-    # Mood tracking stats (count of logs per mood score).
+    # Mood tracking stats (count of logs per mood score), scoped to the org.
     mood_result = await db.execute(
-        select(MoodLog.mood_score, func.count(MoodLog.id)).group_by(MoodLog.mood_score)
+        select(MoodLog.mood_score, func.count(MoodLog.id))
+        .where(MoodLog.org_id == org_id)
+        .group_by(MoodLog.mood_score)
     )
     mood_tracking_stats = {str(row[0]): row[1] for row in mood_result.all()}
 
@@ -104,6 +129,7 @@ async def get_admin_stats(
     window_start = datetime.now(UTC) - timedelta(days=_DEFAULT_ANALYTICS_DAYS)
     active_users_result = await db.execute(
         select(func.count(User.id)).where(
+            User.org_id == org_id,
             User.deleted_at.is_(None),
             User.last_active_at.is_not(None),
             User.last_active_at >= window_start,
@@ -112,11 +138,15 @@ async def get_admin_stats(
     active_users = active_users_result.scalar() or 0
 
     banned_result = await db.execute(
-        select(func.count(User.id)).where(User.is_banned.is_(True))
+        select(func.count(User.id)).where(
+            User.org_id == org_id, User.is_banned.is_(True)
+        )
     )
     banned_users = banned_result.scalar() or 0
 
-    comments_result = await db.execute(select(func.count(Comment.id)))
+    comments_result = await db.execute(
+        select(func.count(Comment.id)).where(Comment.author_id.in_(org_user_ids))
+    )
     total_comments = comments_result.scalar() or 0
 
     return AdminStatsResponse(
@@ -440,13 +470,17 @@ async def get_admin_analytics(
 ) -> AdminAnalyticsResponse:
     window_start = datetime.now(UTC) - timedelta(days=days)
 
+    # Scope all analytics to the admin's own organization (multi-tenant).
+    org_id = admin_user.org_id
+    org_user_ids = select(User.id).where(User.org_id == org_id).scalar_subquery()
+
     reg_rows = (
         await db.execute(
             select(
                 cast(User.created_at, SADate).label("d"),
                 func.count(User.id),
             )
-            .where(User.created_at >= window_start)
+            .where(User.org_id == org_id, User.created_at >= window_start)
             .group_by("d")
             .order_by("d")
         )
@@ -454,7 +488,9 @@ async def get_admin_analytics(
     daily_registrations = _fill_series(reg_rows, days)
 
     baseline_result = await db.execute(
-        select(func.count(User.id)).where(User.created_at < window_start)
+        select(func.count(User.id)).where(
+            User.org_id == org_id, User.created_at < window_start
+        )
     )
     running = baseline_result.scalar() or 0
     community_growth: list[TimeSeriesPoint] = []
@@ -468,7 +504,10 @@ async def get_admin_analytics(
                 cast(TestScore.created_at, SADate).label("d"),
                 func.count(TestScore.id),
             )
-            .where(TestScore.created_at >= window_start)
+            .where(
+                TestScore.user_id.in_(org_user_ids),
+                TestScore.created_at >= window_start,
+            )
             .group_by("d")
             .order_by("d")
         )
@@ -477,9 +516,9 @@ async def get_admin_analytics(
 
     type_rows = (
         await db.execute(
-            select(TestScore.test_id, func.count(TestScore.id)).group_by(
-                TestScore.test_id
-            )
+            select(TestScore.test_id, func.count(TestScore.id))
+            .where(TestScore.user_id.in_(org_user_ids))
+            .group_by(TestScore.test_id)
         )
     ).all()
     assessment_by_type = {row[0]: int(row[1]) for row in type_rows}
@@ -490,7 +529,10 @@ async def get_admin_analytics(
                 cast(MeditationHistory.completed_at, SADate).label("d"),
                 func.coalesce(func.sum(MeditationHistory.duration_minutes), 0),
             )
-            .where(MeditationHistory.completed_at >= window_start)
+            .where(
+                MeditationHistory.user_id.in_(org_user_ids),
+                MeditationHistory.completed_at >= window_start,
+            )
             .group_by("d")
             .order_by("d")
         )
@@ -499,9 +541,9 @@ async def get_admin_analytics(
 
     mood_rows = (
         await db.execute(
-            select(MoodLog.mood_score, func.count(MoodLog.id)).group_by(
-                MoodLog.mood_score
-            )
+            select(MoodLog.mood_score, func.count(MoodLog.id))
+            .where(MoodLog.org_id == org_id)
+            .group_by(MoodLog.mood_score)
         )
     ).all()
     mood_tracking_stats = {str(row[0]): int(row[1]) for row in mood_rows}
