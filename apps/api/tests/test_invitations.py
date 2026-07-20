@@ -162,7 +162,10 @@ async def test_accept_invitation_double_use(
         "/invitations/accept",
         json={**payload, "display_name": "Second"},
     )
-    assert r2.status_code == 401
+    # A used link now returns 409 Conflict with a specific "already used" reason,
+    # instead of the old catch-all 401.
+    assert r2.status_code == 409
+    assert "already been used" in r2.json()["detail"]
 
 
 @pytest.mark.asyncio
@@ -191,7 +194,10 @@ async def test_accept_revoked_invitation(
             "display_name": "Revoked",
         },
     )
-    assert accept.status_code == 401
+    # A cancelled (revoked) link now returns 410 Gone with a specific reason,
+    # instead of the old catch-all 401.
+    assert accept.status_code == 410
+    assert "cancelled" in accept.json()["detail"]
 
 
 @pytest.mark.asyncio

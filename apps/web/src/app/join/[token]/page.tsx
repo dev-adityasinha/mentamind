@@ -40,8 +40,16 @@ export default function JoinPage() {
     void previewInviteApi(token)
       .then((data) => setOrgName(data.org_name))
       .catch((err) => {
-        if (err instanceof ApiError && err.status === 404) {
-          setPreviewError("This invite link is invalid or has expired.");
+        // The backend returns a specific reason (already used / cancelled /
+        // expired / replaced) as the error message for these client statuses.
+        // Show that verbatim; fall back to a generic line for network/5xx errors.
+        if (
+          err instanceof ApiError &&
+          err.status >= 400 &&
+          err.status < 500 &&
+          err.message
+        ) {
+          setPreviewError(err.message);
         } else {
           setPreviewError("Could not load invite. Please try again.");
         }
@@ -87,10 +95,12 @@ export default function JoinPage() {
       router.replace("/onboarding");
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.status === 401) {
-          setErrors({ form: "This invite has already been used or has expired." });
-        } else if (err.status === 429) {
+        if (err.status === 429) {
           setErrors({ form: "Too many attempts. Please wait and try again." });
+        } else if (err.status >= 400 && err.status < 500 && err.message) {
+          // Show the backend's specific reason (already used / cancelled /
+          // expired / replaced) instead of a vague catch-all.
+          setErrors({ form: err.message });
         } else {
           setErrors({ form: "Something went wrong. Please try again." });
         }

@@ -54,6 +54,64 @@ def _decrypt_email(inv: Invitation) -> str:
     return decrypt(inv.email_encrypted, inv.org_id.bytes)
 
 
+def _expires_at_utc(inv: Invitation) -> datetime:
+    """Return the invitation's expiry as a timezone-aware UTC datetime.
+
+    The column is DateTime(timezone=True); Postgres returns it aware, but SQLite
+    (used in tests) returns it naive. Normalizing here keeps the Python-side
+    comparison against an aware ``datetime.now(UTC)`` from raising a naive/aware
+    TypeError. Naive values are assumed to already be UTC (that is how they are
+    written — always from ``datetime.now(UTC)``).
+    """
+    expires = inv.expires_at
+    if expires.tzinfo is None:
+        return expires.replace(tzinfo=UTC)
+    return expires
+
+
+def _invite_failure(inv: Invitation | None, now: datetime) -> HTTPException:
+    """Explain, as specifically as we safely can, why an invite lookup failed.
+
+    Called only on the failure path (the token did not resolve to a usable,
+    pending, unexpired invitation). It inspects the row — if one exists — to
+    return a message that tells the invitee what actually happened, instead of
+    the old catch-all "invalid, expired, or already used".
+
+    ``inv`` is None when no invitation matches the token hash at all: either the
+    token is wrong/corrupted, or it was superseded when someone resent the
+    invitation (a resend rotates the token_hash, so older links stop matching).
+    """
+    if inv is None:
+        return HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "This invite link is no longer valid. It may have been replaced by a "
+            "newer invitation — ask your admin to resend it.",
+        )
+    if inv.status == InvitationStatus.ACCEPTED:
+        return HTTPException(
+            status.HTTP_409_CONFLICT,
+            "This invitation has already been used. If that wasn't you, ask your "
+            "admin to send a new one.",
+        )
+    if inv.status == InvitationStatus.REVOKED:
+        return HTTPException(
+            status.HTTP_410_GONE,
+            "This invitation was cancelled by your organization. Ask your admin "
+            "for a new one.",
+        )
+    if _expires_at_utc(inv) <= now:
+        return HTTPException(
+            status.HTTP_410_GONE,
+            "This invite link has expired. Ask your admin to resend it.",
+        )
+    # Pending and unexpired but still unusable is not expected; fall back to a
+    # generic (non-misleading) message rather than asserting a specific cause.
+    return HTTPException(
+        status.HTTP_400_BAD_REQUEST,
+        "This invite link could not be used. Ask your admin to resend it.",
+    )
+
+
 @router.post(
     "",
     response_model=InvitationCreateResponse,
@@ -242,23 +300,26 @@ async def preview_invitation(
     token_hash = hash_token(body.token)
     now = datetime.now(UTC)
 
+    # Fetch by token alone, then decide usability, so we can report WHY an
+    # invite is unusable (already used / cancelled / expired / replaced).
     result = await db.execute(
-        select(Invitation).where(
-            Invitation.token_hash == token_hash,
-            Invitation.status == InvitationStatus.PENDING,
-            Invitation.expires_at > now,
-        )
+        select(Invitation).where(Invitation.token_hash == token_hash)
     )
     inv = result.scalar_one_or_none()
-    if not inv:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "Invitation not found or expired"
-        )
+    if (
+        inv is None
+        or inv.status != InvitationStatus.PENDING
+        or _expires_at_utc(inv) <= now
+    ):
+        raise _invite_failure(inv, now)
 
     org = await db.get(Organization, inv.org_id)
     if not org:
+        # The invite is valid but its org is gone — a data-integrity edge case,
+        # not something the invitee can fix by getting a fresh link.
         raise HTTPException(
-            status.HTTP_404_NOT_FOUND, "Invitation not found or expired"
+            status.HTTP_404_NOT_FOUND,
+            "This organization is no longer available.",
         )
 
     return InvitationPreviewResponse(org_name=org.name)
@@ -276,6 +337,10 @@ async def accept_invitation(
     token_hash = hash_token(body.token)
     now = datetime.now(UTC)
 
+    # Atomic single-use claim: flip PENDING -> ACCEPTED only if still pending and
+    # unexpired. Keeping this as one conditional UPDATE is what guarantees a link
+    # can be accepted exactly once, even under concurrent requests. Do NOT split
+    # this into a read-then-write.
     stmt = (
         update(Invitation)
         .where(
@@ -287,10 +352,13 @@ async def accept_invitation(
     )
     result = await db.execute(stmt)
     if result.rowcount == 0:
-        raise HTTPException(
-            status.HTTP_401_UNAUTHORIZED,
-            "Invalid, expired, or already used invitation",
+        # The claim didn't apply. Read the row ONLY to explain why (already used /
+        # cancelled / expired / replaced); this read never affects the single-use
+        # guarantee above, so there is no race to introduce here.
+        failed = await db.execute(
+            select(Invitation).where(Invitation.token_hash == token_hash)
         )
+        raise _invite_failure(failed.scalar_one_or_none(), now)
 
     inv_result = await db.execute(
         select(Invitation).where(Invitation.token_hash == token_hash)
