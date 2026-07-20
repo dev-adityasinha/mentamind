@@ -1,21 +1,19 @@
 import uuid
 from datetime import UTC, date, datetime, timedelta
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.meditation import MeditationHistory, MeditationStats
 
 
-def _week_index(d: date) -> int:
-    """Return a monotonic week number so consecutive calendar weeks differ by 1.
+def _week_start(d: date) -> date:
+    """Return the Monday that starts the calendar week containing ``d`` (UTC).
 
-    Uses the ordinal of the Monday that starts the week, divided by 7. This is
-    stable across year boundaries (unlike raw ISO year/week numbers, where the
-    week number wraps back to 1 each January).
+    "Active this week" is measured over the Monday-to-Sunday week, so this
+    gives the inclusive lower bound of the current week's date range.
     """
-    monday = d - timedelta(days=d.weekday())
-    return monday.toordinal() // 7
+    return d - timedelta(days=d.weekday())
 
 
 async def submit_meditation_completion(
@@ -26,7 +24,8 @@ async def submit_meditation_completion(
 ) -> MeditationHistory:
     """
     Records a completed meditation track for a user and securely updates their
-    global stats. Calculates both daily and weekly streak logic.
+    global stats: total minutes/sessions, the daily streak (consecutive days),
+    and "days active this week" (distinct days meditated in the current week).
     """
     now = datetime.now(UTC)
 
@@ -87,25 +86,34 @@ async def submit_meditation_completion(
 
         # If delta_days == 0, they already meditated today, streak unchanged.
 
-    # 4b. Calculate weekly streak (consecutive calendar weeks with a session)
-    if previous_meditated_at is None:
-        stats.weekly_streak = 1
-        stats.longest_weekly_streak = 1
-    else:
-        delta_weeks = _week_index(now.date()) - _week_index(
-            previous_meditated_at.date()
+    # 4b. Calculate "days active this week": how many DISTINCT calendar days in
+    # the current Monday-Sunday week the user has completed a session on (0-7).
+    #
+    # This is derived from history rather than maintained as an incremental
+    # counter, which makes it correct regardless of how many sessions run, in
+    # what order, or how many happen on the same day. It naturally "resets" each
+    # Monday because the query window (week_start .. today) moves forward.
+    week_start = _week_start(now.date())
+
+    # Distinct prior active days this week (rows already committed before now).
+    # The row we just added above may not be flushed yet, so we compute the set
+    # of prior days and add today's date explicitly — deterministic either way.
+    result_days = await db.execute(
+        select(func.distinct(func.date(MeditationHistory.completed_at))).where(
+            MeditationHistory.user_id == user_id,
+            func.date(MeditationHistory.completed_at) >= week_start,
         )
-        if delta_weeks == 1:
-            # Meditated last week, weekly streak continues.
-            stats.weekly_streak += 1
-            if stats.weekly_streak > stats.longest_weekly_streak:
-                stats.longest_weekly_streak = stats.weekly_streak
-        elif delta_weeks > 1:
-            # Missed one or more full weeks, weekly streak resets.
-            stats.weekly_streak = 1
-        # delta_weeks == 0 means already meditated this week; leave unchanged.
-        if stats.longest_weekly_streak < stats.weekly_streak:
-            stats.longest_weekly_streak = stats.weekly_streak
+    )
+    active_days: set[date] = set()
+    for (d,) in result_days.all():
+        # func.date() may return a date or an ISO string depending on the DB
+        # driver; normalize both to a date object before adding to the set.
+        active_days.add(d if isinstance(d, date) else date.fromisoformat(str(d)))
+    active_days.add(now.date())  # include the session being recorded right now
+
+    stats.weekly_streak = len(active_days)  # 1-7 (column reused; now = days/week)
+    if stats.weekly_streak > stats.longest_weekly_streak:
+        stats.longest_weekly_streak = stats.weekly_streak
 
     # 5. Update timestamp
     stats.last_meditated_at = now

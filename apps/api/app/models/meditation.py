@@ -124,7 +124,11 @@ class MeditationStats(Base):
     current_streak: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     longest_streak: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
-    # Weekly streaks (consecutive calendar weeks with at least one session).
+    # "Active this week": number of DISTINCT calendar days in the current
+    # Monday-Sunday week with at least one completed session (0-7). Reuses the
+    # original weekly_streak column; longest_weekly_streak is the best (highest)
+    # days-active-in-a-single-week value ever reached. Recomputed from history
+    # on each completion (see services/meditation_tracker.py).
     weekly_streak: Mapped[int] = mapped_column(
         Integer, default=0, nullable=False, server_default="0"
     )
