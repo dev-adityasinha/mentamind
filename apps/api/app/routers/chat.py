@@ -65,8 +65,9 @@ async def chat_websocket(
 ):
     await chat_manager.connect(user.id, websocket)
 
-    # Try matchmaking right away
-    session = await chat_manager.find_partner(user.id, db)
+    # Try matchmaking right away. Pass org_id so users are only paired with a
+    # partner from their own organization (per-org waiting queue).
+    session = await chat_manager.find_partner(user.id, user.org_id, db)
     if session:
         # Match found! Broadcast to both
         payload = {"type": "matched", "session_id": str(session.id)}

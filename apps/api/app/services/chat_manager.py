@@ -66,17 +66,23 @@ class ChatManager:
         await redis.publish("chat:events", json.dumps(message))
 
     async def find_partner(
-        self, user_id: uuid.UUID, db: AsyncSession
+        self, user_id: uuid.UUID, org_id: uuid.UUID, db: AsyncSession
     ) -> ChatSession | None:
         """
-        Matchmaking logic using Redis queue.
+        Matchmaking logic using a Redis queue.
+
+        Users are only ever matched with a partner from the SAME organization:
+        the waiting queue is keyed per-org, so a user only pops/pushes within
+        their own org's pool and can never be paired across organizations.
+
         If a partner is found, a ChatSession is created in Postgres and returned.
-        Otherwise, adds the user to the waiting queue and returns None.
+        Otherwise, adds the user to their org's waiting queue and returns None.
         """
         redis = get_redis()
-        waiting_pool_key = "chat:waiting_pool"
+        # Per-org waiting pool: matching is confined to a single organization.
+        waiting_pool_key = f"chat:waiting_pool:{org_id}"
 
-        # Try to pop a waiting user
+        # Try to pop a waiting user (necessarily from the same org, by key)
         partner_str = await redis.lpop(waiting_pool_key)
 
         if partner_str:
