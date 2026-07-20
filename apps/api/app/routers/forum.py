@@ -264,6 +264,26 @@ async def report_content(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
+    # Only allow reporting content inside the reporter's own organization, so a
+    # crafted request can't file reports against other orgs' posts/comments.
+    # target_type is schema-validated to "post" or "comment". A post carries
+    # org_id directly; a comment inherits its org via its parent post.
+    if body.target_type == "post":
+        post = await db.get(Post, body.target_id)
+        if not post or post.org_id != current_user.org_id:
+            raise HTTPException(status_code=404, detail="Content not found")
+    elif body.target_type == "comment":
+        comment = await db.get(Comment, body.target_id)
+        if not comment:
+            raise HTTPException(status_code=404, detail="Content not found")
+        post = await db.get(Post, comment.post_id)
+        if not post or post.org_id != current_user.org_id:
+            raise HTTPException(status_code=404, detail="Content not found")
+    else:
+        # Unreachable given the schema's pattern, but fail closed rather than
+        # silently accepting an unrecognized target type.
+        raise HTTPException(status_code=400, detail="Invalid target type")
+
     report = ContentReport(
         reporter_id=current_user.id,
         target_type=body.target_type,
