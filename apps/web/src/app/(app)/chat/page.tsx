@@ -203,10 +203,10 @@ export default function ChatPage() {
                 key={msg.id} 
                 className={`flex flex-col ${msg.sender_id === user?.id ? 'items-end' : 'items-start'}`}
               >
-                <div 
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                    msg.sender_id === user?.id 
-                      ? 'bg-brand text-white rounded-br-none' 
+                <div
+                  className={`max-w-[75%] break-words rounded-2xl px-4 py-2 ${
+                    msg.sender_id === user?.id
+                      ? 'bg-brand text-brand-foreground rounded-br-none'
                       : 'bg-bg border border-border text-text-primary rounded-bl-none'
                   }`}
                 >
@@ -237,16 +237,16 @@ export default function ChatPage() {
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={sendMessage} className="p-4 border-t border-border bg-bg flex gap-2">
+          <form onSubmit={sendMessage} className="p-3 sm:p-4 border-t border-border bg-bg flex items-center gap-2">
             <input
               type="text"
               value={input}
               onChange={handleInputChange}
-              className="flex-1 bg-surface border border-border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand disabled:opacity-50"
+              className="flex-1 min-w-0 bg-surface text-text-primary border border-border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand disabled:opacity-50"
               placeholder={chatEndedBy ? "Chat has ended" : "Type your message..."}
               disabled={!!chatEndedBy}
             />
-            <Button type="submit" variant="primary" className="rounded-full px-6 disabled:opacity-50" disabled={!!chatEndedBy}>Send</Button>
+            <Button type="submit" variant="primary" className="shrink-0 rounded-full px-4 sm:px-6 disabled:opacity-50" disabled={!!chatEndedBy}>Send</Button>
           </form>
 
           {showEndConfirm && (

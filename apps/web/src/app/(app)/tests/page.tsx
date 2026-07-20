@@ -26,7 +26,7 @@ export default function TestsIndexPage() {
               await exitGhostMode();
             }}
             disabled={isTransitioningGhostMode}
-            className="bg-brand text-white font-medium py-3 px-6 rounded-lg hover:bg-brand/90 transition-colors focus:ring-4 focus:ring-brand/20 disabled:opacity-50"
+            className="bg-brand text-brand-foreground font-medium py-3 px-6 rounded-lg hover:bg-brand-hover transition-colors focus:ring-4 focus:ring-brand/20 disabled:opacity-50"
           >
             {isTransitioningGhostMode ? "Switching..." : "Exit anonymous mode"}
           </button>

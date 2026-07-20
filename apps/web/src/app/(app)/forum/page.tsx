@@ -496,13 +496,13 @@ export default function ForumPage() {
         <div className="flex bg-surface-raised rounded-lg p-1 border border-border shrink-0">
           <button
             onClick={() => setSortMethod("recent")}
-            className={`flex-1 md:flex-none px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "recent" ? "bg-brand text-white shadow-sm" : "text-text-secondary hover:text-text-primary"}`}
+            className={`flex-1 md:flex-none px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "recent" ? "bg-brand text-brand-foreground shadow-sm" : "text-text-secondary hover:text-text-primary"}`}
           >
             Recent
           </button>
           <button
             onClick={() => setSortMethod("trending")}
-            className={`flex-1 md:flex-none px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "trending" ? "bg-brand text-white shadow-sm" : "text-text-secondary hover:text-text-primary"}`}
+            className={`flex-1 md:flex-none px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "trending" ? "bg-brand text-brand-foreground shadow-sm" : "text-text-secondary hover:text-text-primary"}`}
           >
             Trending
           </button>
@@ -515,7 +515,7 @@ export default function ForumPage() {
           onClick={() => setActiveCategory(null)}
           className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
             activeCategory === null
-              ? "bg-brand text-white shadow-sm"
+              ? "bg-brand text-brand-foreground shadow-sm"
               : "bg-surface border border-border text-text-secondary hover:bg-surface-raised hover:text-text-primary"
           }`}
         >
@@ -527,7 +527,7 @@ export default function ForumPage() {
             onClick={() => setActiveCategory(c)}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors capitalize ${
               activeCategory === c
-                ? "bg-brand text-white shadow-sm"
+                ? "bg-brand text-brand-foreground shadow-sm"
                 : "bg-surface border border-border text-text-secondary hover:bg-surface-raised hover:text-text-primary"
             }`}
           >
