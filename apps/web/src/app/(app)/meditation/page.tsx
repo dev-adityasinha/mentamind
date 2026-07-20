@@ -171,7 +171,7 @@ export default function MeditationPage() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         <ProgressStat label="Minutes meditated" value={stats?.total_minutes ?? 0} />
         <ProgressStat label="Daily streak" value={stats?.current_streak ?? 0} suffix="d" />
-        <ProgressStat label="Weekly streak" value={stats?.weekly_streak ?? 0} suffix="w" />
+        <ProgressStat label="Active this week" value={stats?.weekly_streak ?? 0} suffix="/ 7 days" />
         <ProgressStat label="Total sessions" value={stats?.total_sessions ?? 0} />
         <ProgressStat label="Favorites" value={favoriteIds.size} />
       </div>
@@ -380,6 +380,46 @@ const EMPTY_FORM: TrackInput = {
   difficulty: "beginner",
 };
 
+/**
+ * Read the length of an audio file in the browser and return it rounded to the
+ * nearest whole minute (minimum 1, clamped to the backend's 600-minute max).
+ *
+ * Uses an off-DOM <audio> element and its `loadedmetadata` event, which exposes
+ * `duration` in seconds without downloading/playing the whole file. Returns null
+ * if the browser can't determine the duration (unsupported codec, corrupt file,
+ * or a live stream with no fixed length) so the caller can fall back gracefully
+ * and never block the upload.
+ */
+function readAudioDurationMinutes(file: File): Promise<number | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const audio = document.createElement("audio");
+    audio.preload = "metadata";
+
+    const cleanup = () => URL.revokeObjectURL(url);
+
+    audio.addEventListener("loadedmetadata", () => {
+      const seconds = audio.duration;
+      cleanup();
+      // Infinity/NaN happen for streams or undecodable files — treat as unknown.
+      if (!Number.isFinite(seconds) || seconds <= 0) {
+        resolve(null);
+        return;
+      }
+      const minutes = Math.round(seconds / 60);
+      // Match the backend bounds (gt:0, le:600): never below 1, never above 600.
+      resolve(Math.min(600, Math.max(1, minutes)));
+    });
+
+    audio.addEventListener("error", () => {
+      cleanup();
+      resolve(null);
+    });
+
+    audio.src = url;
+  });
+}
+
 function LibraryManager({
   tracks,
   onChanged,
@@ -415,9 +455,24 @@ function LibraryManager({
     if (!file) return;
     setUploading(true);
     try {
-      const { audio_url } = await uploadAudio(file);
-      setForm((f) => ({ ...f, audio_url }));
-      addToast("Audio uploaded", "success");
+      // Read the audio length locally while the file uploads, so the duration
+      // field auto-fills from the real audio instead of being hand-typed. The
+      // two run together; a failed reading just leaves the current value.
+      const [{ audio_url }, detectedMinutes] = await Promise.all([
+        uploadAudio(file),
+        readAudioDurationMinutes(file),
+      ]);
+      setForm((f) => ({
+        ...f,
+        audio_url,
+        duration_minutes: detectedMinutes ?? f.duration_minutes,
+      }));
+      addToast(
+        detectedMinutes
+          ? `Audio uploaded · duration set to ${detectedMinutes} min`
+          : "Audio uploaded",
+        "success",
+      );
     } catch (e) {
       addToast(e instanceof Error ? e.message : "Upload failed", "error");
     } finally {
