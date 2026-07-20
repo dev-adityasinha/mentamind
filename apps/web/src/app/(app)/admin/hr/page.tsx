@@ -107,14 +107,14 @@ export default function HRDashboardPage() {
   function burnoutLabel(score: number | null | undefined): { label: string; color: string; bg: string } {
     if (score == null) return { label: "—", color: "text-text-muted", bg: "bg-surface-raised" };
     if (score > 75) return { label: "High", color: "text-destructive", bg: "bg-destructive-subtle" };
-    if (score > 40) return { label: "Moderate", color: "text-amber-500", bg: "bg-amber-50" };
+    if (score > 40) return { label: "Moderate", color: "text-amber-500", bg: "bg-amber-500/10" };
     return { label: "Low", color: "text-success", bg: "bg-success-subtle" };
   }
 
   function wellnessBand(score: number | null | undefined): { label: string; color: string; bg: string } {
     if (score == null) return { label: "—", color: "text-text-muted", bg: "bg-surface-raised" };
     if (score >= 70) return { label: "Good", color: "text-success", bg: "bg-success-subtle" };
-    if (score >= 40) return { label: "Fair", color: "text-amber-500", bg: "bg-amber-50" };
+    if (score >= 40) return { label: "Fair", color: "text-amber-500", bg: "bg-amber-500/10" };
     return { label: "Concerning", color: "text-destructive", bg: "bg-destructive-subtle" };
   }
 
@@ -260,7 +260,7 @@ export default function HRDashboardPage() {
                     <td className="py-2.5 pr-4">
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                         u.role === "admin" ? "bg-destructive-subtle text-destructive" :
-                        u.role === "hr_manager" ? "bg-amber-50 text-amber-600" :
+                        u.role === "hr_manager" ? "bg-amber-500/10 text-amber-500" :
                         "bg-surface-raised text-text-secondary"
                       }`}>
                         {u.role.replace("_", " ")}

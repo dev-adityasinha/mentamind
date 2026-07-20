@@ -8,11 +8,14 @@ import { useToast } from "@/components/ui/Toast";
 import { MicrophoneButton } from "@/components/ui/MicrophoneButton";
 
 const MOODS = [
-  { value: 1, label: "Terrible", emoji: "😭", color: "hover:bg-red-50 hover:border-red-200" },
-  { value: 2, label: "Bad", emoji: "😔", color: "hover:bg-orange-50 hover:border-orange-200" },
-  { value: 3, label: "Okay", emoji: "😐", color: "hover:bg-yellow-50 hover:border-yellow-200" },
-  { value: 4, label: "Good", emoji: "🙂", color: "hover:bg-green-50 hover:border-green-200" },
-  { value: 5, label: "Great", emoji: "🤩", color: "hover:bg-emerald-50 hover:border-emerald-200" },
+  // Opacity-based tints (…/10, …/40) render as a subtle wash on BOTH light and
+  // dark surfaces, unlike the fixed light -50/-200 shades which looked like
+  // bright patches in dark mode.
+  { value: 1, label: "Terrible", emoji: "😭", color: "hover:bg-red-500/10 hover:border-red-500/40" },
+  { value: 2, label: "Bad", emoji: "😔", color: "hover:bg-orange-500/10 hover:border-orange-500/40" },
+  { value: 3, label: "Okay", emoji: "😐", color: "hover:bg-yellow-500/10 hover:border-yellow-500/40" },
+  { value: 4, label: "Good", emoji: "🙂", color: "hover:bg-green-500/10 hover:border-green-500/40" },
+  { value: 5, label: "Great", emoji: "🤩", color: "hover:bg-emerald-500/10 hover:border-emerald-500/40" },
 ];
 
 const EMOTIONS = [

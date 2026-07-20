@@ -89,7 +89,7 @@ function PostCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-border p-5 transition-shadow hover:shadow-md">
+    <div className="bg-surface rounded-xl shadow-sm border border-border p-4 sm:p-5 transition-shadow hover:shadow-md">
       <div className="flex justify-between items-start mb-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -120,7 +120,7 @@ function PostCard({
           </button>
           
           {showReport && (
-            <div className="absolute right-0 top-8 w-64 bg-white shadow-lg border border-border rounded-lg p-3 z-10">
+            <div className="absolute right-0 top-8 w-64 max-w-[calc(100vw-2rem)] bg-surface-raised shadow-lg border border-border rounded-lg p-3 z-10">
               <h4 className="text-sm font-medium mb-2 text-text-primary flex items-center gap-1.5">
                 <AlertTriangle className="h-4 w-4 text-warning" />
                 Options
@@ -139,7 +139,7 @@ function PostCard({
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
                 placeholder="Why are you reporting this?"
-                className="w-full text-sm rounded-md border border-border p-2 mb-2 focus:ring-1 focus:ring-brand focus:outline-none"
+                className="w-full text-sm rounded-md border border-border bg-surface text-text-primary p-2 mb-2 focus:ring-1 focus:ring-brand focus:outline-none"
                 rows={2}
               />
               <div className="flex gap-2 justify-end">
@@ -220,8 +220,8 @@ function CommentsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-surface rounded-t-2xl sm:rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] sm:max-h-[85vh] flex flex-col">
         <div className="p-4 border-b border-border flex justify-between items-center">
           <h3 className="font-semibold text-lg text-text-primary">Replies</h3>
           <button onClick={onClose} className="text-text-secondary hover:text-text-primary">✕</button>
@@ -265,7 +265,7 @@ function CommentsModal({
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Write a reply..."
-            className="w-full text-sm rounded-lg border border-border p-3 mb-3 focus:ring-1 focus:ring-brand focus:outline-none resize-none"
+            className="w-full text-sm rounded-lg border border-border bg-surface text-text-primary p-3 mb-3 focus:ring-1 focus:ring-brand focus:outline-none resize-none"
             rows={3}
           />
           <div className="flex justify-between items-center">
@@ -420,22 +420,22 @@ export default function ForumPage() {
       </div>
 
       {isComposing && (
-        <div className="bg-white rounded-xl shadow-md border border-border p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="bg-surface rounded-xl shadow-md border border-border p-4 sm:p-6 mb-8 animate-in fade-in slide-in-from-top-4 duration-300">
           <h2 className="text-lg font-semibold text-text-primary mb-4">Share your thoughts</h2>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What's on your mind? You can share completely anonymously."
-            className="w-full text-sm rounded-xl border border-border p-4 mb-4 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none resize-y min-h-[120px]"
+            className="w-full text-sm rounded-xl border border-border bg-surface text-text-primary p-4 mb-4 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none resize-y min-h-[120px]"
           />
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label className="block text-xs font-medium text-text-secondary mb-1">Category</label>
-              <select 
-                value={category} 
+              <select
+                value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full text-sm rounded-lg border border-border p-2 focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full text-sm rounded-lg border border-border bg-surface text-text-primary p-2 focus:outline-none focus:ring-1 focus:ring-brand"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
@@ -444,22 +444,22 @@ export default function ForumPage() {
             </div>
             <div>
               <label className="block text-xs font-medium text-text-secondary mb-1">Tags (comma separated)</label>
-              <input 
-                type="text" 
-                value={tagsInput} 
+              <input
+                type="text"
+                value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
                 placeholder="e.g. mindfulness, help"
-                className="w-full text-sm rounded-lg border border-border p-2 focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full text-sm rounded-lg border border-border bg-surface text-text-primary p-2 focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-text-secondary mb-1">Moods (comma separated)</label>
-              <input 
-                type="text" 
-                value={moodsInput} 
+              <input
+                type="text"
+                value={moodsInput}
                 onChange={(e) => setMoodsInput(e.target.value)}
                 placeholder="e.g. anxious, tired"
-                className="w-full text-sm rounded-lg border border-border p-2 focus:outline-none focus:ring-1 focus:ring-brand"
+                className="w-full text-sm rounded-lg border border-border bg-surface text-text-primary p-2 focus:outline-none focus:ring-1 focus:ring-brand"
               />
             </div>
           </div>
@@ -484,25 +484,25 @@ export default function ForumPage() {
       {/* Search and Sort */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2">
-          <input 
+          <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search posts..."
-            className="flex-1 text-sm rounded-lg border border-border p-2 focus:outline-none focus:ring-1 focus:ring-brand"
+            className="flex-1 min-w-0 text-sm rounded-lg border border-border bg-surface text-text-primary p-2 focus:outline-none focus:ring-1 focus:ring-brand"
           />
           <Button type="submit" variant="secondary">Search</Button>
         </form>
-        <div className="flex bg-surface rounded-lg p-1 border border-border shrink-0">
-          <button 
+        <div className="flex bg-surface-raised rounded-lg p-1 border border-border shrink-0">
+          <button
             onClick={() => setSortMethod("recent")}
-            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "recent" ? "bg-white shadow-sm text-text-primary" : "text-text-secondary hover:text-text-primary"}`}
+            className={`flex-1 md:flex-none px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "recent" ? "bg-brand text-white shadow-sm" : "text-text-secondary hover:text-text-primary"}`}
           >
             Recent
           </button>
-          <button 
+          <button
             onClick={() => setSortMethod("trending")}
-            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "trending" ? "bg-white shadow-sm text-text-primary" : "text-text-secondary hover:text-text-primary"}`}
+            className={`flex-1 md:flex-none px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sortMethod === "trending" ? "bg-brand text-white shadow-sm" : "text-text-secondary hover:text-text-primary"}`}
           >
             Trending
           </button>
@@ -514,9 +514,9 @@ export default function ForumPage() {
         <button
           onClick={() => setActiveCategory(null)}
           className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-            activeCategory === null 
-              ? "bg-text-primary text-white" 
-              : "bg-surface text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+            activeCategory === null
+              ? "bg-brand text-white shadow-sm"
+              : "bg-surface border border-border text-text-secondary hover:bg-surface-raised hover:text-text-primary"
           }`}
         >
           All Topics
@@ -526,9 +526,9 @@ export default function ForumPage() {
             key={c}
             onClick={() => setActiveCategory(c)}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors capitalize ${
-              activeCategory === c 
-                ? "bg-text-primary text-white" 
-                : "bg-surface text-text-secondary hover:bg-surface-hover hover:text-text-primary"
+              activeCategory === c
+                ? "bg-brand text-white shadow-sm"
+                : "bg-surface border border-border text-text-secondary hover:bg-surface-raised hover:text-text-primary"
             }`}
           >
             {c}
@@ -542,7 +542,7 @@ export default function ForumPage() {
           <Loader2 className="h-8 w-8 animate-spin text-brand" />
         </div>
       ) : posts.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-border border-dashed">
+        <div className="text-center py-16 bg-surface rounded-xl border border-border border-dashed">
           <MessageSquare className="h-12 w-12 text-border mx-auto mb-4" />
           <h3 className="text-lg font-medium text-text-primary">No posts yet</h3>
           <p className="text-text-secondary mt-1">Be the first to share something with the community.</p>
