@@ -17,7 +17,7 @@ function gentleBandMessage(band: string, testId: string): { headline: string; de
     if (b.includes('minimal') || b.includes('none') || b.includes('no significant') || b.includes('normal') || b.includes('low')) {
         return {
             headline: 'Things seem to be going well',
-            description: 'Your responses suggest you\'re managing well in this area. It\'s great that you took the time to check in \u2014 keep doing what works for you.',
+            description: 'Your responses suggest you\'re managing well in this area. It\'s great that you took the time to check in — keep doing what works for you.',
         };
     }
     if (b.includes('mild')) {
@@ -187,7 +187,7 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                                 {result.escalationReasons.length > 0 && (
                                     <ul className="mt-2 space-y-1">
                                         {result.escalationReasons.map((r, i) => (
-                                            <li key={i} className="text-xs text-destructive-hover">\u2022 {r}</li>
+                                            <li key={i} className="text-xs text-destructive-hover">• {r}</li>
                                         ))}
                                     </ul>
                                 )}

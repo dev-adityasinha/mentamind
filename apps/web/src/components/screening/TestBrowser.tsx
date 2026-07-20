@@ -99,7 +99,7 @@ export const TestBrowser: React.FC<TestBrowserProps> = ({ onSelectTest, onBack }
 
                 <div className="pt-4 pb-8 text-center">
                     <p className="text-xs text-text-muted max-w-sm mx-auto">
-                        All screenings use clinically validated tools. Results are for self-awareness only \u2014 not a diagnosis.
+                        All screenings use clinically validated tools. Results are for self-awareness only — not a diagnosis.
                     </p>
                 </div>
             </main>
