@@ -5,6 +5,7 @@ from typing import Annotated
 
 from fastapi import (
     APIRouter,
+    BackgroundTasks,
     Depends,
     File,
     HTTPException,
@@ -39,6 +40,7 @@ from app.schemas.meditation import (
 )
 from app.services.media_storage import MediaStorageError, store_audio
 from app.services.meditation_tracker import submit_meditation_completion
+from app.services.notification import notify_org_new_meditation
 from app.settings import settings
 
 try:
@@ -136,8 +138,15 @@ async def create_track(
     body: MeditationTrackCreate,
     admin_user: Annotated[User, _require_manager],
     db: Annotated[AsyncSession, Depends(get_db)],
+    background_tasks: BackgroundTasks,
 ) -> MeditationTrack:
-    """Create a new meditation session, private to the admin's organization."""
+    """Create a new meditation session, private to the admin's organization.
+
+    After the track is saved, every other active member of the admin's
+    organization is notified in-app that a new session was added. The fan-out
+    runs as a background task (after this response is sent) so the upload stays
+    fast even for large organizations.
+    """
     track = MeditationTrack(
         org_id=admin_user.org_id,
         title=body.title,
@@ -150,6 +159,20 @@ async def create_track(
     db.add(track)
     await db.commit()
     await db.refresh(track)
+
+    # Notify the rest of the org in the background. Only org-owned tracks trigger
+    # this; a global/shared track (org_id is None) is not "news" for any single
+    # org and would have no org to fan out to. Guard is defensive: create_track
+    # always sets org_id to the admin's org, which is non-null.
+    if track.org_id is not None:
+        background_tasks.add_task(
+            notify_org_new_meditation,
+            org_id=track.org_id,
+            track_id=track.id,
+            track_title=track.title,
+            uploader_id=admin_user.id,
+        )
+
     return track
 
 

@@ -109,6 +109,94 @@ async def send_notification(
     return NotificationResult.SENT
 
 
+async def notify_org_new_meditation(
+    *,
+    org_id: uuid.UUID,
+    track_id: uuid.UUID,
+    track_title: str,
+    uploader_id: uuid.UUID,
+) -> int:
+    """Announce a newly-added meditation track to every member of the org.
+
+    Fans out one in-app notification to each active member of ``org_id`` except
+    the uploader. Designed to run as a FastAPI background task AFTER the upload
+    response has been sent, so the admin's "create track" request never waits on
+    the fan-out. It opens its OWN database session (the request-scoped session is
+    already closed by the time a background task runs).
+
+    Unlike ``send_notification``, this deliberately does NOT apply quiet-hours or
+    the per-user reminder rate cap: this is a one-off content announcement, not a
+    recurring reminder, so those suppressions would wrongly drop it (e.g. a track
+    uploaded at night would reach nobody). Bodies are encrypted per-recipient
+    with the exact same scheme the rest of the notification system uses, so they
+    decrypt correctly in the notifications router.
+
+    Returns the number of notifications created (useful for logging/tests).
+    """
+    # Imported lazily to avoid a circular import at module load time
+    # (models.user does not import this service, but keeping the import local
+    # also keeps this announcement-only helper self-contained).
+    from sqlalchemy import select
+
+    from app.database import AsyncSessionLocal
+    from app.models.user import User, UserRole
+    from app.models.user_settings import UserSettings
+
+    title = "New meditation added"
+    body = f'A new session "{track_title}" was just added to your library.'
+
+    created = 0
+    async with AsyncSessionLocal() as db:
+        # Recipients = the same "real, notifiable user" definition the reminder
+        # scheduler uses (reminder_scheduler._eligible_users), scoped to this org
+        # and excluding the uploader: active, onboarded, not anonymous, not
+        # banned, and who have NOT disabled notifications in their settings.
+        # notifications_enabled defaults True; a NULL (no settings row) is
+        # treated as enabled, matching the scheduler.
+        result = await db.execute(
+            select(User.id)
+            .outerjoin(UserSettings, UserSettings.user_id == User.id)
+            .where(
+                User.org_id == org_id,
+                User.id != uploader_id,
+                User.deleted_at.is_(None),
+                User.is_banned.is_(False),
+                User.is_anonymous.is_(False),
+                User.onboarding_completed_at.is_not(None),
+                User.role != UserRole.ANONYMOUS,
+                (UserSettings.notifications_enabled.is_(None))
+                | (UserSettings.notifications_enabled.is_(True)),
+            )
+        )
+        recipient_ids = [row[0] for row in result.all()]
+
+        for recipient_id in recipient_ids:
+            body_encrypted = encrypt(body, associated_data=str(recipient_id).encode())
+            db.add(
+                NotificationEvent(
+                    user_id=recipient_id,
+                    org_id=org_id,
+                    category=NotificationCategory.MEDITATION_REMINDER,
+                    title=title,
+                    body_encrypted=body_encrypted,
+                )
+            )
+            created += 1
+
+        # Single commit for the whole fan-out (atomic; far cheaper than one
+        # commit per recipient for large orgs).
+        await db.commit()
+
+    log.info(
+        '{"event": "meditation_announced", "org_id": "%s", "track_id": "%s", '
+        '"recipients": %d}',
+        org_id,
+        track_id,
+        created,
+    )
+    return created
+
+
 async def send_email_ses_stub(
     *,
     email_hash: str,
