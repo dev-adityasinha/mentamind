@@ -12,7 +12,7 @@ from fastapi import (
     UploadFile,
     status,
 )
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -83,8 +83,18 @@ async def list_tracks(
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ) -> list[MeditationTrack]:
-    """List all available meditation tracks in the library, with optional filters."""
-    stmt = select(MeditationTrack).order_by(MeditationTrack.created_at.desc())
+    """List meditation tracks visible to the user: global (shared) tracks plus
+    the ones uploaded by the user's own organization."""
+    stmt = (
+        select(MeditationTrack)
+        .where(
+            or_(
+                MeditationTrack.org_id.is_(None),
+                MeditationTrack.org_id == current_user.org_id,
+            )
+        )
+        .order_by(MeditationTrack.created_at.desc())
+    )
 
     if category:
         stmt = stmt.where(MeditationTrack.category == category)
@@ -103,9 +113,9 @@ async def get_track(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> MeditationTrack:
-    """Get details of a specific meditation track."""
+    """Get details of a specific meditation track (must be global or in-org)."""
     track = await db.get(MeditationTrack, track_id)
-    if not track:
+    if not track or (track.org_id is not None and track.org_id != current_user.org_id):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
         )
@@ -127,8 +137,9 @@ async def create_track(
     admin_user: Annotated[User, _require_manager],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> MeditationTrack:
-    """Create a new meditation session in the library."""
+    """Create a new meditation session, private to the admin's organization."""
     track = MeditationTrack(
+        org_id=admin_user.org_id,
         title=body.title,
         description=body.description,
         audio_url=body.audio_url,
@@ -149,9 +160,11 @@ async def update_track(
     admin_user: Annotated[User, _require_manager],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> MeditationTrack:
-    """Update an existing meditation session."""
+    """Update a meditation session owned by the admin's organization."""
     track = await db.get(MeditationTrack, track_id)
-    if not track:
+    if not track or track.org_id != admin_user.org_id:
+        # 404 (not 403) so we don't reveal the existence of other orgs' or
+        # global tracks. Global (org_id NULL) tracks are read-only here.
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
         )
@@ -171,9 +184,10 @@ async def delete_track(
     admin_user: Annotated[User, _require_manager],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> None:
-    """Delete a meditation session from the library."""
+    """Delete a meditation session owned by the admin's organization."""
     track = await db.get(MeditationTrack, track_id)
-    if not track:
+    if not track or track.org_id != admin_user.org_id:
+        # 404 so global/other-org tracks are neither deletable nor disclosed.
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Track not found"
         )

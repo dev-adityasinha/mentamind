@@ -7,6 +7,7 @@ from sqlalchemy import (
     DateTime,
     Enum,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -37,11 +38,22 @@ class MeditationDifficulty(enum.StrEnum):
 
 
 class MeditationTrack(Base):
-    """The static library of meditation sessions"""
+    """The library of meditation sessions.
+
+    org_id NULL  -> a global/seed track visible to every organization.
+    org_id set   -> a track uploaded by that organization, private to it.
+    """
 
     __tablename__ = "meditation_tracks"
 
+    __table_args__ = (Index("ix_meditation_tracks_org_id", "org_id"),)
+
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    # Owning organization. NULL means a shared/global track (e.g. seeded CC0
+    # audio) that every org can see.
+    org_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=True
+    )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     audio_url: Mapped[str] = mapped_column(String(500), nullable=False)
