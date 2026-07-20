@@ -4,6 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -365,6 +366,25 @@ async def accept_invitation(
     )
     inv = inv_result.scalar_one()
 
+    # A user with this email may already exist — e.g. the invite was accepted
+    # once (creating the account) and later resent, which reopens the invite but
+    # does not remove the account. Creating a second user would violate the
+    # unique email_hash constraint and surface as a 500, so we detect it up front
+    # and return a clear, actionable message instead. (The failed UPDATE above
+    # has not been committed yet; raising here rolls the whole transaction back,
+    # so the invite is left untouched.)
+    existing = await db.execute(
+        select(User.id).where(
+            User.email_hash == inv.email_hash,
+            User.org_id == inv.org_id,
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "An account for this email already exists. Please sign in instead.",
+        )
+
     user = User(
         org_id=inv.org_id,
         email_hash=inv.email_hash,
@@ -375,7 +395,17 @@ async def accept_invitation(
         consent_ai_coaching=False,
     )
     db.add(user)
-    await db.flush()
+    try:
+        await db.flush()
+    except IntegrityError:
+        # Race: another request created the same account between the check above
+        # and this flush. Roll back and return the same clean message rather than
+        # a 500. The unique constraint is the authoritative guard.
+        await db.rollback()
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "An account for this email already exists. Please sign in instead.",
+        ) from None
 
     access_token = create_access_token(user.id, user.org_id, user.role.value)
     raw_refresh, refresh_hash = generate_refresh_token()

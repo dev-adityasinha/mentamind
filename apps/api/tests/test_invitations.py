@@ -299,3 +299,68 @@ async def test_invite_assigned_correct_org(
     tokens = accept.json()
     me = await client.get("/me", headers=_auth(tokens["access_token"]))
     assert me.json()["org_id"] == str(org_a.id)
+
+
+@pytest.mark.asyncio
+async def test_accept_when_account_already_exists(
+    client: AsyncClient, db_session: AsyncSession, org_a: Organization
+) -> None:
+    """Accepting an invite for an email that ALREADY has an account must return a
+    clean 409, not a 500 from the unique email_hash constraint.
+
+    Reproduces the production crash: after an invite is accepted (creating the
+    account) and later resent, a pending invite and an existing user share the
+    same email_hash. We set that state up directly, then accept.
+    """
+    from datetime import UTC, datetime, timedelta
+
+    from app.models.invitation import Invitation, InvitationStatus
+    from app.models.user import User
+    from app.services.auth_service import (
+        generate_invite_token,
+        hash_email,
+        hash_password,
+    )
+    from app.services.encryption import encrypt
+
+    email = "existing@acme.com"
+    email_hash = hash_email(email)
+
+    # An account for this email already exists in the org.
+    db_session.add(
+        User(
+            org_id=org_a.id,
+            email_hash=email_hash,
+            display_name="Already Here",
+            role=UserRole.USER,
+            password_hash=hash_password("Pass123456!"),
+            consent_analytics=False,
+            consent_ai_coaching=False,
+        )
+    )
+    # ...and a still-pending invite for the same email (as a resend would leave).
+    raw_token, token_hash = generate_invite_token()
+    db_session.add(
+        Invitation(
+            org_id=org_a.id,
+            email_hash=email_hash,
+            email_encrypted=encrypt(email, org_a.id.bytes),
+            invited_role=UserRole.USER,
+            token_hash=token_hash,
+            status=InvitationStatus.PENDING,
+            expires_at=datetime.now(UTC) + timedelta(days=7),
+        )
+    )
+    await db_session.commit()
+
+    resp = await client.post(
+        "/invitations/accept",
+        json={
+            "token": raw_token,
+            "password": "Pass123456!",
+            "display_name": "Second",
+        },
+    )
+    # Must be a clean, meaningful 409 — never a 500.
+    assert resp.status_code == 409
+    assert "already exists" in resp.json()["detail"]
