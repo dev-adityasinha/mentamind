@@ -104,6 +104,22 @@ export default function HRDashboardPage() {
   const latest = trendData[trendData.length - 1] ?? null;
   const previous = trendData.length >= 2 ? trendData[trendData.length - 2] : null;
 
+  // Whether anyone checked in on the most recent day in the selected window.
+  // Drives the difference between "no one checked in yet" (whole card empty)
+  // and "people checked in but this particular metric wasn't reported".
+  const hasCheckins = latest != null && latest.participants > 0;
+
+  // Small explanatory placeholder shown instead of a bare "—" so an HR viewer
+  // understands WHY a value is empty rather than seeing what looks like a bug.
+  // `metric` is what's missing when check-ins DID happen (e.g. "mood data").
+  function EmptyMetric({ metric }: { metric: string }) {
+    return (
+      <span className="text-sm font-normal text-text-muted">
+        {hasCheckins ? `No ${metric} yet` : "No check-ins yet"}
+      </span>
+    );
+  }
+
   function burnoutLabel(score: number | null | undefined): { label: string; color: string; bg: string } {
     if (score == null) return { label: "—", color: "text-text-muted", bg: "bg-surface-raised" };
     if (score > 75) return { label: "High", color: "text-destructive", bg: "bg-destructive-subtle" };
@@ -165,68 +181,98 @@ export default function HRDashboardPage() {
         <Card>
           <div className="p-5">
             <p className="text-sm text-text-muted">Wellness Score</p>
-            <div className="mt-1 flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-text-primary">
-                {latest ? latest.avg_composite ?? "—" : "—"}
-              </p>
-              <span className="text-lg text-text-muted">/ 100</span>
-            </div>
-            <div className="mt-2 flex items-center gap-2">
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${wellnessBand(latest?.avg_composite).bg} ${wellnessBand(latest?.avg_composite).color}`}>
-                {wellnessBand(latest?.avg_composite).label}
-              </span>
-              <span className={`text-xs ${trend(latest?.avg_composite, previous?.avg_composite).color}`}>
-                {trend(latest?.avg_composite, previous?.avg_composite).arrow} vs yesterday
-              </span>
-            </div>
+            {latest?.avg_composite != null ? (
+              <>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <p className="text-3xl font-bold text-text-primary">
+                    {latest.avg_composite}
+                  </p>
+                  <span className="text-lg text-text-muted">/ 100</span>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${wellnessBand(latest.avg_composite).bg} ${wellnessBand(latest.avg_composite).color}`}>
+                    {wellnessBand(latest.avg_composite).label}
+                  </span>
+                  <span className={`text-xs ${trend(latest.avg_composite, previous?.avg_composite).color}`}>
+                    {trend(latest.avg_composite, previous?.avg_composite).arrow} vs yesterday
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="mt-2">
+                <EmptyMetric metric="wellness data" />
+              </div>
+            )}
           </div>
         </Card>
         <Card>
           <div className="p-5">
             <p className="text-sm text-text-muted">Avg Mood</p>
-            <div className="mt-1 flex items-baseline gap-2">
-              <p className="text-3xl font-bold text-text-primary">
-                {latest ? latest.avg_mood ?? "—" : "—"}
-              </p>
-              <span className="text-lg text-text-muted">/ 100</span>
-            </div>
-            <div className="mt-2 flex items-center gap-2">
-              <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${wellnessBand(latest?.avg_mood).bg} ${wellnessBand(latest?.avg_mood).color}`}>
-                {wellnessBand(latest?.avg_mood).label}
-              </span>
-              <span className={`text-xs ${trend(latest?.avg_mood, previous?.avg_mood).color}`}>
-                {trend(latest?.avg_mood, previous?.avg_mood).arrow} vs yesterday
-              </span>
-            </div>
+            {latest?.avg_mood != null ? (
+              <>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <p className="text-3xl font-bold text-text-primary">
+                    {latest.avg_mood}
+                  </p>
+                  <span className="text-lg text-text-muted">/ 100</span>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${wellnessBand(latest.avg_mood).bg} ${wellnessBand(latest.avg_mood).color}`}>
+                    {wellnessBand(latest.avg_mood).label}
+                  </span>
+                  <span className={`text-xs ${trend(latest.avg_mood, previous?.avg_mood).color}`}>
+                    {trend(latest.avg_mood, previous?.avg_mood).arrow} vs yesterday
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="mt-2">
+                <EmptyMetric metric="mood data" />
+              </div>
+            )}
           </div>
         </Card>
         <Card>
           <div className="p-5">
             <p className="text-sm text-text-muted">Burnout Risk</p>
-            <p className="mt-1 flex items-center gap-2">
-              <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${burnoutLabel(latest?.avg_burnout).bg} ${burnoutLabel(latest?.avg_burnout).color}`}>
-                {burnoutLabel(latest?.avg_burnout).label}
-              </span>
-            </p>
-            <div className="mt-2 flex items-center gap-2">
-              <span className={`text-xs ${trend(latest?.avg_burnout, previous?.avg_burnout).color}`}>
-                {trend(latest?.avg_burnout, previous?.avg_burnout).arrow} vs yesterday
-              </span>
-              {latest?.avg_burnout != null && (
-                <span className="text-xs text-text-muted">({latest.avg_burnout}/100)</span>
-              )}
-            </div>
+            {latest?.avg_burnout != null ? (
+              <>
+                <p className="mt-1 flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${burnoutLabel(latest.avg_burnout).bg} ${burnoutLabel(latest.avg_burnout).color}`}>
+                    {burnoutLabel(latest.avg_burnout).label}
+                  </span>
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className={`text-xs ${trend(latest.avg_burnout, previous?.avg_burnout).color}`}>
+                    {trend(latest.avg_burnout, previous?.avg_burnout).arrow} vs yesterday
+                  </span>
+                  <span className="text-xs text-text-muted">({latest.avg_burnout}/100)</span>
+                </div>
+              </>
+            ) : (
+              <div className="mt-2">
+                <EmptyMetric metric="burnout data" />
+              </div>
+            )}
           </div>
         </Card>
         <Card>
           <div className="p-5">
             <p className="text-sm text-text-muted">Participants</p>
-            <p className="mt-1 text-3xl font-bold text-text-primary">
-              {latest?.participants ?? "—"}
-            </p>
-            <p className="mt-1 text-xs text-text-muted">
-              checked in today
-            </p>
+            {latest != null ? (
+              <>
+                <p className="mt-1 text-3xl font-bold text-text-primary">
+                  {latest.participants}
+                </p>
+                <p className="mt-1 text-xs text-text-muted">
+                  checked in today
+                </p>
+              </>
+            ) : (
+              <div className="mt-2">
+                <EmptyMetric metric="check-ins" />
+              </div>
+            )}
             {participation && (
               <p className="mt-1 text-xs text-text-muted">
                 {participation.participation_rate}% of org this month
