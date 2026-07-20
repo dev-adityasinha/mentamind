@@ -18,7 +18,7 @@ export function AuthContainer({ children }: { children: React.ReactNode }) {
         />
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="/" className="flex items-center gap-2 font-medium text-text-primary">
-            <Image src="/logo/mentamind.webp" alt="Mentamind Logo" width={24} height={24} className="object-contain" />
+            <Image src="/logo/mentamind.webp" alt="Mentamind Logo" width={24} height={24} unoptimized className="object-contain" />
             Mentamind
           </Link>
         </div>
@@ -51,12 +51,19 @@ export function AuthContainer({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Right panel - image, hidden on mobile */}
-      <div className="relative hidden bg-muted lg:block">
+      {/* Right panel - image, hidden on mobile. A gradient sits behind the
+          image so that if the photo ever fails to load (stale PWA cache, image
+          optimizer hiccup, etc.) the panel still looks intentional rather than
+          showing a broken-image icon. `unoptimized` + `priority` serve the
+          static file directly, bypassing the flaky /_next/image optimizer. */}
+      <div className="relative hidden overflow-hidden lg:block bg-gradient-to-br from-blue-600 via-indigo-700 to-slate-900">
         <Image
           src="/auth-bg.jpg"
           alt=""
           fill
+          priority
+          unoptimized
+          sizes="50vw"
           className="object-cover"
         />
       </div>
