@@ -10,6 +10,7 @@ const MEDITATION_TABS: { href: string; label: string }[] = [
   { href: "/meditation/journey", label: "Journey" },
   { href: "/meditation/dashboard", label: "Dashboard" },
   { href: "/meditation/journal", label: "Journal" },
+  { href: "/meditation/checkin", label: "Check-in" },
   { href: "/meditation/task", label: "Task" },
   { href: "/meditation/library", label: "Library" },
 ];
