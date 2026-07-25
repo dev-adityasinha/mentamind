@@ -41,6 +41,16 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       SUPER_ADMIN_EMAIL: ${SUPER_ADMIN_EMAIL:-zaid@mentamind.in}
       ENVIRONMENT: ${ENVIRONMENT:-development}
+      # Trust X-Forwarded-For: the web container proxies auth calls server-side,
+      # so without this every user's request is attributed to its IP.
+      BEHIND_PROXY: ${BEHIND_PROXY:-true}
+      # Auth rate limits, raised for local dev. A browser talking straight to
+      # the Next.js server has no upstream setting X-Forwarded-For, so all
+      # proxied logins still share one bucket here; the shipped default of 5 per
+      # 15 min locks you out after a few attempts. Production keeps the strict
+      # defaults from app/settings.py.
+      AUTH_LOGIN_RATE_LIMIT_CALLS: ${AUTH_LOGIN_RATE_LIMIT_CALLS:-100}
+      AUTH_REGISTER_RATE_LIMIT_CALLS: ${AUTH_REGISTER_RATE_LIMIT_CALLS:-50}
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_USERNAME: ${SMTP_USERNAME}
@@ -62,10 +72,16 @@ services:
     build:
       context: ./apps/web
       dockerfile: Dockerfile
+      args:
+        # Must be a build arg, not just a runtime env var: Next.js inlines
+        # NEXT_PUBLIC_* into the client bundle during `next build`. This is the
+        # browser-facing origin, so it stays localhost even though the
+        # server-side API_URL below uses the compose network name.
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
       API_URL: http://api:8000
     depends_on:
       - api

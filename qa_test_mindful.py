@@ -50,7 +50,7 @@ async def run_qa():
     async with AsyncSessionLocal() as db:
         await db.execute(text("""
             INSERT INTO meditation_tracks (id, title, description, audio_url, duration_minutes, category, difficulty)
-            VALUES (:id, 'Test Guided Focus', 'Focus on your breath', 'https://example.com/audio.mp3', 10, 'FOCUS', 'BEGINNER')
+            VALUES (:id, 'Test Guided Focus', 'Focus on your breath', 'https://example.com/audio.mp3', 10, 'focus', 'beginner')
             ON CONFLICT (id) DO NOTHING
         """), {"id": str(track_id)})
         await db.commit()

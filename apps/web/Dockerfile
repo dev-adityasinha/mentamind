@@ -3,6 +3,14 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install
 COPY . .
+
+# NEXT_PUBLIC_* values are inlined into the client bundle by `next build`, not
+# read at runtime. Supplying this only as a container env var leaves
+# process.env.NEXT_PUBLIC_API_URL undefined in the browser, so getApiBase()
+# throws and every direct API call from the client fails.
+ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN npm run build
 
 FROM node:20-alpine AS runner

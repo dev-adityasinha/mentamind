@@ -54,8 +54,10 @@ async def run_qa():
         assert res.status_code == 200, res.text
         phq9_resp = res.json()
         assert phq9_resp["test_id"] == "phq-9"
+        # Server re-scores from `answers` (authoritative): sum == 15, which
+        # PHQ-9 bands classify as "Moderately Severe" (score >= 15).
         assert phq9_resp["score"] == 15
-        assert phq9_resp["severity"] == "moderate"
+        assert phq9_resp["severity"] == "Moderately Severe"
         print(f"✅ PHQ-9 recorded successfully. ID: {phq9_resp['id']}\n")
 
         # 3. Submit a Screening Result (GAD-7)

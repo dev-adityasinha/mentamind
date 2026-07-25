@@ -11,7 +11,7 @@ from app.models.user import UserRole
 
 _STATUS_VALUES = "('pending', 'accepted', 'revoked')"
 _ROLE_VALUES = (
-    "('employee', 'manager', 'hr_manager', 'wellness_officer',"
+    "('user', 'employee', 'manager', 'hr_manager', 'wellness_officer',"
     " 'admin', 'counselor', 'student', 'moderator', 'therapist')"
 )
 

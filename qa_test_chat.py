@@ -78,7 +78,7 @@ async def run_qa():
         res = await client.post(f"{API_URL}/forum/posts", json={
             "title": "QA Test Post",
             "content": "Does anonymity work?",
-            "category": "General",
+            "category": "general",
             "is_anonymous": True
         }, headers={"Authorization": f"Bearer {token_a}"})
         assert res.status_code == 200, res.text

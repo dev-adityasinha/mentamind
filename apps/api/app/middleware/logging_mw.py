@@ -10,7 +10,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-from app.settings import settings
+from app.client_ip import client_ip
 
 _request_id_var: ContextVar[str] = ContextVar("request_id", default="")
 
@@ -22,14 +22,6 @@ def get_request_id() -> str:
 def _hash_ip(ip: str) -> str:
     """12-char hex prefix of SHA-256(ip): enough for correlation, not reversible."""
     return hashlib.sha256(ip.encode()).hexdigest()[:12]
-
-
-def _client_ip(request: Request) -> str:
-    if settings.behind_proxy:
-        xff = request.headers.get("X-Forwarded-For", "")
-        if xff:
-            return xff.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
 
 
 class JSONFormatter(logging.Formatter):
@@ -55,7 +47,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
         _token = _request_id_var.set(request_id)
-        ip_hash = _hash_ip(_client_ip(request))
+        ip_hash = _hash_ip(client_ip(request))
         start = time.monotonic()
 
         _log.info(

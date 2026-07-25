@@ -29,6 +29,13 @@ async def run_qa():
         user_token = login_res.json()["access_token"]
         user_headers = {"Authorization": f"Bearer {user_token}"}
 
+        # Admin stats/reports are scoped to the admin's own organization, so the
+        # admin must live in the SAME org as the standard user for the reported
+        # post to be visible. Fetch the standard user's org_id to reuse it.
+        me_res = await client.get(f"{API_URL}/me", headers=user_headers)
+        assert me_res.status_code == 200, me_res.text
+        org_id = me_res.json()["org_id"]
+
         # 2. Register an Admin user
         # Note: By default register sets role=UserRole.EMPLOYEE (or student).
         # We'll need a trick or just use an existing admin. Let's see if we can promote them,
@@ -43,6 +50,7 @@ async def run_qa():
                 "email": admin_email,
                 "password": "Password123!",
                 "display_name": "Admin User",
+                "org_id": org_id,
             },
         )
         print("=== Promoting User to Admin via DB ===")

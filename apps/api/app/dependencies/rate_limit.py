@@ -7,19 +7,11 @@ from typing import Annotated
 import redis.asyncio as aioredis
 from fastapi import Depends, HTTPException, Request, status
 
+from app.client_ip import client_ip
 from app.dependencies.redis_dep import get_redis_dep
 from app.services.redis_client import RATE_CAP_LUA as _RATE_CAP_LUA
-from app.settings import settings
 
 log = logging.getLogger(__name__)
-
-
-def _ip_from_request(request: Request) -> str:
-    if settings.behind_proxy:
-        xff = request.headers.get("X-Forwarded-For", "")
-        if xff:
-            return xff.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
 
 
 def auth_rate_limit(*, endpoint: str, max_calls: int, window_seconds: int):
@@ -34,7 +26,7 @@ def auth_rate_limit(*, endpoint: str, max_calls: int, window_seconds: int):
         request: Request,
         redis: Annotated[aioredis.Redis, Depends(get_redis_dep)],
     ) -> None:
-        ip = _ip_from_request(request)
+        ip = client_ip(request)
         ip_hash = hashlib.sha256(ip.encode()).hexdigest()[:16]
         key = f"ratelimit:auth:{endpoint}:{ip_hash}"
         try:

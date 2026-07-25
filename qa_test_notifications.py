@@ -39,9 +39,9 @@ async def run_qa():
         
         # Bypass onboarding
         await client.post(
-            f"{API_URL}/onboarding/submit-consent",
+            f"{API_URL}/onboarding/complete",
             headers=headers,
-            json={"data_processing": True, "anonymized_research": True}
+            json={"consent_analytics": True, "consent_ai_coaching": True}
         )
         print("    QA User registered and onboarded.")
 
@@ -60,8 +60,8 @@ async def run_qa():
             
             body_encrypted = encrypt("We noticed you've been working late. Take a break!", associated_data=user_id.encode())
             event = NotificationEvent(
-                user_id=user_id,
-                org_id=org_id,
+                user_id=uuid.UUID(user_id),
+                org_id=uuid.UUID(org_id),
                 category=NotificationCategory.BURNOUT_ALERT,
                 title="Burnout Warning",
                 body_encrypted=body_encrypted,

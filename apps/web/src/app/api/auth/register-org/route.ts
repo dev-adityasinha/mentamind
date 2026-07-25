@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { withClientIp } from "@/lib/client-ip";
+
 const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
 const REFRESH_COOKIE = "mm_refresh";
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60;
@@ -19,7 +21,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     apiRes = await fetch(`${API_URL}/auth/register-organization`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: withClientIp(req, { "Content-Type": "application/json" }),
       body: JSON.stringify(body),
     });
   } catch {
