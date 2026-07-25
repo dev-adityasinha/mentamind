@@ -25,6 +25,7 @@ from app.schemas.mindful import (
     DailyCompletionUpdate,
     JourneyBlockProgress,
     JourneyResponse,
+    MindfulStatsResponse,
 )
 
 router = APIRouter(prefix="/mindful", tags=["mindful"])
@@ -234,4 +235,60 @@ async def get_journey(
         completed_days=completed_days,
         blocks=blocks,
         last_completed_at=last_completed_at,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Aggregate stats (dashboard)
+# ---------------------------------------------------------------------------
+@router.get("/stats", response_model=MindfulStatsResponse)
+async def get_mindful_stats(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> MindfulStatsResponse:
+    """Aggregate meditation stats for the dashboard, derived from
+    daily_completions (no dependency on the track library).
+
+    total_minutes / total_sessions come from days whose meditation is done;
+    current_streak and current_day mirror the journey computation.
+    """
+    result = await db.execute(
+        select(
+            DailyCompletion.day,
+            DailyCompletion.meditation,
+            DailyCompletion.meditation_duration,
+        ).where(DailyCompletion.user_id == current_user.id)
+    )
+
+    completed_by_day: dict[int, bool] = {}
+    total_minutes = 0
+    total_sessions = 0
+    for day, meditation, duration in result.all():
+        if meditation:
+            completed_by_day[day] = True
+            total_sessions += 1
+            total_minutes += int(duration or 0)
+
+    completed_days = len(completed_by_day)
+
+    current_day = TOTAL_DAYS
+    for d in range(1, TOTAL_DAYS + 1):
+        if not completed_by_day.get(d):
+            current_day = d
+            break
+
+    streak = 0
+    for d in range(1, TOTAL_DAYS + 1):
+        if completed_by_day.get(d):
+            streak += 1
+        else:
+            break
+
+    return MindfulStatsResponse(
+        total_minutes=total_minutes,
+        total_sessions=total_sessions,
+        current_streak=streak,
+        completed_days=completed_days,
+        current_day=current_day,
+        total_days=TOTAL_DAYS,
     )

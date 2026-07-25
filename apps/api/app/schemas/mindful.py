@@ -75,3 +75,15 @@ class JourneyResponse(BaseModel):
     completed_days: int
     blocks: list[JourneyBlockProgress]
     last_completed_at: datetime | None = None
+
+
+# ---------------------------------------------------------------------------
+# Aggregate stats (dashboard)
+# ---------------------------------------------------------------------------
+class MindfulStatsResponse(BaseModel):
+    total_minutes: int
+    total_sessions: int
+    current_streak: int
+    completed_days: int
+    current_day: int
+    total_days: int

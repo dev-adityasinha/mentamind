@@ -74,6 +74,15 @@ export interface Journey {
   last_completed_at: string | null;
 }
 
+export interface MindfulStats {
+  total_minutes: number;
+  total_sessions: number;
+  current_streak: number;
+  completed_days: number;
+  current_day: number;
+  total_days: number;
+}
+
 export interface CompletionUpdate {
   day: number;
   meditation?: boolean;
@@ -127,4 +136,9 @@ export async function markCompletion(
 // --- Journey / progress ---
 export async function getJourney(): Promise<Journey> {
   return json(await apiFetch("/mindful/journey"));
+}
+
+
+export async function getMindfulStats(): Promise<MindfulStats> {
+  return json(await apiFetch("/mindful/stats"));
 }
