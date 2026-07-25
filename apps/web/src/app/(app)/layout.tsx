@@ -20,6 +20,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
+  ChevronDown,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/context";
 import { NotificationDropdown } from "@/components/dashboard/NotificationDropdown";
@@ -32,6 +33,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  // Whether the Meditation section's sub-tabs are expanded in the sidebar.
+  const [medOpen, setMedOpen] = useState(false);
+
+  // Sub-pages shown when the Meditation nav item is expanded.
+  const MEDITATION_SUBTABS: { href: string; label: string }[] = [
+    { href: "/meditation", label: "Home" },
+    { href: "/meditation/journey", label: "Journey" },
+    { href: "/meditation/dashboard", label: "Dashboard" },
+    { href: "/meditation/journal", label: "Journal" },
+    { href: "/meditation/checkin", label: "Check-in" },
+    { href: "/meditation/task", label: "Task" },
+    { href: "/meditation/library", label: "Library" },
+  ];
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -47,6 +61,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       router.replace("/onboarding");
     }
   }, [user, isLoading, isGhostMode, router]);
+
+  // Keep the Meditation group open while browsing its pages.
+  useEffect(() => {
+    if (pathname?.startsWith("/meditation")) setMedOpen(true);
+  }, [pathname]);
 
   if (isLoading) return null;
 
@@ -161,6 +180,57 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {navItems.map((item) => {
             const active = isItemActive(item);
             const Icon = item.icon;
+
+            // Meditation is an expandable group: the row toggles its sub-tabs
+            // (unless the sidebar is collapsed, where it's a plain link).
+            if (item.href === "/meditation" && !collapsed) {
+              return (
+                <li key={item.href}>
+                  <button
+                    type="button"
+                    onClick={() => setMedOpen((o) => !o)}
+                    aria-expanded={medOpen}
+                    className={`${itemClass(active)} w-full justify-between`}
+                  >
+                    <span className="flex items-center gap-3">
+                      <Icon className="h-5 w-5 shrink-0" />
+                      <span>{item.label}</span>
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 shrink-0 text-text-muted transition-transform ${medOpen ? "rotate-180" : ""}`}
+                      aria-hidden
+                    />
+                  </button>
+                  {medOpen && (
+                    <ul className="mt-1 flex flex-col gap-0.5 pl-4">
+                      {MEDITATION_SUBTABS.map((sub) => {
+                        const subActive =
+                          sub.href === "/meditation"
+                            ? pathname === "/meditation"
+                            : !!pathname?.startsWith(sub.href);
+                        return (
+                          <li key={sub.href}>
+                            <Link
+                              href={sub.href}
+                              onClick={onNavigate}
+                              aria-current={subActive ? "page" : undefined}
+                              className={`block rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                                subActive
+                                  ? "bg-brand-subtle font-medium text-brand"
+                                  : "text-text-secondary hover:text-text-primary hover:bg-surface-raised"
+                              }`}
+                            >
+                              {sub.label}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            }
+
             return (
               <li key={item.href}>
                 <Link
