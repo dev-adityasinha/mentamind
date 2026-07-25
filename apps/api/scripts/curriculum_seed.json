@@ -1,0 +1,936 @@
+{
+  "blocks": [
+    {
+      "block": 1,
+      "name": "Foundation",
+      "focus": "Settling in and learning basic techniques",
+      "meditationFocus": "Grounding, breath awareness, light body scans",
+      "reflectionFocus": "Noticing tension, physical/emotional signals",
+      "taskFocus": "Digital resets, evening cues, minor adjustments",
+      "color": "from-teal-400 to-teal-600"
+    },
+    {
+      "block": 2,
+      "name": "Depth",
+      "focus": "Increasing depth and building skills",
+      "meditationFocus": "Return-to-anchor, deeper scans, visualization",
+      "reflectionFocus": "Attention patterns, supportive/disruptive factors",
+      "taskFocus": "Brief walks, organization, planning",
+      "color": "from-indigo-400 to-indigo-600"
+    },
+    {
+      "block": 3,
+      "name": "Integration",
+      "focus": "Application in daily life and maintenance",
+      "meditationFocus": "Consolidated grounding, relaxed awareness",
+      "reflectionFocus": "Real-life application, weekly patterns",
+      "taskFocus": "Stable daily cues, reducing friction, habits",
+      "color": "from-purple-400 to-purple-600"
+    }
+  ],
+  "days": [
+    {
+      "day": 1,
+      "block": 1,
+      "title": "Foundation",
+      "subtitle": "Begin your journey",
+      "theme": "Getting Started",
+      "meditation": {
+        "title": "Grounding Basics",
+        "duration": 10,
+        "shortDuration": 5,
+        "techniques": [
+          "breath awareness",
+          "grounding"
+        ],
+        "description": "A gentle introduction to meditation. Learn to settle your body and mind through breath awareness.",
+        "script": "Welcome to Day 1. Today is about building your foundation. Find a comfortable position, sitting tall but relaxed. Close your eyes gently. Take a deep breath in... and let it out slowly. For the next few minutes, simply notice the sensation of your breath moving in and out of your body. There is nowhere else you need to be."
+      },
+      "reflection": {
+        "prompt": "What brought you here today? What are you hoping to change?"
+      },
+      "task": {
+        "title": "Digital Sunset",
+        "subtitle": "Prepare for rest",
+        "description": "Turn on night mode on all your devices after 8pm. This signals to your brain that the day is winding down.",
+        "icon": "brightness_4",
+        "duration": 2,
+        "image": "/assets/images/tasks/day01-digital-sunset.svg"
+      },
+      "moodQuestion": "How do you feel right now?"
+    },
+    {
+      "day": 2,
+      "block": 1,
+      "title": "Awareness",
+      "subtitle": "Notice your surroundings",
+      "theme": "Present Moment",
+      "meditation": {
+        "title": "Present Moment",
+        "duration": 10,
+        "shortDuration": 5,
+        "techniques": [
+          "breath awareness",
+          "attention anchoring"
+        ],
+        "description": "Learn to anchor your attention in the present moment using your breath as a focal point.",
+        "script": "Welcome to Day 2. Today we practice awareness. As you settle in, notice the sounds around you. Notice the temperature of the air. Now, bring your focus to your anchor—your breath. Whenever your mind wanders to the past or future, gently bring it back to this present breath. Right here. Right now."
+      },
+      "reflection": {
+        "prompt": "What did you notice about your thoughts today?"
+      },
+      "task": {
+        "title": "Mindful Tea",
+        "subtitle": "Savor the moment",
+        "description": "Drink a cup of tea or water slowly, noticing each sip. Feel the warmth, taste, and sensation.",
+        "icon": "emoji_food_beverage",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How present do you feel?"
+    },
+    {
+      "day": 3,
+      "block": 1,
+      "title": "Breath Work",
+      "subtitle": "Connect with your breath",
+      "theme": "Breathing",
+      "meditation": {
+        "title": "Paced Breathing",
+        "duration": 10,
+        "shortDuration": 6,
+        "techniques": [
+          "paced breathing",
+          "counting"
+        ],
+        "description": "Discover the power of controlled breathing to calm your nervous system.",
+        "script": "Welcome to Day 3. Today we explore the breath. We will practice paced breathing to calm the nervous system. Inhale deeply for a count of four... two, three, four. Pause. And exhale for four... two, three, four. Feel your body softening with each exhale. Continue this rhythm on your own."
+      },
+      "reflection": {
+        "prompt": "When do you hold your breath or breathe shallowly?"
+      },
+      "task": {
+        "title": "Phone-Free Morning",
+        "subtitle": "Start without screens",
+        "description": "Wait 30 minutes before checking your phone after waking. Use this time for yourself.",
+        "icon": "smartphone",
+        "duration": 30,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How calm do you feel?"
+    },
+    {
+      "day": 4,
+      "block": 1,
+      "title": "Body Scan",
+      "subtitle": "Tune into sensations",
+      "theme": "Body Awareness",
+      "meditation": {
+        "title": "Light Body Scan",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "body scan",
+          "tension release"
+        ],
+        "description": "Gently scan through your body, noticing areas of tension and relaxation.",
+        "script": "Welcome to Day 4. Today we reconnect with the body. Bring your attention to the top of your head. Slowly scan down through your forehead, your eyes, your jaw. Release any tension you find. Move down to your shoulders, your chest, your hands. Let gravity support you as you scan all the way down to your feet."
+      },
+      "reflection": {
+        "prompt": "Where do you hold tension in your body?"
+      },
+      "task": {
+        "title": "Stretch Break",
+        "subtitle": "Release tension",
+        "description": "Take a 3-minute stretch break mid-day. Focus on areas where you hold tension.",
+        "icon": "fitness_center",
+        "duration": 3,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How relaxed is your body?"
+    },
+    {
+      "day": 5,
+      "block": 1,
+      "title": "Release",
+      "subtitle": "Let go of tension",
+      "theme": "Letting Go",
+      "meditation": {
+        "title": "Tension Release",
+        "duration": 10,
+        "shortDuration": 5,
+        "techniques": [
+          "progressive relaxation",
+          "breath awareness"
+        ],
+        "description": "Learn to consciously release tension from your body, one area at a time.",
+        "script": "Welcome to Day 5. Today is about release. Visualize a knot of tension in your body. With every exhale, imagine that knot loosening, untangling, and melting away. Inhale peace, exhale tension. Let go of what you are holding onto physically and mentally."
+      },
+      "reflection": {
+        "prompt": "What would you like to release today?"
+      },
+      "task": {
+        "title": "Mindful Walking",
+        "subtitle": "Connect with the ground",
+        "description": "Take 10 minutes to walk without a destination. Focus on the sensation of your feet touching the ground.",
+        "icon": "directions_walk",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How light do you feel?"
+    },
+    {
+      "day": 6,
+      "block": 1,
+      "title": "Stillness",
+      "subtitle": "Find your center",
+      "theme": "Inner Peace",
+      "meditation": {
+        "title": "Seated Stillness",
+        "duration": 10,
+        "shortDuration": 5,
+        "techniques": [
+          "stillness",
+          "grounding"
+        ],
+        "description": "Practice being completely still, allowing your mind to settle naturally.",
+        "script": "Welcome to Day 6. Today we practice stillness. Physical stillness often leads to mental stillness. Commit to not moving your body for the next few minutes. If an itch arises, just observe it. Watch the urge to move, but remain still. Find the silence within that stillness."
+      },
+      "reflection": {
+        "prompt": "What does stillness mean to you?"
+      },
+      "task": {
+        "title": "Quiet Moment",
+        "subtitle": "Embrace silence",
+        "description": "Spend 5 minutes in complete silence. No phone, no music, just you.",
+        "icon": "volume_off",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How centered do you feel?"
+    },
+    {
+      "day": 7,
+      "block": 1,
+      "title": "Observation",
+      "subtitle": "Watch without judgment",
+      "theme": "Non-Judgment",
+      "meditation": {
+        "title": "Thought Observation",
+        "duration": 10,
+        "shortDuration": 6,
+        "techniques": [
+          "thought watching",
+          "non-attachment"
+        ],
+        "description": "Learn to observe your thoughts like clouds passing through the sky.",
+        "script": "Welcome to Day 7. Today we become the observer. Imagine your mind is a vast blue sky, and your thoughts are just clouds passing by. Some are dark, some are fluffy. Do not chase them, do not push them away. Just watch them float by. You are the sky, not the clouds."
+      },
+      "reflection": {
+        "prompt": "What patterns do you notice in your thoughts?"
+      },
+      "task": {
+        "title": "Nature Pause",
+        "subtitle": "Connect with nature",
+        "description": "Step outside and observe nature for 5 minutes. Notice colors, sounds, movements.",
+        "icon": "park",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How aware do you feel?"
+    },
+    {
+      "day": 8,
+      "block": 1,
+      "title": "Patience",
+      "subtitle": "Embrace the pace",
+      "theme": "Patience",
+      "meditation": {
+        "title": "Patience Practice",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "breath awareness",
+          "patience cultivation"
+        ],
+        "description": "Cultivate patience by slowing down and accepting the present moment.",
+        "script": "Welcome to Day 8. Today we cultivate patience. Notice if you are in a rush to finish this session. Acknowledge that feeling. Can you be okay with things taking exactly as long as they need to take? Breathe into the pause. There is no rush. This moment is enough."
+      },
+      "reflection": {
+        "prompt": "What triggers impatience in you?"
+      },
+      "task": {
+        "title": "Slow Task",
+        "subtitle": "Decelerate",
+        "description": "Do one routine task 50% slower than usual. Notice what changes.",
+        "icon": "hourglass_empty",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How patient do you feel?"
+    },
+    {
+      "day": 9,
+      "block": 1,
+      "title": "Acceptance",
+      "subtitle": "Welcome what is",
+      "theme": "Self-Compassion",
+      "meditation": {
+        "title": "Acceptance Meditation",
+        "duration": 10,
+        "shortDuration": 6,
+        "techniques": [
+          "acceptance",
+          "self-compassion"
+        ],
+        "description": "Practice accepting yourself and your experience exactly as it is.",
+        "script": "Welcome to Day 9. Today is for acceptance. Whatever you are feeling right now—boredom, anxiety, calm, or joy—greet it with a friendly 'hello'. Do not try to change it. Simply allow it to be there. This is acceptance. You are safe to feel whatever is here."
+      },
+      "reflection": {
+        "prompt": "What are you resisting in your life right now?"
+      },
+      "task": {
+        "title": "Gratitude List",
+        "subtitle": "Count your blessings",
+        "description": "Write down 3 things you're grateful for today. Be specific.",
+        "icon": "favorite",
+        "duration": 3,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How accepting do you feel?"
+    },
+    {
+      "day": 10,
+      "block": 1,
+      "title": "Integration",
+      "subtitle": "Block 1 Complete",
+      "theme": "Milestone",
+      "meditation": {
+        "title": "Foundation Review",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "breath awareness",
+          "body scan",
+          "grounding"
+        ],
+        "description": "Integrate everything you've learned in Block 1. A comprehensive practice session.",
+        "script": "Welcome to Day 10. Congratulations on completing the Foundation block. Today, we bring it all together. Ground yourself. Scan your body. Anchor to your breath. Notice the stillness you have cultivated over the last ten days. Carry this sense of foundation with you as you move forward."
+      },
+      "reflection": {
+        "prompt": "What have you learned about yourself in the first 10 days?"
+      },
+      "task": {
+        "title": "Weekly Review",
+        "subtitle": "Reflect on progress",
+        "description": "Review your mood trends and insights from this week. What worked best?",
+        "icon": "insights",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How has your baseline shifted?"
+    },
+    {
+      "day": 11,
+      "block": 2,
+      "title": "Deepening",
+      "subtitle": "Go deeper within",
+      "theme": "Focus",
+      "meditation": {
+        "title": "Return to Anchor",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "anchor practice",
+          "focused attention"
+        ],
+        "description": "Strengthen your ability to return to your breath when the mind wanders.",
+        "script": "Welcome to Day 11. As we begin the Depth block, we strengthen our focus. Today, be very precise with your attention. Feel the exact moment the inhale starts. Follow it all the way to the pause. Feel the exact moment the exhale begins. If you drift, sharply but kindly cut the thought and return to the breath."
+      },
+      "reflection": {
+        "prompt": "What distracts you most during meditation?"
+      },
+      "task": {
+        "title": "Notification Audit",
+        "subtitle": "Reclaim attention",
+        "description": "Disable non-essential app notifications. Keep only what truly matters.",
+        "icon": "notifications_off",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How focused do you feel?"
+    },
+    {
+      "day": 12,
+      "block": 2,
+      "title": "Insight",
+      "subtitle": "Finding clarity",
+      "theme": "Clarity",
+      "meditation": {
+        "title": "Morning Clarity",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "visualization",
+          "clarity cultivation"
+        ],
+        "description": "Start your day with crystal clear intention and mental clarity.",
+        "script": "Welcome to Day 12. Today we seek clarity. Imagine a glass of water filled with sand, shaken up. As you sit in stillness, watch the sand settle to the bottom. Watch the water become clear. Let your mind settle in the same way, until your perception is crystal clear."
+      },
+      "reflection": {
+        "prompt": "What insight emerged from today's practice?"
+      },
+      "task": {
+        "title": "Tidy Space",
+        "subtitle": "Clear environment",
+        "description": "Spend 10 minutes organizing one area of your space. External order, internal calm.",
+        "icon": "cleaning_services",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How clear is your mind?"
+    },
+    {
+      "day": 13,
+      "block": 2,
+      "title": "Visualization",
+      "subtitle": "See your path",
+      "theme": "Vision",
+      "meditation": {
+        "title": "Peaceful Visualization",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "visualization",
+          "relaxation"
+        ],
+        "description": "Create a peaceful inner sanctuary through guided visualization.",
+        "script": "Welcome to Day 13. Today we visualize. Close your eyes and create a sanctuary in your mind. It could be a forest, a beach, or a room. Notice the colors, the smells, the temperature. This is your safe space. You can return here whenever you need peace. Breathe in the safety of this place."
+      },
+      "reflection": {
+        "prompt": "What does your ideal peaceful space look like?"
+      },
+      "task": {
+        "title": "Vision Moment",
+        "subtitle": "Future self",
+        "description": "Spend 5 minutes visualizing your best self. How do they move? Speak? Feel?",
+        "icon": "visibility",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How clear is your vision?"
+    },
+    {
+      "day": 14,
+      "block": 2,
+      "title": "Connection",
+      "subtitle": "Link mind and body",
+      "theme": "Unity",
+      "meditation": {
+        "title": "Mind-Body Connection",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "body awareness",
+          "breath awareness"
+        ],
+        "description": "Strengthen the connection between your mental state and physical sensations.",
+        "script": "Welcome to Day 14. Today we connect mind and body. Notice how your body feels when you think a stressful thought. Now, think of something you love. How does your body respond? Your body is listening to your mind. Send it messages of safety and ease today."
+      },
+      "reflection": {
+        "prompt": "How does your body respond to your emotions?"
+      },
+      "task": {
+        "title": "Mindful Meal",
+        "subtitle": "Eat consciously",
+        "description": "Eat one meal today without any screens. Focus entirely on the food.",
+        "icon": "restaurant",
+        "duration": 20,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How connected do you feel to your body?"
+    },
+    {
+      "day": 15,
+      "block": 2,
+      "title": "Flow",
+      "subtitle": "Find your rhythm",
+      "theme": "Flow State",
+      "meditation": {
+        "title": "Flow State",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "breath flow",
+          "presence"
+        ],
+        "description": "Discover the effortless state of flow through breath and presence.",
+        "script": "Welcome to Day 15. Today is about flow. Meditation is not a struggle. It is a river. Drop your oars. Stop fighting the current of your thoughts/feelings. Just float. Trust the flow of your breath to carry you exactly where you need to go."
+      },
+      "reflection": {
+        "prompt": "When do you feel most in flow?"
+      },
+      "task": {
+        "title": "Focus Block",
+        "subtitle": "Deep work",
+        "description": "Set a 25-minute timer. Work on one task with zero distractions.",
+        "icon": "timer",
+        "duration": 25,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How easily can you enter flow?"
+    },
+    {
+      "day": 16,
+      "block": 2,
+      "title": "Balance",
+      "subtitle": "Find equilibrium",
+      "theme": "Harmony",
+      "meditation": {
+        "title": "Balance Meditation",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "centering",
+          "equilibrium"
+        ],
+        "description": "Find balance between effort and ease, activity and rest.",
+        "script": "Welcome to Day 16. Today we find balance. Are you trying too hard? Or are you too loose? Tune your strings like an instrument—not too tight, not too slack. Find the middle path where attention is light yet stable. Balance effort with ease."
+      },
+      "reflection": {
+        "prompt": "What areas of your life need more balance?"
+      },
+      "task": {
+        "title": "Energy Audit",
+        "subtitle": "Know your peaks",
+        "description": "Note your energy levels throughout the day. When are you most energized?",
+        "icon": "bolt",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How balanced do you feel?"
+    },
+    {
+      "day": 17,
+      "block": 2,
+      "title": "Resilience",
+      "subtitle": "Build inner strength",
+      "theme": "Strength",
+      "meditation": {
+        "title": "Inner Strength",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "resilience building",
+          "grounding"
+        ],
+        "description": "Cultivate resilience through grounding and inner stability practices.",
+        "script": "Welcome to Day 17. Today we build resilience. Imagine you are a mountain. Winds may blow, storms may come, but the mountain remains rooted, unshakable. Feel that density and stability in your posture. You are the mountain. Let the weather of your emotions pass around you."
+      },
+      "reflection": {
+        "prompt": "What challenges have made you stronger?"
+      },
+      "task": {
+        "title": "Cold Exposure",
+        "subtitle": "Build tolerance",
+        "description": "End your shower with 30 seconds of cold water. Notice how you adapt.",
+        "icon": "ac_unit",
+        "duration": 1,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How resilient do you feel?"
+    },
+    {
+      "day": 18,
+      "block": 2,
+      "title": "Strength",
+      "subtitle": "Inner power",
+      "theme": "Empowerment",
+      "meditation": {
+        "title": "Core Power",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "empowerment",
+          "breath power"
+        ],
+        "description": "Connect with your inner power through breath and visualization.",
+        "script": "Welcome to Day 18. Today we tap into strength. Bring your attention to your solar plexus, your core. Breathe fire into this center. Feel a sense of capability and power growing with each inhale. You are stronger than you think. You can handle whatever comes your way."
+      },
+      "reflection": {
+        "prompt": "What makes you feel powerful?"
+      },
+      "task": {
+        "title": "Power Pose",
+        "subtitle": "Embody confidence",
+        "description": "Stand in a power pose for 2 minutes. Arms wide, chest open.",
+        "icon": "accessibility_new",
+        "duration": 2,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How strong do you feel inside?"
+    },
+    {
+      "day": 19,
+      "block": 2,
+      "title": "Clarity",
+      "subtitle": "Clear the fog",
+      "theme": "Mental Clarity",
+      "meditation": {
+        "title": "Mental Clearing",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "mental clarity",
+          "focus"
+        ],
+        "description": "Clear mental fog and sharpen your focus through guided practice.",
+        "script": "Welcome to Day 19. Today we clear the fog. Take a deep breath in through your nose, and exhale forcefully through your mouth, releasing stale energy. Again. Inhale clarity, exhale confusion. Let your mind be sharp, bright, and awake."
+      },
+      "reflection": {
+        "prompt": "What clouds your thinking?"
+      },
+      "task": {
+        "title": "Brain Dump",
+        "subtitle": "Empty your mind",
+        "description": "Write down everything on your mind. Don't filter, just dump.",
+        "icon": "edit_note",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How clear-headed do you feel?"
+    },
+    {
+      "day": 20,
+      "block": 2,
+      "title": "Peace",
+      "subtitle": "Block 2 Complete",
+      "theme": "Milestone",
+      "meditation": {
+        "title": "Deep Peace",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "deep relaxation",
+          "peace cultivation"
+        ],
+        "description": "Integrate Block 2 learnings with a deep peace meditation.",
+        "script": "Welcome to Day 20. We have reached the end of the Depth block. Sink into the deep peace you have cultivated. Like a stone resting at the bottom of a quiet lake. The surface may ripple, but down here, it is silent. Rest in this silence."
+      },
+      "reflection": {
+        "prompt": "How has your practice deepened over the last 10 days?"
+      },
+      "task": {
+        "title": "Progress Celebration",
+        "subtitle": "Honor your journey",
+        "description": "Do something kind for yourself today. You've come far.",
+        "icon": "celebration",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How deep is your peace?"
+    },
+    {
+      "day": 21,
+      "block": 3,
+      "title": "Application",
+      "subtitle": "Bring it to life",
+      "theme": "Daily Life",
+      "meditation": {
+        "title": "Daily Integration",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "mindful living",
+          "presence"
+        ],
+        "description": "Learn to carry your meditative awareness into everyday activities.",
+        "script": "Welcome to Day 21. We enter the Integration block. Today, we practice keeping our eyes slightly open. Soften your gaze. Meditation is not just for closed eyes. Can you be aware of your breath while seeing the world? Bridge the gap between practice and life."
+      },
+      "reflection": {
+        "prompt": "How can you apply mindfulness to your daily routines?"
+      },
+      "task": {
+        "title": "Mindful Commute",
+        "subtitle": "Transform routine",
+        "description": "If you commute, use it for mindfulness. If not, pick a routine activity.",
+        "icon": "commute",
+        "duration": 15,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How present are you in daily activities?"
+    },
+    {
+      "day": 22,
+      "block": 3,
+      "title": "Wisdom",
+      "subtitle": "Inner knowing",
+      "theme": "Intuition",
+      "meditation": {
+        "title": "Inner Wisdom",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "intuition",
+          "listening"
+        ],
+        "description": "Connect with your inner wisdom and intuition through quiet listening.",
+        "script": "Welcome to Day 22. Today we listen to wisdom. There is a quiet voice inside you that knows what you need. It is often drowned out by noise. Quiet the noise. Listen closely. What is your heart trying to tell you right now?"
+      },
+      "reflection": {
+        "prompt": "What is your intuition telling you right now?"
+      },
+      "task": {
+        "title": "Trust Intuition",
+        "subtitle": "Follow your gut",
+        "description": "Make one decision today based purely on intuition.",
+        "icon": "psychology_alt",
+        "duration": 1,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How connected are you to your intuition?"
+    },
+    {
+      "day": 23,
+      "block": 3,
+      "title": "Harmony",
+      "subtitle": "Living in sync",
+      "theme": "Alignment",
+      "meditation": {
+        "title": "Harmonious Living",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "harmony",
+          "alignment"
+        ],
+        "description": "Align your actions with your deepest values and intentions.",
+        "script": "Welcome to Day 23. Today is about harmony. When your thoughts, words, and actions are aligned, you feel peace. Breathe in alignment. Breathe out discord. Feel your entire being coming into sync, like a complex clock clicking perfectly into place."
+      },
+      "reflection": {
+        "prompt": "Are your daily actions aligned with your values?"
+      },
+      "task": {
+        "title": "Value Check",
+        "subtitle": "Align actions",
+        "description": "List your top 3 values. Did today's actions reflect them?",
+        "icon": "check_circle",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How aligned do you feel?"
+    },
+    {
+      "day": 24,
+      "block": 3,
+      "title": "Purpose",
+      "subtitle": "Find meaning",
+      "theme": "Meaning",
+      "meditation": {
+        "title": "Purpose Meditation",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "purpose finding",
+          "visualization"
+        ],
+        "description": "Connect with your sense of purpose and meaning.",
+        "script": "Welcome to Day 24. Today we touch upon purpose. You are here for a reason. Even if you don't know it yet, you can feel the weight of your own potential. Breathe into that sense of meaning. You matter. Your presence here matters."
+      },
+      "reflection": {
+        "prompt": "What gives your life meaning?"
+      },
+      "task": {
+        "title": "Meaning Moment",
+        "subtitle": "Find purpose",
+        "description": "Do one thing today that feels meaningful to you.",
+        "icon": "star",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How purposeful do you feel?"
+    },
+    {
+      "day": 25,
+      "block": 3,
+      "title": "Renewal",
+      "subtitle": "Fresh start",
+      "theme": "Refresh",
+      "meditation": {
+        "title": "Fresh Start",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "renewal",
+          "letting go"
+        ],
+        "description": "Release the old and welcome the new with each breath.",
+        "script": "Welcome to Day 25. Today is for renewal. Every breath is a new beginning. Every exhale is a letting go of the past. You don't have to carry yesterday's baggage into today. Set it down. Step into this moment fresh, new, and unburdened."
+      },
+      "reflection": {
+        "prompt": "What do you need to let go of to move forward?"
+      },
+      "task": {
+        "title": "Release Ritual",
+        "subtitle": "Let go",
+        "description": "Write down something you want to release. Then tear it up.",
+        "icon": "delete",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How renewed do you feel?"
+    },
+    {
+      "day": 26,
+      "block": 3,
+      "title": "Reflection",
+      "subtitle": "Look within",
+      "theme": "Self-Discovery",
+      "meditation": {
+        "title": "Deep Reflection",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "self-inquiry",
+          "reflection"
+        ],
+        "description": "Look deeply into yourself with compassion and curiosity.",
+        "script": "Welcome to Day 26. Today we reflect. Look back on who you were 26 days ago. Send that version of yourself some love. Acknowledge how you have grown. You are becoming more aware, more kind, more present. Honor that growth."
+      },
+      "reflection": {
+        "prompt": "Who are you becoming through this practice?"
+      },
+      "task": {
+        "title": "Letter to Self",
+        "subtitle": "Future you",
+        "description": "Write a letter to your future self. What do you want them to know?",
+        "icon": "mail",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How self-aware are you?"
+    },
+    {
+      "day": 27,
+      "block": 3,
+      "title": "Integration",
+      "subtitle": "Bringing it together",
+      "theme": "Wholeness",
+      "meditation": {
+        "title": "Wholeness Practice",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "integration",
+          "completeness"
+        ],
+        "description": "Experience yourself as whole and complete, just as you are.",
+        "script": "Welcome to Day 27. Today we practice wholeness. You are not broken. You do not need fixing. You are already whole. Meditation is just remembering that truth. Rest in your own completeness. Nothing to add, nothing to take away."
+      },
+      "reflection": {
+        "prompt": "What parts of yourself are you learning to accept?"
+      },
+      "task": {
+        "title": "Whole Day",
+        "subtitle": "Live mindfully",
+        "description": "Try to maintain mindful awareness throughout your entire day.",
+        "icon": "all_inclusive",
+        "duration": 0,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How whole do you feel?"
+    },
+    {
+      "day": 28,
+      "block": 3,
+      "title": "Mastery",
+      "subtitle": "Own your practice",
+      "theme": "Confidence",
+      "meditation": {
+        "title": "Self-Guided Practice",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "self-guidance",
+          "intuition"
+        ],
+        "description": "Guide yourself through meditation using everything you've learned.",
+        "script": "Welcome to Day 28. Today involves mastery. I will speak less. You know what to do. Find your anchor. Watch your mind. Return when you wander. Trust your own guidance. You are your own best teacher. Begin."
+      },
+      "reflection": {
+        "prompt": "How has meditation changed you?"
+      },
+      "task": {
+        "title": "Teach Someone",
+        "subtitle": "Share wisdom",
+        "description": "Share one mindfulness technique with someone today.",
+        "icon": "groups",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How confident are you in your practice?"
+    },
+    {
+      "day": 29,
+      "block": 3,
+      "title": "Celebration",
+      "subtitle": "Honor your journey",
+      "theme": "Achievement",
+      "meditation": {
+        "title": "Gratitude Celebration",
+        "duration": 12,
+        "shortDuration": 7,
+        "techniques": [
+          "gratitude",
+          "celebration"
+        ],
+        "description": "Celebrate how far you've come with deep gratitude.",
+        "script": "Welcome to Day 29. Today is for celebration. You have journeyed far. Close your eyes and let a smile form on your lips. Feel the gratitude for yourself, for your effort, for showing up day after day. You did this. Breathe in pride. Breathe out gratitude.",
+        "audioUrl": null
+      },
+      "reflection": {
+        "prompt": "What are you most proud of from this journey?"
+      },
+      "task": {
+        "title": "Reward Yourself",
+        "subtitle": "You earned it",
+        "description": "Treat yourself to something special. You've done the work.",
+        "icon": "card_giftcard",
+        "duration": 10,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How accomplished do you feel?"
+    },
+    {
+      "day": 30,
+      "block": 3,
+      "title": "Continuation",
+      "subtitle": "This is just the beginning",
+      "theme": "New Chapter",
+      "meditation": {
+        "title": "New Beginning",
+        "duration": 15,
+        "shortDuration": 8,
+        "techniques": [
+          "intention setting",
+          "continuation"
+        ],
+        "description": "Set your intention for continued practice beyond the 30 days.",
+        "script": "Welcome to Day 30. This is not the end. It is a new beginning. As you sit here one last time in this program, ask yourself: How will I carry this forward? The silence you found is always yours. It is always right here, just one breath away. Thank you for walking this path.",
+        "audioUrl": null
+      },
+      "reflection": {
+        "prompt": "How will you continue this practice?"
+      },
+      "task": {
+        "title": "Commitment",
+        "subtitle": "Plan ahead",
+        "description": "Set your intention for the next 30 days of your journey.",
+        "icon": "rocket_launch",
+        "duration": 5,
+        "image": "/assets/images/tasks/placeholder_task.svg"
+      },
+      "moodQuestion": "How ready are you to continue?"
+    }
+  ]
+}

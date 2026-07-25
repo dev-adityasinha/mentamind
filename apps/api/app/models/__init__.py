@@ -5,6 +5,7 @@ from app.models.audit_log import AuditLog
 from app.models.chat import ChatSession
 from app.models.comment import Comment
 from app.models.consent_record import ConsentRecord
+from app.models.curriculum_day import CurriculumBlock, CurriculumDay
 from app.models.daily_completion import DailyCompletion
 from app.models.department import Department
 from app.models.emotion_analysis import EmotionAnalysis
@@ -47,6 +48,8 @@ __all__ = [
     "PsychologistSummary",
     "TestScore",
     "DailyCompletion",
+    "CurriculumBlock",
+    "CurriculumDay",
     "MeditationHistory",
     "MeditationStats",
     "MeditationTrack",
