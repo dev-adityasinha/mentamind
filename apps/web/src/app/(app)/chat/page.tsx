@@ -124,6 +124,17 @@ export default function ChatPage() {
     setSocket(ws);
   };
 
+  const cancelWaiting = () => {
+    // Stop searching for a partner: clear the timeout, close the socket,
+    // and return to the initial 'Join a Chat' screen (not the timeout state).
+    if (waitTimeoutRef.current) clearTimeout(waitTimeoutRef.current);
+    if (socket) socket.close();
+    setSocket(null);
+    setIsWaiting(false);
+    setIsTimeout(false);
+    setTimeLeft(120);
+  };
+
   const endChat = () => {
     if (socket && sessionId) {
       socket.send(JSON.stringify({ type: "end", session_id: sessionId }));
@@ -172,6 +183,7 @@ export default function ChatPage() {
             <div className="flex flex-col items-center gap-2">
               <p className="text-brand font-medium animate-pulse">Waiting for a partner...</p>
               <p className="text-3xl font-bold text-text-primary tabular-nums tracking-widest">{formatTime(timeLeft)}</p>
+              <Button onClick={cancelWaiting} variant="secondary" size="sm" className="mt-2">Stop</Button>
             </div>
           ) : isTimeout ? (
             <div className="flex flex-col items-center gap-2">

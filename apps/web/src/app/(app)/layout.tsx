@@ -117,7 +117,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <div className="flex h-full flex-col">
       {/* Header: WELCOME / user */}
-      <div className="flex items-center justify-between gap-2 px-4 pt-5 pb-4">
+      <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border px-4">
         {!collapsed && (
           <div className="min-w-0">
             <p className="text-xs font-semibold tracking-widest text-text-primary">WELCOME</p>
@@ -154,7 +154,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="mx-3 border-t border-border" />
 
       {/* Nav items */}
       <nav aria-label="Main navigation" className="flex-1 overflow-y-auto px-3 py-4">
@@ -221,8 +220,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-black p-3 md:p-6">
-      <div className="relative isolate flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-3rem)] overflow-hidden rounded-3xl border border-border bg-bg shadow-2xl">
+    <div className="h-screen w-screen overflow-hidden bg-bg">
+      <div className="relative isolate flex h-full w-full overflow-hidden bg-bg">
         <div
           className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full opacity-0 dark:opacity-[0.15] blur-[120px] -z-10 transition-opacity"
           style={{ background: "radial-gradient(circle, #1d4ed8 0%, transparent 70%)" }}
@@ -285,7 +284,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </header>
 
           <main className="flex-1 overflow-y-auto">
-            <div className="px-4 sm:px-6 lg:px-8 pt-4 pb-8">{children}</div>
+            <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 pt-6 pb-10">{children}</div>
           </main>
         </div>
       </div>

@@ -143,7 +143,7 @@ export default function InvitesPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="space-y-8">
       <h1 className="text-2xl font-semibold text-text-primary">Invite teammates</h1>
 
       <Card>

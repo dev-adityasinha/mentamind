@@ -36,7 +36,7 @@ export default function TestsIndexPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-text-primary">Clinical Assessments</h1>
         <p className="mt-2 text-text-secondary">
