@@ -19,6 +19,7 @@ import {
   Users,
   PanelLeftClose,
   PanelLeftOpen,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/context";
 import { NotificationDropdown } from "@/components/dashboard/NotificationDropdown";
@@ -206,7 +207,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               collapsed ? "md:justify-center md:px-2" : ""
             }`}
           >
-            <X className="h-5 w-5 shrink-0 rotate-45" />
+            <LogOut className="h-5 w-5 shrink-0" />
             <span className={collapsed ? "md:hidden" : ""}>Sign out</span>
           </button>
         )}
