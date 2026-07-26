@@ -4,6 +4,7 @@ import { apiFetch } from "./client";
 
 export interface JournalEntry {
   id: string;
+  content?: string | null;
   entry_type: "text" | "voice" | "gratitude" | "ai_reflection";
   mood_score: number | null;
   emotion_tags: string[];

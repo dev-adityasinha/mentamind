@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import {
   listJournalEntries,
+  getJournalEntry,
   createJournalEntry,
   updateJournalEntry,
   deleteJournalEntry,
@@ -40,6 +41,9 @@ export default function JournalPage() {
   const [emotionTags, setEmotionTags] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [contentById, setContentById] = useState<Record<string, string>>({});
+  const [loadingContentId, setLoadingContentId] = useState<string | null>(null);
 
   const loadEntries = useCallback(async () => {
     try {
@@ -85,12 +89,52 @@ export default function JournalPage() {
     }
   }, [content, moodScore, emotionTags, editingId, addToast, loadEntries]);
 
-  const handleEdit = (entry: JournalEntry) => {
+  // Fetch the full (decrypted) entry content on demand and cache it.
+  const fetchContent = useCallback(
+    async (id: string): Promise<string> => {
+      if (contentById[id] !== undefined) return contentById[id];
+      setLoadingContentId(id);
+      try {
+        const full = await getJournalEntry(id);
+        const text = full.content ?? "";
+        setContentById((prev) => ({ ...prev, [id]: text }));
+        return text;
+      } finally {
+        setLoadingContentId(null);
+      }
+    },
+    [contentById],
+  );
+
+  const toggleExpand = useCallback(
+    async (id: string) => {
+      if (expandedId === id) {
+        setExpandedId(null);
+        return;
+      }
+      setExpandedId(id);
+      try {
+        await fetchContent(id);
+      } catch {
+        addToast("Could not load entry", "error");
+      }
+    },
+    [expandedId, fetchContent, addToast],
+  );
+
+  const handleEdit = async (entry: JournalEntry) => {
     setEditingId(entry.id);
-    setContent("");
     setMoodScore(entry.mood_score);
     setEmotionTags(entry.emotion_tags);
     setShowCreate(true);
+    // Pre-fill the editor with the real content instead of a blank box.
+    try {
+      const text = await fetchContent(entry.id);
+      setContent(text);
+    } catch {
+      setContent("");
+      addToast("Could not load entry content", "error");
+    }
   };
 
   const handleDelete = useCallback(async (id: string) => {
@@ -222,9 +266,37 @@ export default function JournalPage() {
                         </>
                       )}
                     </div>
-                    <p className="text-sm text-text-primary leading-relaxed">
-                      {entry.entry_type === "text" ? "Journal entry" : entry.entry_type}
-                    </p>
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(entry.id)}
+                      aria-expanded={expandedId === entry.id}
+                      className="flex items-center gap-1 text-left text-sm font-medium text-text-primary transition-colors hover:text-brand"
+                    >
+                      <span>
+                        {entry.entry_type === "text" ? "Journal entry" : entry.entry_type}
+                      </span>
+                      <span
+                        className={`material-symbols-outlined text-[18px] transition-transform ${
+                          expandedId === entry.id ? "rotate-180" : ""
+                        }`}
+                        aria-hidden
+                      >
+                        expand_more
+                      </span>
+                    </button>
+                    {expandedId === entry.id && (
+                      <div className="mt-2 rounded-xl border border-border bg-surface-raised/40 p-3">
+                        {loadingContentId === entry.id && contentById[entry.id] === undefined ? (
+                          <p className="text-sm text-text-muted">Loading…</p>
+                        ) : (
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed text-text-secondary">
+                            {contentById[entry.id]?.trim()
+                              ? contentById[entry.id]
+                              : "This entry has no text."}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     {entry.emotion_tags.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {entry.emotion_tags.map((tag) => (

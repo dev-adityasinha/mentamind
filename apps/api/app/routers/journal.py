@@ -15,7 +15,7 @@ from app.schemas.journal import (
     JournalResponse,
     JournalUpdateRequest,
 )
-from app.services.encryption import encrypt
+from app.services.encryption import decrypt, encrypt
 
 router = APIRouter(prefix="/journal", tags=["journal"])
 
@@ -79,7 +79,19 @@ async def get_journal_entry(
     entry = result.scalar_one_or_none()
     if not entry:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Journal entry not found")
-    return entry
+    # Decrypt the content for this single entry so the user can view/edit it.
+    content = decrypt(entry.content_encrypted, current_user.id.bytes)
+    return JournalResponse(
+        id=entry.id,
+        content=content,
+        entry_type=entry.entry_type,
+        mood_score=entry.mood_score,
+        emotion_tags=entry.emotion_tags,
+        word_count=entry.word_count,
+        duration_seconds=entry.duration_seconds,
+        created_at=entry.created_at,
+        updated_at=entry.updated_at,
+    )
 
 
 @router.patch("/{entry_id}", response_model=JournalResponse)

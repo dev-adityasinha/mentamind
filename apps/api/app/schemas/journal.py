@@ -30,6 +30,9 @@ class JournalResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
+    # Present only on the single-entry detail endpoint (decrypted on demand);
+    # the list endpoint leaves this null so entries stay metadata-only.
+    content: str | None = None
     entry_type: JournalEntryType
     mood_score: int | None
     emotion_tags: list[str]
