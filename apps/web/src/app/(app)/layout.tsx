@@ -40,10 +40,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const MEDITATION_SUBTABS: { href: string; label: string }[] = [
     { href: "/meditation", label: "Today" },
     { href: "/meditation/journey", label: "Journey" },
-    { href: "/meditation/dashboard", label: "Dashboard" },
     { href: "/meditation/journal", label: "Journal" },
     { href: "/meditation/checkin", label: "Check-in" },
     { href: "/meditation/library", label: "Library" },
+    { href: "/meditation/dashboard", label: "Dashboard" },
   ];
 
   useEffect(() => {
