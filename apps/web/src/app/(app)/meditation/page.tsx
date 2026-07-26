@@ -116,9 +116,6 @@ export default function MeditationTodayPage() {
             Day <span className="text-[#2B4D41] dark:text-[#4FD1C5]">{currentDay}</span> of {journey.total_days}
           </h1>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gradient-to-br from-[#e8f5f3] to-[#d0ebe6] shadow-sm dark:border-gray-800 dark:from-[#1e3a3a] dark:to-[#0d2626]">
-          <span className="text-xl">🙂</span>
-        </div>
       </header>
 
       {/* Week Calendar */}

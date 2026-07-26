@@ -157,8 +157,16 @@ function SessionPlayer() {
   }, []);
 
   function finishBack() {
+    // After completing the session, move forward to the day/journey (never
+    // back to the player the user just left).
     if (dayParam) router.push(`/meditation/day/${dayNum}`);
     else router.push("/meditation");
+  }
+
+  function goBack() {
+    // Plain "Back" — return to wherever the user came from (Today,
+    // Recommended, Dashboard...), not a hardcoded destination.
+    router.back();
   }
 
   async function markDoneNow() {
@@ -216,7 +224,7 @@ function SessionPlayer() {
         </div>
         <button
           type="button"
-          onClick={finishBack}
+          onClick={goBack}
           className="text-sm text-text-secondary hover:text-text-primary"
         >
           Back

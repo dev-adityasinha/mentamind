@@ -107,7 +107,7 @@ function TaskInner() {
         </button>
         <button
           type="button"
-          onClick={() => (dayParam ? router.push(`/meditation/day/${day}`) : router.push("/meditation"))}
+          onClick={() => router.back()}
           className="text-sm text-text-secondary hover:text-text-primary"
         >
           Back
