@@ -107,12 +107,12 @@ export default function MeditationTodayPage() {
   const taskDone = !!completion?.task;
 
   return (
-    <div className="relative min-h-screen font-['Epilogue'] pb-16">
+    <div className="relative min-h-screen pb-16">
       {/* Header */}
       <header className="flex items-center justify-between pb-4">
         <div>
-          <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">Your Journey</p>
-          <h1 className="text-2xl font-bold text-[#111818] dark:text-white">
+          <p className="mb-1 text-sm text-text-muted">Your Journey</p>
+          <h1 className="text-2xl font-bold text-text-primary">
             Day <span className="text-[#2B4D41] dark:text-[#4FD1C5]">{currentDay}</span> of {journey.total_days}
           </h1>
         </div>
@@ -161,10 +161,10 @@ export default function MeditationTodayPage() {
                 <span className="material-symbols-outlined text-[14px] text-[#3D6B5B] dark:text-[#4FD1C5]">spa</span>
                 <span className="text-xs font-bold text-[#3D6B5B] dark:text-[#4FD1C5]">Meditation</span>
               </div>
-              <h3 className="mb-0.5 text-lg font-bold text-[#2C3E35] dark:text-white">
+              <h3 className="mb-0.5 text-lg font-bold text-text-primary">
                 {day.meditation?.title ?? "Morning Clarity"}
               </h3>
-              <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mb-2 text-xs text-text-muted">
                 {day.meditation?.duration ?? 10} min audio
               </p>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[#111818] px-3 py-1.5 text-xs font-bold text-white dark:bg-white dark:text-[#111818]">
@@ -198,8 +198,8 @@ export default function MeditationTodayPage() {
                 <span className="material-symbols-outlined text-[14px] text-[#e57373] dark:text-[#f87171]">edit_note</span>
                 <span className="text-xs font-bold text-[#e57373] dark:text-[#f87171]">Reflection</span>
               </div>
-              <h3 className="mb-0.5 text-lg font-bold text-[#111818] dark:text-white">Daily Journal</h3>
-              <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Write your thoughts</p>
+              <h3 className="mb-0.5 text-lg font-bold text-text-primary">Daily Journal</h3>
+              <p className="mb-2 text-xs text-text-muted">Write your thoughts</p>
               <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-[#111818] dark:border-gray-700 dark:bg-[#1e1e1e] dark:text-white">
                 <span className="material-symbols-outlined text-[16px]">edit</span>
                 Open
@@ -231,10 +231,10 @@ export default function MeditationTodayPage() {
                 <span className="material-symbols-outlined text-[14px] text-[#60a5fa]">directions_walk</span>
                 <span className="text-xs font-bold text-[#60a5fa]">Task</span>
               </div>
-              <h3 className="mb-1 text-xl font-bold text-[#111818] dark:text-white">
+              <h3 className="mb-1 text-xl font-bold text-text-primary">
                 {day.task?.title ?? "Mindful Walking"}
               </h3>
-              <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Step away from screen</p>
+              <p className="mb-2 text-xs text-text-muted">Step away from screen</p>
               <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-[#111818] dark:border-gray-700 dark:bg-[#1e1e1e] dark:text-white">
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 View
@@ -253,7 +253,7 @@ export default function MeditationTodayPage() {
 
         {/* Recommended for You */}
         <section className="mt-5">
-          <h2 className="mb-3 text-base font-bold text-[#111818] dark:text-white">Recommended for You</h2>
+          <h2 className="mb-3 text-base font-bold text-text-primary">Recommended for You</h2>
           <div className="flex gap-3">
             <div
               onClick={() => router.push(`/meditation/session?day=${currentDay}`)}
@@ -262,8 +262,8 @@ export default function MeditationTodayPage() {
               <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#4b9b87]/10 dark:bg-[#5eead4]/20">
                 <span className="material-symbols-outlined text-[20px] text-[#4b9b87] dark:text-[#5eead4]">bolt</span>
               </div>
-              <h3 className="mb-0.5 text-sm font-bold text-[#111818] dark:text-white">Quick Start</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-500">A short session</p>
+              <h3 className="mb-0.5 text-sm font-bold text-text-primary">Quick Start</h3>
+              <p className="text-xs text-text-muted">A short session</p>
             </div>
             <div
               onClick={() => router.push(`/meditation/session?day=${currentDay}`)}
@@ -272,15 +272,15 @@ export default function MeditationTodayPage() {
               <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30">
                 <span className="material-symbols-outlined text-[20px] text-indigo-500 dark:text-indigo-400">bedtime</span>
               </div>
-              <h3 className="mb-0.5 text-sm font-bold text-[#111818] dark:text-white">Sleep Ready</h3>
-              <p className="text-xs text-gray-400 dark:text-gray-500">Wind down</p>
+              <h3 className="mb-0.5 text-sm font-bold text-text-primary">Sleep Ready</h3>
+              <p className="text-xs text-text-muted">Wind down</p>
             </div>
           </div>
         </section>
 
         {/* Mood This Week */}
         <section className="mt-5">
-          <h2 className="mb-3 text-base font-bold text-[#111818] dark:text-white">Your Mood This Week</h2>
+          <h2 className="mb-3 text-base font-bold text-text-primary">Your Mood This Week</h2>
           <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-[#161B22] dark:shadow-none">
             <div className="mb-4 flex h-24 items-end justify-between gap-2">
               {last7.map((d, i) => (
@@ -312,12 +312,12 @@ export default function MeditationTodayPage() {
               ))}
             </div>
             {avgMood === null ? (
-              <p className="text-center text-sm text-gray-400 dark:text-gray-500">
+              <p className="text-center text-sm text-text-muted">
                 Complete mood check-ins to see your trends
               </p>
             ) : (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Avg: {avgMood}/5</span>
+                <span className="text-sm text-text-secondary">Avg: {avgMood}/5</span>
                 <button
                   type="button"
                   onClick={() => router.push("/meditation/dashboard")}

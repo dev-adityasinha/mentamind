@@ -68,26 +68,35 @@ export default function MeditationCheckinPage() {
 
   const Scale = ({
     label,
+    lowHint,
+    highHint,
     value,
     onChange,
   }: {
     label: string;
+    lowHint: string;
+    highHint: string;
     value: number | null;
     onChange: (n: number) => void;
   }) => (
     <div>
-      <p className="mb-2 text-sm text-text-secondary">{label}</p>
-      <div className="flex gap-2">
+      <div className="mb-3 flex items-baseline justify-between">
+        <p className="text-sm font-medium text-text-secondary">{label}</p>
+        <span className="text-xs text-text-muted">
+          {lowHint} · {highHint}
+        </span>
+      </div>
+      <div className="flex items-center gap-2 sm:gap-3">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             type="button"
             onClick={() => onChange(n)}
             aria-pressed={value === n}
-            className={`h-10 w-10 rounded-full border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+            className={`flex h-11 flex-1 items-center justify-center rounded-xl border text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
               value === n
-                ? "border-brand bg-brand text-brand-foreground"
-                : "border-border text-text-secondary hover:text-text-primary"
+                ? "border-brand bg-brand text-brand-foreground shadow-sm shadow-brand/25"
+                : "border-border bg-surface text-text-secondary hover:border-brand/40 hover:text-text-primary"
             }`}
           >
             {n}
@@ -98,92 +107,149 @@ export default function MeditationCheckinPage() {
   );
 
   return (
-    <div className="mx-auto max-w-xl space-y-6">
-      <div>
-        <p className="text-sm text-text-muted">Daily check-in</p>
-        <h1 className="mt-1 text-2xl font-semibold text-text-primary">How are you?</h1>
-      </div>
+    <div className="mx-auto max-w-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-surface shadow-xl">
+        {/* Warm gradient header accent */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-brand/10 to-transparent" />
 
-      {/* Mood */}
-      <div>
-        <p className="mb-2 text-sm text-text-secondary">Your mood</p>
-        <div className="flex flex-wrap gap-2">
-          {MOODS.map((m) => (
-            <button
-              key={m.score}
-              type="button"
-              onClick={() => setMood((cur) => (cur === m.score ? null : m.score))}
-              aria-pressed={mood === m.score}
-              className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
-                mood === m.score
-                  ? "border-brand bg-brand-subtle text-brand"
-                  : "border-border text-text-secondary hover:text-text-primary"
-              }`}
+        <div className="relative space-y-8 p-6 sm:p-8">
+          {/* Header */}
+          <div className="text-center">
+            <p className="text-xs font-semibold uppercase tracking-wider text-brand">
+              Daily check-in
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-text-primary">
+              How are you?
+            </h1>
+            <p className="mt-1 text-sm text-text-muted">
+              A quick moment to notice how you feel today.
+            </p>
+          </div>
+
+          {/* Mood */}
+          <div className="rounded-2xl border border-border bg-surface-raised/40 p-5">
+            <p className="mb-4 text-sm font-medium text-text-secondary">Your mood</p>
+            <div className="grid grid-cols-5 gap-2 sm:gap-3">
+              {MOODS.map((m) => (
+                <button
+                  key={m.score}
+                  type="button"
+                  onClick={() => setMood((cur) => (cur === m.score ? null : m.score))}
+                  aria-pressed={mood === m.score}
+                  className={`flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                    mood === m.score
+                      ? "border-brand bg-brand-subtle shadow-sm shadow-brand/20 -translate-y-0.5"
+                      : "border-border bg-surface hover:border-brand/40 hover:-translate-y-0.5"
+                  }`}
+                >
+                  <span
+                    aria-hidden
+                    className={`text-2xl transition-transform ${
+                      mood === m.score ? "scale-110" : ""
+                    }`}
+                  >
+                    {m.emoji}
+                  </span>
+                  <span
+                    className={`text-xs font-medium ${
+                      mood === m.score ? "text-brand" : "text-text-secondary"
+                    }`}
+                  >
+                    {m.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Emotions */}
+          <div>
+            <p className="mb-3 text-sm font-medium text-text-secondary">
+              What best describes it?{" "}
+              <span className="font-normal text-text-muted">(optional)</span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {EMOTIONS.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleEmotion(tag)}
+                  aria-pressed={emotions.includes(tag)}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm capitalize transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                    emotions.includes(tag)
+                      ? "border-brand bg-brand-subtle font-medium text-brand shadow-sm shadow-brand/10"
+                      : "border-border text-text-secondary hover:border-brand/40 hover:text-text-primary"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Energy & Stress */}
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Scale
+              label="Energy (optional)"
+              lowHint="Drained"
+              highHint="Energized"
+              value={energy}
+              onChange={setEnergy}
+            />
+            <Scale
+              label="Stress (optional)"
+              lowHint="Relaxed"
+              highHint="Tense"
+              value={stress}
+              onChange={setStress}
+            />
+          </div>
+
+          {/* Note */}
+          <div>
+            <label
+              htmlFor="mood-note"
+              className="mb-3 block text-sm font-medium text-text-secondary"
             >
-              <span aria-hidden>{m.emoji}</span> {m.label}
-            </button>
-          ))}
-        </div>
-      </div>
+              Anything on your mind?{" "}
+              <span className="font-normal text-text-muted">(optional)</span>
+            </label>
+            <textarea
+              id="mood-note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={3}
+              maxLength={1000}
+              placeholder="A few words…"
+              className="w-full resize-none rounded-2xl border border-border bg-surface-raised/40 p-4 text-text-primary placeholder:text-text-muted focus:border-brand/40 focus:outline-none focus:ring-2 focus:ring-focus"
+            />
+          </div>
 
-      {/* Emotions */}
-      <div>
-        <p className="mb-2 text-sm text-text-secondary">What best describes it? (optional)</p>
-        <div className="flex flex-wrap gap-2">
-          {EMOTIONS.map((tag) => (
+          {error && (
+            <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+              {error}
+            </p>
+          )}
+
+          {/* Actions */}
+          <div className="flex items-center justify-between gap-3 pt-1">
             <button
-              key={tag}
               type="button"
-              onClick={() => toggleEmotion(tag)}
-              aria-pressed={emotions.includes(tag)}
-              className={`rounded-full border px-3 py-1 text-sm capitalize transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${
-                emotions.includes(tag)
-                  ? "border-brand bg-brand-subtle text-brand"
-                  : "border-border text-text-secondary hover:text-text-primary"
-              }`}
+              onClick={() => router.push("/meditation")}
+              className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
             >
-              {tag}
+              Skip for now
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving || mood == null}
+              className="rounded-full bg-brand px-7 py-3 text-sm font-semibold text-brand-foreground shadow-lg shadow-brand/25 transition-all hover:bg-brand-hover hover:shadow-brand/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            >
+              {saving ? "Saving…" : "Save check-in"}
+            </button>
+          </div>
         </div>
-      </div>
-
-      <Scale label="Energy (optional)" value={energy} onChange={setEnergy} />
-      <Scale label="Stress (optional)" value={stress} onChange={setStress} />
-
-      <div>
-        <label htmlFor="mood-note" className="mb-2 block text-sm text-text-secondary">
-          Anything on your mind? (optional)
-        </label>
-        <textarea
-          id="mood-note"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={3}
-          maxLength={1000}
-          placeholder="A few words…"
-          className="w-full resize-none rounded-2xl border border-border bg-surface p-4 text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-focus"
-        />
-      </div>
-
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={save}
-          disabled={saving || mood == null}
-          className="rounded-full bg-brand px-6 py-2.5 text-sm font-medium text-brand-foreground hover:bg-brand-hover disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
-        >
-          {saving ? "Saving…" : "Save check-in"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push("/meditation")}
-          className="text-sm text-text-secondary hover:text-text-primary"
-        >
-          Skip
-        </button>
       </div>
     </div>
   );

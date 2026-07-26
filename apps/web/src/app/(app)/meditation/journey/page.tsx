@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   getJourney,
   getCurriculum,
@@ -11,14 +12,27 @@ import {
   type DailyCompletion,
 } from "@/lib/api/mindful";
 
-type DayStatus = "complete" | "partial" | "current" | "upcoming";
+type Status = "complete" | "partial" | "upcoming";
+
+const BLOCK_META: Record<number, { name: string; icon: string; color: string }> = {
+  1: { name: "Foundation", icon: "foundation", color: "from-teal-400 to-teal-600" },
+  2: { name: "Depth", icon: "landscape", color: "from-indigo-400 to-indigo-600" },
+  3: { name: "Integration", icon: "integration_instructions", color: "from-purple-400 to-purple-600" },
+};
+
+const BLOCK_FOCUS: Record<number, string> = {
+  1: "Settling in and learning basic techniques",
+  2: "Increasing depth and building skills",
+  3: "Application in daily life and maintenance",
+};
 
 export default function MeditationJourneyPage() {
+  const router = useRouter();
   const [journey, setJourney] = useState<Journey | null>(null);
   const [days, setDays] = useState<CurriculumDay[]>([]);
   const [completions, setCompletions] = useState<DailyCompletion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<number | null>(1);
 
   useEffect(() => {
     let active = true;
@@ -34,7 +48,7 @@ export default function MeditationJourneyPage() {
         setDays(cur);
         setCompletions(comp);
       } catch {
-        if (active) setError("Could not load the journey. Please try again.");
+        // handled below
       } finally {
         if (active) setLoading(false);
       }
@@ -45,41 +59,25 @@ export default function MeditationJourneyPage() {
   }, []);
 
   if (loading) return <div className="text-text-muted">Loading the journey…</div>;
-  if (error || !journey) {
+  if (!journey) {
     return (
       <div className="rounded-2xl border border-border bg-surface p-8 text-text-secondary">
-        {error ?? "No content available yet."}
+        No content available yet.
       </div>
     );
   }
 
-  // Map completions by day for status lookup.
   const compByDay = new Map<number, DailyCompletion>();
   for (const c of completions) compByDay.set(c.day, c);
 
-  const statusFor = (dayNum: number): DayStatus => {
+  const statusFor = (dayNum: number): Status => {
     const c = compByDay.get(dayNum);
-    const done = c ? [c.meditation, c.reflection, c.task].filter(Boolean).length : 0;
-    if (done === 3) return "complete";
-    if (dayNum === journey.current_day) return "current";
-    if (done > 0) return "partial";
+    if (!c) return "upcoming";
+    if (c.meditation && c.reflection && c.task) return "complete";
+    if (c.meditation || c.reflection || c.task) return "partial";
     return "upcoming";
   };
 
-  const tileClass = (s: DayStatus) => {
-    switch (s) {
-      case "complete":
-        return "border-brand bg-brand text-brand-foreground";
-      case "current":
-        return "border-brand bg-brand-subtle text-brand ring-2 ring-brand/40";
-      case "partial":
-        return "border-border-strong bg-surface-raised text-text-primary";
-      default:
-        return "border-border bg-surface text-text-muted hover:border-border-strong";
-    }
-  };
-
-  // Group days by block.
   const byBlock = new Map<number, CurriculumDay[]>();
   for (const d of days) {
     const arr = byBlock.get(d.block) ?? [];
@@ -87,73 +85,172 @@ export default function MeditationJourneyPage() {
     byBlock.set(d.block, arr);
   }
 
-  const overallPct =
-    journey.total_days > 0
-      ? Math.round((journey.completed_days / journey.total_days) * 100)
-      : 0;
+  const overallItems = completions.reduce(
+    (acc, s) => acc + (s.meditation ? 1 : 0) + (s.task ? 1 : 0) + (s.reflection ? 1 : 0),
+    0,
+  );
+  const overallPct = Math.round((overallItems / (journey.total_days * 3)) * 100);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-text-muted">30-day program</p>
-          <h1 className="text-2xl font-semibold text-text-primary">Your journey</h1>
-        </div>
-        <span className="rounded-full border border-border bg-surface-raised px-3 py-1 text-sm text-text-secondary">
-          Day {journey.current_day}/{journey.total_days}
-        </span>
-      </div>
+  const activeBlock =
+    journey.current_day > 20 ? 3 : Math.ceil(journey.current_day / 10);
 
-      {/* Overall progress */}
-      <div className="rounded-2xl border border-border bg-surface p-5">
-        <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-text-secondary">Overall progress</span>
-          <span className="font-medium text-text-primary">{overallPct}%</span>
-        </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-raised">
-          <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${overallPct}%` }} />
-        </div>
-      </div>
+  const BlockCard = ({ block }: { block: number }) => {
+    const meta = BLOCK_META[block];
+    const blockDays = (byBlock.get(block) ?? []).slice().sort((a, b) => a.day - b.day);
+    const totalItems = blockDays.length * 3;
+    const completedItems = blockDays.reduce((acc, d) => {
+      const s = compByDay.get(d.day);
+      if (!s) return acc;
+      return acc + (s.meditation ? 1 : 0) + (s.reflection ? 1 : 0) + (s.task ? 1 : 0);
+    }, 0);
+    const percent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+    const fullyDone = blockDays.filter((d) => statusFor(d.day) === "complete").length;
+    const isActive = block === activeBlock;
+    const open = selectedBlock === block;
 
-      {/* Blocks */}
-      {journey.blocks.map((b) => {
-        const blockDays = (byBlock.get(b.block) ?? []).sort((x, y) => x.day - y.day);
-        const pct = b.total_days > 0 ? Math.round((b.completed_days / b.total_days) * 100) : 0;
-        return (
-          <div key={b.block} className="rounded-2xl border border-border bg-surface p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-text-primary">
-                  Block {b.block} — {b.name}
-                </h2>
-                <p className="text-sm text-text-muted">
-                  {b.completed_days}/{b.total_days} days
-                </p>
+    return (
+      <div className="overflow-hidden rounded-xl bg-white shadow-lg dark:bg-[#151E32]">
+        <button
+          type="button"
+          onClick={() => setSelectedBlock(open ? null : block)}
+          className="w-full p-4 text-left transition-all"
+        >
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${meta.color}`}>
+                <span className="material-symbols-outlined text-[20px] text-white">{meta.icon}</span>
               </div>
-              <span className="text-sm font-medium text-text-secondary">{pct}%</span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[#111817] dark:text-white">
+                    Block {block}: {meta.name}
+                  </h3>
+                  {isActive && (
+                    <span className="rounded-full bg-[#3D6B5B]/10 px-2 py-0.5 text-xs font-bold text-[#3D6B5B] dark:bg-[#3D6B5B]/20 dark:text-[#4FD1C5]">
+                      Current
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{BLOCK_FOCUS[block]}</p>
+              </div>
             </div>
-            <div className="my-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-raised">
-              <div className="h-full rounded-full bg-brand" style={{ width: `${pct}%` }} />
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {fullyDone}/{blockDays.length} days
+              </span>
+              <span
+                className={`material-symbols-outlined text-gray-500 transition-transform dark:text-gray-400 ${open ? "rotate-180" : ""}`}
+              >
+                expand_more
+              </span>
             </div>
-            <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
-              {blockDays.map((d) => {
-                const s = statusFor(d.day);
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+            <div
+              className={`h-full rounded-full bg-gradient-to-r ${meta.color} transition-all duration-500`}
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+        </button>
+
+        {open && (
+          <div className="space-y-2 border-t border-gray-100 px-4 pb-4 dark:border-white/5">
+            <div className="grid grid-cols-1 gap-2 pt-4 sm:grid-cols-2">
+              {blockDays.map((day) => {
+                const status = statusFor(day.day);
+                const isCurrent = day.day === journey.current_day;
                 return (
-                  <Link
-                    key={d.day}
-                    href={`/meditation/day/${d.day}`}
-                    title={d.title}
-                    aria-label={`Day ${d.day}: ${d.title}`}
-                    className={`flex aspect-square items-center justify-center rounded-xl border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${tileClass(s)}`}
+                  <button
+                    key={day.day}
+                    type="button"
+                    onClick={() => router.push(`/meditation/day/${day.day}`)}
+                    className={`rounded-2xl p-4 text-left transition-all active:scale-[0.98] ${
+                      isCurrent
+                        ? "bg-[#3D6B5B]/10 ring-2 ring-[#3D6B5B] dark:bg-[#3D6B5B]/20"
+                        : status === "complete"
+                          ? "bg-green-50 dark:bg-[#3D6B5B]/10"
+                          : status === "partial"
+                            ? "bg-yellow-50 dark:bg-yellow-900/20"
+                            : "bg-gray-50 dark:bg-white/5"
+                    }`}
                   >
-                    {s === "complete" ? "✓" : d.day}
-                  </Link>
+                    <div className="mb-1 flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Day {day.day}</span>
+                      {status === "complete" && (
+                        <span className="material-symbols-outlined text-[16px] text-[#3D6B5B]">check_circle</span>
+                      )}
+                      {status === "partial" && (
+                        <span className="material-symbols-outlined text-[16px] text-yellow-600 dark:text-yellow-400">pending</span>
+                      )}
+                      {isCurrent && status !== "complete" && (
+                        <span className="h-2 w-2 animate-pulse rounded-full bg-[#3D6B5B]" />
+                      )}
+                    </div>
+                    <p className="truncate text-sm font-bold text-[#111817] dark:text-white">{day.title}</p>
+                    <p className="truncate text-xs text-gray-400 dark:text-gray-500">{day.theme}</p>
+                  </button>
                 );
               })}
             </div>
           </div>
-        );
-      })}
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="relative min-h-screen pb-16">
+      {/* Header */}
+      <header className="sticky top-0 z-30 -mx-4 mb-1 px-4 pb-3 pt-1 backdrop-blur-xl">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">30-Day Program</p>
+            <h1 className="text-2xl font-extrabold tracking-tight text-[#111817] dark:text-white">
+              Your Journey
+            </h1>
+          </div>
+          <div className="rounded-full bg-[#3D6B5B]/10 px-4 py-2 text-sm font-bold text-[#3D6B5B] dark:bg-[#3D6B5B]/20 dark:text-[#4FD1C5]">
+            Day {journey.current_day}/{journey.total_days}
+          </div>
+        </div>
+      </header>
+
+      <main className="space-y-3">
+        {/* Overall Progress */}
+        <div className="rounded-xl bg-white p-4 shadow-lg dark:bg-[#151E32]">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-bold text-[#111817] dark:text-white">Overall Progress</h2>
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{overallPct}%</span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#3D6B5B] to-[#4FD1C5] transition-all duration-500"
+              style={{ width: `${overallPct}%` }}
+            />
+          </div>
+          <div className="mt-3 flex justify-between">
+            {[1, 2, 3].map((block) => (
+              <div key={block} className="flex items-center gap-2">
+                <div
+                  className={`h-3 w-3 rounded-full ${
+                    block === 1
+                      ? "bg-gradient-to-r from-teal-400 to-teal-600"
+                      : block === 2
+                        ? "bg-gradient-to-r from-indigo-400 to-indigo-600"
+                        : "bg-gradient-to-r from-purple-400 to-purple-600"
+                  }`}
+                />
+                <span className="text-xs text-gray-500 dark:text-gray-400">Block {block}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Blocks */}
+        <BlockCard block={1} />
+        <BlockCard block={2} />
+        <BlockCard block={3} />
+      </main>
     </div>
   );
 }
