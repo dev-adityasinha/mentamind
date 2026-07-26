@@ -64,12 +64,13 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ helpText, whyText, exa
                 <div
                     ref={tooltipRef}
                     role="tooltip"
-                    className="absolute left-0 bottom-full mb-2 z-50 w-72 sm:w-80
+                    className="absolute right-0 top-full mt-2 z-50 w-72 sm:w-80
+                               max-h-[60vh] overflow-y-auto
                                bg-white rounded-2xl shadow-xl border border-gray-100
                                p-4 animate-scale-in"
                 >
                     {/* Arrow */}
-                    <div className="absolute -bottom-1.5 left-4 w-3 h-3 bg-white border-r border-b border-gray-100 transform rotate-45" />
+                    <div className="absolute -top-1.5 right-4 w-3 h-3 bg-white border-l border-t border-gray-100 transform rotate-45" />
 
                     {helpText && (
                         <div className="mb-3">

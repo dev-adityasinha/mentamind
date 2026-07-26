@@ -79,15 +79,15 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
             {/* Question */}
             <div className="flex-1 min-h-0 flex flex-col px-6 pb-4 max-w-2xl mx-auto w-full">
-                <div className="mb-5 mt-2 shrink-0">
+                <div className="mb-5 mt-2 shrink-0 flex items-start justify-between gap-3">
                     <h2
                         id={`question-${question.id}`}
-                        className="text-xl sm:text-2xl font-semibold text-gray-800 leading-snug break-words"
+                        className="flex-1 min-w-0 text-xl sm:text-2xl font-semibold text-gray-800 leading-snug break-words"
                     >
                         {question.text}
                     </h2>
                     {(helpText || whyText || helpExample) && (
-                        <div className="mt-2">
+                        <div className="shrink-0 mt-1">
                             <HelpTooltip helpText={helpText} whyText={whyText} example={helpExample} />
                         </div>
                     )}
