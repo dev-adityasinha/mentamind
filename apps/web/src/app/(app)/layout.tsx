@@ -38,12 +38,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Sub-pages shown when the Meditation nav item is expanded.
   const MEDITATION_SUBTABS: { href: string; label: string }[] = [
-    { href: "/meditation", label: "Home" },
+    { href: "/meditation", label: "Today" },
     { href: "/meditation/journey", label: "Journey" },
     { href: "/meditation/dashboard", label: "Dashboard" },
     { href: "/meditation/journal", label: "Journal" },
     { href: "/meditation/checkin", label: "Check-in" },
-    { href: "/meditation/task", label: "Task" },
     { href: "/meditation/library", label: "Library" },
   ];
 
