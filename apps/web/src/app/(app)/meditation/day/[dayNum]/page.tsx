@@ -125,7 +125,7 @@ export default function MeditationDayPage() {
         </button>
       </header>
 
-      <main className="relative z-10 flex flex-1 flex-col items-center px-6 pb-8">
+      <main className="relative z-10 flex flex-1 flex-col items-center px-6 pb-8 pt-2">
         {/* Main Task Card */}
         <div className="group relative w-full max-w-md transform transition-all duration-500 hover:scale-[1.01]">
           {/* Card shadow */}
@@ -140,7 +140,7 @@ export default function MeditationDayPage() {
                   src={content.task.image}
                   alt={content.task.title}
                   onError={() => setImgFailed(true)}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover object-top"
                 />
               ) : (
                 <>

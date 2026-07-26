@@ -99,7 +99,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                     className="space-y-2 min-h-0 flex-1 overflow-y-auto"
                 >
                     <legend className="sr-only">{question.text}</legend>
-                    {question.options.map((option, idx) => {
+                    {(question.options ?? []).length > 0 ? (
+                        (question.options ?? []).map((option) => {
                         const isSelected = selectedValue === option.value;
                         return (
                             <button
@@ -133,7 +134,21 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                                 </span>
                             </button>
                         );
-                    })}
+                    })
+                    ) : (
+                        // Some questions (e.g. sleep times) have no multiple-choice
+                        // options — render a free text/number input so the user can
+                        // answer and continue instead of crashing on options.map.
+                        <input
+                            type="text"
+                            defaultValue=""
+                            onChange={(e) => onAnswer(e.target.value.trim() === '' ? (null as unknown as number) : 0)}
+                            placeholder="Type your answer…"
+                            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700
+                                       focus:outline-none focus:ring-4 focus:ring-mentamind-200 focus:border-mentamind-300
+                                       min-h-[48px] text-sm sm:text-base"
+                        />
+                    )}
                 </fieldset>
             </div>
 
