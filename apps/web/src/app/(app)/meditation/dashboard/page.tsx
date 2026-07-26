@@ -6,9 +6,11 @@ import {
   getMindfulStats,
   getJourney,
   getCompletions,
+  getCurriculumDay,
   type MindfulStats,
   type Journey,
   type DailyCompletion,
+  type CurriculumDay,
 } from "@/lib/api/mindful";
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
@@ -24,6 +26,7 @@ export default function MeditationDashboardPage() {
   const [stats, setStats] = useState<MindfulStats | null>(null);
   const [journey, setJourney] = useState<Journey | null>(null);
   const [completions, setCompletions] = useState<DailyCompletion[]>([]);
+  const [dayContent, setDayContent] = useState<CurriculumDay | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +43,13 @@ export default function MeditationDashboardPage() {
         setStats(s);
         setJourney(j);
         setCompletions(c);
+        // Load the current day's content so we can show the meditation's name.
+        try {
+          const content = await getCurriculumDay(s.current_day);
+          if (active) setDayContent(content);
+        } catch {
+          // Non-fatal: fall back to a generic title.
+        }
       } catch {
         if (active) setError("Could not load your dashboard.");
       } finally {
@@ -72,7 +82,7 @@ export default function MeditationDashboardPage() {
 
   const focusMeta: Record<string, { title: string; href: string; cta: string }> = {
     meditation: {
-      title: "Your meditation is waiting",
+      title: dayContent?.meditation?.title ?? "Your meditation is waiting",
       href: `/meditation/session?day=${currentDay}`,
       cta: "Start meditation",
     },
