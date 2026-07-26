@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 
 const STORAGE_PREFIX = 'mentamind_session_';
-const AUTOSAVE_INTERVAL_MS = 5000;
 
 interface SessionData {
     testId: string;
@@ -18,12 +17,9 @@ interface UseAutosaveReturn {
 }
 
 /**
- * Hook that saves screening session progress to localStorage
- * and optionally POSTs to /api/sessions stub.
+ * Hook that saves screening session progress to localStorage.
  */
 export function useAutosave(): UseAutosaveReturn {
-    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const pendingDataRef = useRef<SessionData | null>(null);
 
     const save = useCallback((data: Omit<SessionData, 'lastSavedAt'>) => {
         const sessionData: SessionData = {
@@ -40,9 +36,6 @@ export function useAutosave(): UseAutosaveReturn {
         } catch {
             console.warn('Failed to save session to localStorage');
         }
-
-        // Queue for API POST (debounced)
-        pendingDataRef.current = sessionData;
     }, []);
 
     const load = useCallback((testId: string): SessionData | null => {
@@ -63,28 +56,6 @@ export function useAutosave(): UseAutosaveReturn {
         } catch {
             console.warn('Failed to clear session from localStorage');
         }
-    }, []);
-
-    // Periodic API sync
-    useEffect(() => {
-        timerRef.current = setInterval(async () => {
-            if (pendingDataRef.current) {
-                try {
-                    await fetch('/api/sessions', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(pendingDataRef.current),
-                    });
-                    pendingDataRef.current = null;
-                } catch {
-                    // Silently fail — localStorage is the primary backup
-                }
-            }
-        }, AUTOSAVE_INTERVAL_MS);
-
-        return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
-        };
     }, []);
 
     return { save, load, clear };
