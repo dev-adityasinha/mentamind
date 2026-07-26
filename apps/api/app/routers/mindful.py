@@ -78,7 +78,12 @@ async def get_curriculum_day(
 async def _latest_completion_for_day(
     db: AsyncSession, user_id, day: int
 ) -> DailyCompletion | None:
-    """Most recent completion row for a user+day (any date)."""
+    """Merged completion for a user+day across all dates.
+
+    A program-day may have several rows (one per calendar date it was worked
+    on). Merge them so meditation/reflection/task are OR-ed together, so parts
+    completed on different days are never lost.
+    """
     result = await db.execute(
         select(DailyCompletion)
         .where(
@@ -86,9 +91,18 @@ async def _latest_completion_for_day(
             DailyCompletion.day == day,
         )
         .order_by(DailyCompletion.completion_date.desc())
-        .limit(1)
     )
-    return result.scalar_one_or_none()
+    rows = list(result.scalars().all())
+    if not rows:
+        return None
+    merged = rows[0]
+    for r in rows[1:]:
+        merged.meditation = merged.meditation or r.meditation
+        merged.reflection = merged.reflection or r.reflection
+        merged.task = merged.task or r.task
+        if merged.meditation_duration is None and r.meditation_duration is not None:
+            merged.meditation_duration = r.meditation_duration
+    return merged
 
 
 @router.get("/completions", response_model=list[DailyCompletionResponse])
@@ -126,21 +140,25 @@ async def mark_completion(
     Upserts today's completion row for the given day. Only the flags present in
     the request body are changed; once set true a flag is never cleared here.
     """
-    today = date.today()
+    # Update the user's existing row for this program-day, regardless of the
+    # calendar date it was created, so meditation/reflection/task accumulate on
+    # one row instead of fragmenting across dates (which made earlier-completed
+    # parts appear undone). Only create a new row if none exists yet.
     result = await db.execute(
-        select(DailyCompletion).where(
+        select(DailyCompletion)
+        .where(
             DailyCompletion.user_id == current_user.id,
             DailyCompletion.day == body.day,
-            DailyCompletion.completion_date == today,
         )
+        .order_by(DailyCompletion.completion_date.desc())
     )
-    row = result.scalar_one_or_none()
+    row = result.scalars().first()
 
     if row is None:
         row = DailyCompletion(
             user_id=current_user.id,
             day=body.day,
-            completion_date=today,
+            completion_date=date.today(),
         )
         db.add(row)
 
