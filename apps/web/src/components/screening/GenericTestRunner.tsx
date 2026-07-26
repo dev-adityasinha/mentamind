@@ -31,6 +31,7 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
     const { save, load, clear } = useAutosave();
     const { addEntry, getHistoryForTest } = useSessionHistory();
 
+    // Load saved session
     useEffect(() => {
         const saved = load(testId);
         if (saved) {
@@ -42,6 +43,7 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
         }
     }, [testId, load]);
 
+    // Save on every answer change
     useEffect(() => {
         if (screen === 'questions') {
             save({
@@ -75,11 +77,12 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
             setResult(scoreResult);
             setScreen('results');
             clear(testId);
+            // Save to history for trend tracking
             addEntry({
                 testId,
                 testTitle: testData.title || testData.shortTitle || testId,
                 totalScore: scoreResult.totalScore,
-                maxScore: testData.scoring?.maxScore ?? testData.scoring?.range?.max ?? 0,
+                maxScore: testData.scoring?.maxScore || 0,
                 band: scoreResult.band,
             });
         }
@@ -98,61 +101,66 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
         setScreen('intro');
     }, [testData]);
 
+    // Derive a user-friendly title
     const friendlyTitle = testData.title || testData.shortTitle || testId;
     const timeFrame = testData.timeFrame || testData.timeframe || '';
     const description = testData.description || testData.instruction || '';
     const disclaimer = testData.non_diagnostic_disclaimer || testData.safetyNotes?.[0]
         || 'This is a screening tool, not a diagnosis.';
 
+    // ─── Intro Screen ────────────────────────
     if (screen === 'intro') {
         return (
             <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-6">
+                {/* Back button */}
                 <div className="fixed top-6 left-6">
                     <button
                         onClick={onBack}
-                        className="w-10 h-10 rounded-xl bg-surface/80 border border-border flex items-center justify-center
-                                   hover:bg-surface-raised transition-colors focus:outline-none focus:ring-4 focus:ring-focus"
+                        className="w-10 h-10 rounded-xl bg-white/80 border border-gray-200 flex items-center justify-center
+                                   hover:bg-gray-50 transition-colors focus:outline-none focus:ring-4 focus:ring-mentamind-200"
                         aria-label="Go back"
                     >
-                        <svg className="w-5 h-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
                 </div>
 
                 <div className="max-w-md w-full text-center animate-fade-slide">
-                    <div className="w-16 h-16 bg-brand-subtle rounded-2xl flex items-center justify-center mx-auto mb-6 animate-breathe">
-                        <svg className="w-8 h-8 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    {/* Icon */}
+                    <div className="w-16 h-16 bg-mentamind-100 rounded-2xl flex items-center justify-center mx-auto mb-6 animate-breathe">
+                        <svg className="w-8 h-8 text-mentamind-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                             <path strokeLinecap="round" strokeLinejoin="round"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
 
-                    <h1 className="text-3xl font-bold text-text-primary mb-3">
+                    <h1 className="text-3xl font-bold text-gray-800 mb-3">
                         {friendlyTitle}
                     </h1>
 
                     {timeFrame && (
-                        <p className="text-text-secondary mb-2 text-sm">
-                            {timeFrame} \u2022 {testData.questions.length} questions
+                        <p className="text-gray-500 mb-2 text-sm">
+                            {timeFrame} • {testData.questions.length} questions
                         </p>
                     )}
 
-                    <p className="text-text-secondary leading-relaxed mb-8">
+                    <p className="text-gray-600 leading-relaxed mb-8">
                         {description}
                     </p>
 
-                    <div className="bg-destructive-subtle border border-destructive-subtle rounded-xl p-4 mb-8 text-left">
-                        <p className="text-sm text-destructive">
+                    {/* Disclaimer */}
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-8 text-left">
+                        <p className="text-sm text-amber-800">
                             {disclaimer}
                         </p>
                     </div>
 
                     <button
                         onClick={() => setScreen('questions')}
-                        className="w-full px-6 py-4 rounded-2xl font-semibold text-brand-foreground text-lg
-                               bg-brand hover:bg-brand-hover shadow-lg shadow-brand/20
-                               transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-focus min-h-[56px]
+                        className="w-full px-6 py-4 rounded-2xl font-semibold text-white text-lg
+                               bg-mentamind-600 hover:bg-mentamind-700 shadow-lg shadow-mentamind-200/60
+                               transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-mentamind-200 min-h-[56px]
                                active:scale-[0.98]"
                         autoFocus
                     >
@@ -163,17 +171,18 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
         );
     }
 
+    // ─── Questions Screen ─────────────────────
     if (screen === 'questions' && currentQuestion) {
         return (
-            <div>
-                <div className="fixed top-0 left-0 right-0 z-10 bg-surface/80 backdrop-blur-sm border-b border-border px-6 py-3">
+            <div className="flex h-[calc(100vh-7rem)] flex-col">
+                <div className="shrink-0 bg-white/80 backdrop-blur-sm border-b border-gray-100 px-6 py-3">
                     <ProgressBar
                         current={currentIndex + 1}
                         total={testData.questions.length}
                         testTitle={friendlyTitle}
                     />
                 </div>
-                <div className="pt-16">
+                <div className="min-h-0 flex-1">
                     <QuestionScreen
                         question={currentQuestion}
                         questionNumber={currentIndex + 1}
@@ -194,6 +203,7 @@ export const GenericTestRunner: React.FC<GenericTestRunnerProps> = ({ testId, on
         );
     }
 
+    // ─── Results Screen ───────────────────────
     if (screen === 'results' && result) {
         return (
             <GentleResultsPage

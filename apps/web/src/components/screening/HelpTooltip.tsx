@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface HelpTooltipProps {
+    /** Main help text — "What does this question mean?" */
     helpText?: string;
+    /** Additional context — "Why are we asking this?" */
     whyText?: string;
+    /** Optional example for clarification */
     example?: string;
 }
 
@@ -11,6 +14,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ helpText, whyText, exa
     const tooltipRef = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
 
+    // Close on outside click
     useEffect(() => {
         if (!isOpen) return;
         const handleOutside = (e: MouseEvent) => {
@@ -25,6 +29,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ helpText, whyText, exa
         return () => document.removeEventListener('mousedown', handleOutside);
     }, [isOpen]);
 
+    // Close on Escape
     useEffect(() => {
         if (!isOpen) return;
         const handleKey = (e: KeyboardEvent) => {
@@ -34,6 +39,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ helpText, whyText, exa
         return () => document.removeEventListener('keydown', handleKey);
     }, [isOpen]);
 
+    // If no help content provided, don't render
     if (!helpText && !whyText && !example) return null;
 
     return (
@@ -41,10 +47,10 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ helpText, whyText, exa
             <button
                 ref={buttonRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-7 h-7 rounded-full bg-brand-subtle border border-brand-subtle
-                           flex items-center justify-center text-brand
-                           hover:bg-brand-subtle hover:text-brand-hover
-                           transition-colors focus:outline-none focus:ring-2 focus:ring-focus"
+                className="w-7 h-7 rounded-full bg-mentamind-50 border border-mentamind-200
+                           flex items-center justify-center text-mentamind-500
+                           hover:bg-mentamind-100 hover:text-mentamind-600
+                           transition-colors focus:outline-none focus:ring-2 focus:ring-mentamind-300"
                 aria-label="Learn more about this question"
                 aria-expanded={isOpen}
             >
@@ -58,44 +64,45 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ helpText, whyText, exa
                 <div
                     ref={tooltipRef}
                     role="tooltip"
-                    className="absolute left-0 top-full mt-2 z-50 w-72 sm:w-80
-                               bg-surface rounded-2xl shadow-xl border border-border
+                    className="absolute left-0 bottom-full mb-2 z-50 w-72 sm:w-80
+                               bg-white rounded-2xl shadow-xl border border-gray-100
                                p-4 animate-scale-in"
                 >
-                    <div className="absolute -top-1.5 left-4 w-3 h-3 bg-surface border-l border-t border-border transform rotate-45" />
+                    {/* Arrow */}
+                    <div className="absolute -bottom-1.5 left-4 w-3 h-3 bg-white border-r border-b border-gray-100 transform rotate-45" />
 
                     {helpText && (
                         <div className="mb-3">
-                            <p className="text-xs font-medium text-brand uppercase tracking-wide mb-1">
+                            <p className="text-xs font-medium text-mentamind-600 uppercase tracking-wide mb-1">
                                 What this means
                             </p>
-                            <p className="text-sm text-text-secondary leading-relaxed">{helpText}</p>
+                            <p className="text-sm text-gray-600 leading-relaxed">{helpText}</p>
                         </div>
                     )}
 
                     {whyText && (
                         <div className="mb-3">
-                            <p className="text-xs font-medium text-brand uppercase tracking-wide mb-1">
+                            <p className="text-xs font-medium text-violet-600 uppercase tracking-wide mb-1">
                                 Why we ask this
                             </p>
-                            <p className="text-sm text-text-secondary leading-relaxed">{whyText}</p>
+                            <p className="text-sm text-gray-600 leading-relaxed">{whyText}</p>
                         </div>
                     )}
 
                     {example && (
-                        <div className="bg-surface-raised rounded-xl p-3">
-                            <p className="text-xs font-medium text-text-secondary uppercase tracking-wide mb-1">
+                        <div className="bg-gray-50 rounded-xl p-3">
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
                                 For example
                             </p>
-                            <p className="text-sm text-text-secondary italic leading-relaxed">{example}</p>
+                            <p className="text-sm text-gray-600 italic leading-relaxed">{example}</p>
                         </div>
                     )}
 
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="mt-2 text-xs text-text-muted hover:text-text-secondary transition-colors"
+                        className="mt-2 text-xs text-gray-400 hover:text-gray-600 transition-colors"
                     >
-                        Got it \u2713
+                        Got it ✓
                     </button>
                 </div>
             )}

@@ -39,27 +39,27 @@ export const GuidedSelector: React.FC<GuidedSelectorProps> = ({ onSelectTest, on
             <header className="px-6 pt-6 pb-4 flex items-center gap-3">
                 <button
                     onClick={onBack}
-                    className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center
-                               hover:bg-surface-raised transition-colors focus:outline-none focus:ring-4 focus:ring-brand-subtle"
+                    className="w-10 h-10 rounded-xl bg-white/80 border border-gray-200 flex items-center justify-center
+                               hover:bg-gray-50 transition-colors focus:outline-none focus:ring-4 focus:ring-mentamind-200"
                     aria-label="Go back"
                 >
-                    <svg className="w-5 h-5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
                 <div>
-                    <h1 className="text-lg font-semibold text-text-primary">Check In</h1>
-                    <p className="text-xs text-text-muted">Take your time, no rush</p>
+                    <h1 className="text-lg font-semibold text-gray-800">Check In</h1>
+                    <p className="text-xs text-gray-400">Take your time, no rush</p>
                 </div>
             </header>
 
             <main className="flex-1 px-6 pb-8 max-w-lg mx-auto w-full">
                 {/* Question */}
                 <div className="mb-6 animate-fade-slide">
-                    <h2 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                         {guided.text}
                     </h2>
-                    <p className="text-sm text-text-muted">
+                    <p className="text-sm text-gray-400">
                         Choose what resonates most — we&apos;ll suggest a good starting point.
                     </p>
                 </div>
@@ -73,17 +73,17 @@ export const GuidedSelector: React.FC<GuidedSelectorProps> = ({ onSelectTest, on
                                 key={idx}
                                 onClick={() => setSelectedOption(idx)}
                                 className={`w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-200
-                                    focus:outline-none focus:ring-4 focus:ring-brand-subtle min-h-[56px]
+                                    focus:outline-none focus:ring-4 focus:ring-mentamind-200 min-h-[56px]
                                     ${isSelected
-                                        ? 'border-brand bg-brand-subtle shadow-md shadow-black/5'
-                                        : 'border-border bg-surface hover:border-border-strong hover:bg-surface-raised'
+                                        ? 'border-mentamind-500 bg-mentamind-50 shadow-md shadow-mentamind-100'
+                                        : 'border-gray-100 bg-white hover:border-mentamind-200 hover:bg-mentamind-50/30'
                                     }`}
                             >
                                 <span className="flex items-center gap-3">
                                     <span className="text-xl flex-shrink-0">
                                         {optionIcons[option.icon] || '💚'}
                                     </span>
-                                    <span className={`text-base font-medium ${isSelected ? 'text-brand' : 'text-text-primary'}`}>
+                                    <span className={`text-base font-medium ${isSelected ? 'text-mentamind-800' : 'text-gray-700'}`}>
                                         {option.label}
                                     </span>
                                 </span>
@@ -95,7 +95,7 @@ export const GuidedSelector: React.FC<GuidedSelectorProps> = ({ onSelectTest, on
                 {/* Recommended tests */}
                 {selectedOption !== null && (
                     <div className="animate-fade-slide">
-                        <p className="text-sm font-medium text-text-secondary mb-3 uppercase tracking-wide">
+                        <p className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wide">
                             We suggest starting with
                         </p>
                         <div className="space-y-2">
@@ -106,23 +106,23 @@ export const GuidedSelector: React.FC<GuidedSelectorProps> = ({ onSelectTest, on
                                     <button
                                         key={testId}
                                         onClick={() => onSelectTest(testId)}
-                                        className="w-full text-left px-5 py-4 rounded-2xl bg-surface border border-border
-                                                   hover:border-border-strong hover:shadow-md transition-all duration-200
-                                                   focus:outline-none focus:ring-4 focus:ring-brand-subtle group"
+                                        className="w-full text-left px-5 py-4 rounded-2xl bg-white border border-gray-100
+                                                   hover:border-mentamind-300 hover:shadow-md transition-all duration-200
+                                                   focus:outline-none focus:ring-4 focus:ring-mentamind-200 group"
                                         style={{ animationDelay: `${idx * 80}ms` }}
                                     >
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <p className="font-semibold text-text-primary group-hover:text-brand transition-colors">
+                                                <p className="font-semibold text-gray-800 group-hover:text-mentamind-700 transition-colors">
                                                     {info.title}
                                                 </p>
-                                                <p className="text-sm text-text-muted mt-0.5">
+                                                <p className="text-sm text-gray-400 mt-0.5">
                                                     {info.purpose}
                                                 </p>
                                             </div>
                                             <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-                                                <span className="text-xs text-text-muted">{info.time}</span>
-                                                <svg className="w-5 h-5 text-text-muted group-hover:text-brand transition-colors"
+                                                <span className="text-xs text-gray-400">{info.time}</span>
+                                                <svg className="w-5 h-5 text-gray-300 group-hover:text-mentamind-500 transition-colors"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                                                 </svg>
@@ -139,8 +139,8 @@ export const GuidedSelector: React.FC<GuidedSelectorProps> = ({ onSelectTest, on
                 <div className="mt-6 text-center">
                     <button
                         onClick={onBrowseAll}
-                        className="text-sm text-brand hover:text-brand-hover font-medium transition-colors
-                                   focus:outline-none focus:ring-4 focus:ring-brand-subtle rounded-lg px-3 py-1.5"
+                        className="text-sm text-mentamind-600 hover:text-mentamind-700 font-medium transition-colors
+                                   focus:outline-none focus:ring-4 focus:ring-mentamind-200 rounded-lg px-3 py-1.5"
                     >
                         Or browse all screenings →
                     </button>

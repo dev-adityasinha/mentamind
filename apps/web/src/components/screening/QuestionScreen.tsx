@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { HelpTooltip } from './HelpTooltip';
 
 interface ResponseOption {
@@ -23,8 +23,11 @@ interface QuestionScreenProps {
     isFirst: boolean;
     isLast: boolean;
     testTitle: string;
+    /** Contextual help — "What this means" */
     helpText?: string;
+    /** Contextual help — "Why we ask this" */
     whyText?: string;
+    /** Contextual help — example */
     helpExample?: string;
 }
 
@@ -43,15 +46,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     whyText,
     helpExample,
 }) => {
-    const firstOptionRef = useRef<HTMLButtonElement>(null);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            firstOptionRef.current?.focus();
-        }, 100);
-        return () => clearTimeout(timer);
-    }, [question.id]);
-
+    // Keyboard navigation
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent) => {
             if (e.key === 'Enter' && selectedValue !== null) {
@@ -67,38 +62,41 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
     return (
         <div
-            className="min-h-screen bg-bg flex flex-col"
+            className="h-full bg-bg flex flex-col"
             role="main"
             aria-label={`Question ${questionNumber} of ${totalQuestions}`}
             onKeyDown={handleKeyDown}
         >
-            <header className="px-6 pt-8 pb-4">
-                <p className="text-sm font-medium text-brand tracking-wide uppercase">
+            {/* Header */}
+            <header className="px-6 pt-4 pb-3 shrink-0">
+                <p className="text-sm font-medium text-mentamind-600 tracking-wide uppercase">
                     {testTitle}
                 </p>
-                <p className="text-xs text-text-muted mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                     Question {questionNumber} of {totalQuestions}
                 </p>
             </header>
 
-            <div className="flex-1 flex flex-col justify-center px-6 pb-8 max-w-2xl mx-auto w-full">
-                <div className="mb-10">
+            {/* Question */}
+            <div className="flex-1 min-h-0 flex flex-col px-6 pb-4 max-w-2xl mx-auto w-full">
+                <div className="mb-5 mt-2 shrink-0">
                     <h2
                         id={`question-${question.id}`}
-                        className="text-2xl sm:text-3xl font-semibold text-text-primary leading-snug"
+                        className="text-xl sm:text-2xl font-semibold text-gray-800 leading-snug break-words"
                     >
                         {question.text}
                     </h2>
                     {(helpText || whyText || helpExample) && (
-                        <div className="mt-3">
+                        <div className="mt-2">
                             <HelpTooltip helpText={helpText} whyText={whyText} example={helpExample} />
                         </div>
                     )}
                 </div>
 
+                {/* Options — scroll only this region if there are many */}
                 <fieldset
                     aria-labelledby={`question-${question.id}`}
-                    className="space-y-3"
+                    className="space-y-2 min-h-0 flex-1 overflow-y-auto"
                 >
                     <legend className="sr-only">{question.text}</legend>
                     {question.options.map((option, idx) => {
@@ -106,18 +104,17 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                         return (
                             <button
                                 key={option.value}
-                                ref={idx === 0 ? firstOptionRef : undefined}
                                 role="radio"
                                 aria-checked={isSelected}
                                 tabIndex={0}
                                 onClick={() => onAnswer(option.value)}
                                 className={`
-                  w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-200
-                  focus:outline-none focus:ring-4 focus:ring-focus
-                  min-h-[56px] text-base sm:text-lg
+                  w-full text-left px-4 py-2.5 rounded-xl border-2 transition-all duration-200
+                  focus:outline-none focus:ring-4 focus:ring-mentamind-200
+                  min-h-[44px] text-sm sm:text-base
                   ${isSelected
-                                        ? 'border-brand bg-brand-subtle text-brand shadow-md shadow-brand/10'
-                                        : 'border-border bg-surface text-text-primary hover:border-brand-hover hover:bg-brand-subtle'
+                                        ? 'border-mentamind-500 bg-mentamind-50 text-mentamind-800 shadow-md shadow-mentamind-100'
+                                        : 'border-gray-200 bg-white text-gray-700 hover:border-mentamind-300 hover:bg-mentamind-50/30'
                                     }
                 `}
                             >
@@ -125,7 +122,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                                     <span
                                         className={`
                       flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors
-                      ${isSelected ? 'border-brand bg-brand' : 'border-border-strong'}
+                      ${isSelected ? 'border-mentamind-500 bg-mentamind-500' : 'border-gray-300'}
                     `}
                                     >
                                         {isSelected && (
@@ -140,12 +137,13 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                 </fieldset>
             </div>
 
-            <footer className="px-6 pb-8 flex gap-3 max-w-2xl mx-auto w-full">
+            {/* Navigation */}
+            <footer className="px-6 pt-3 pb-4 flex gap-3 max-w-2xl mx-auto w-full shrink-0">
                 {!isFirst && (
                     <button
                         onClick={onPrevious}
-                        className="px-6 py-3 rounded-xl border-2 border-border text-text-secondary font-medium
-                       hover:bg-surface-raised transition-colors focus:outline-none focus:ring-4 focus:ring-focus
+                        className="px-6 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-medium
+                       hover:bg-gray-50 transition-colors focus:outline-none focus:ring-4 focus:ring-gray-200
                        min-h-[48px]"
                         aria-label="Go to previous question"
                     >
@@ -157,10 +155,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                     disabled={selectedValue === null}
                     className={`
             flex-1 px-6 py-3 rounded-xl font-semibold text-white transition-all
-            focus:outline-none focus:ring-4 focus:ring-focus min-h-[48px]
+            focus:outline-none focus:ring-4 focus:ring-mentamind-200 min-h-[48px]
             ${selectedValue !== null
-                            ? 'bg-brand hover:bg-brand-hover shadow-lg shadow-brand/20'
-                            : 'bg-border-strong cursor-not-allowed'
+                            ? 'bg-mentamind-600 hover:bg-mentamind-700 shadow-lg shadow-mentamind-200'
+                            : 'bg-gray-300 cursor-not-allowed'
                         }
           `}
                     aria-label={isLast ? 'Submit answers' : 'Go to next question'}

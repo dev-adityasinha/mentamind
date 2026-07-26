@@ -11,18 +11,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseAll }
             {/* Header */}
             <header className="px-6 pt-6 pb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 bg-brand rounded-xl flex items-center justify-center">
-                        <svg className="w-5 h-5 text-brand-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <div className="w-9 h-9 bg-mentamind-500 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                     </div>
-                    <span className="font-bold text-lg text-text-primary">Mentamind</span>
+                    <span className="font-bold text-lg text-gray-800">Mentamind</span>
                 </div>
                 <a
                     href="https://mentamind.in"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-brand hover:text-brand-hover font-medium transition-colors"
+                    className="text-sm text-mentamind-600 hover:text-mentamind-700 font-medium transition-colors"
                 >
                     mentamind.in
                 </a>
@@ -33,24 +33,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseAll }
                 <div className="max-w-lg w-full animate-fade-slide">
                     {/* Floating illustration */}
                     <div className="animate-float mb-8">
-                        <div className="w-24 h-24 mx-auto bg-gradient-to-br from-brand-subtle via-emerald-100 to-teal-100 rounded-3xl flex items-center justify-center shadow-lg shadow-black/5">
-                            <svg className="w-12 h-12 text-brand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <div className="w-24 h-24 mx-auto bg-gradient-to-br from-mentamind-200 via-emerald-100 to-teal-100 rounded-3xl flex items-center justify-center shadow-lg shadow-mentamind-100/50">
+                            <svg className="w-12 h-12 text-mentamind-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round"
                                     d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                             </svg>
                         </div>
                     </div>
 
-                    <h1 className="text-4xl sm:text-5xl font-bold text-text-primary mb-4 leading-tight">
-                        How are you <span className="text-brand">feeling</span>?
+                    <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+                        How are you <span className="text-mentamind-600">feeling</span>?
                     </h1>
 
-                    <p className="text-lg text-text-secondary mb-3 leading-relaxed">
+                    <p className="text-lg text-gray-500 mb-3 leading-relaxed">
                         Take a moment to check in with yourself.
                         This is a safe, calm space — no judgments, no diagnoses.
                     </p>
 
-                    <p className="text-sm text-text-muted mb-10">
+                    <p className="text-sm text-gray-400 mb-10">
                         Your answers stay private and are never shared.
                     </p>
 
@@ -58,10 +58,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseAll }
                     <div className="space-y-3">
                         <button
                             onClick={onStart}
-                            className="w-full px-6 py-4 rounded-2xl font-semibold text-brand-foreground text-lg
-                               bg-brand hover:bg-brand-hover shadow-lg shadow-black/10
-                               transition-all duration-300 hover:shadow-xl hover:shadow-black/15
-                               focus:outline-none focus:ring-4 focus:ring-brand-subtle min-h-[56px]
+                            className="w-full px-6 py-4 rounded-2xl font-semibold text-white text-lg
+                               bg-mentamind-600 hover:bg-mentamind-700 shadow-lg shadow-mentamind-200/60
+                               transition-all duration-300 hover:shadow-xl hover:shadow-mentamind-200/80
+                               focus:outline-none focus:ring-4 focus:ring-mentamind-200 min-h-[56px]
                                active:scale-[0.98]"
                             autoFocus
                         >
@@ -70,10 +70,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseAll }
 
                         <button
                             onClick={onBrowseAll}
-                            className="w-full px-6 py-3 rounded-2xl font-medium text-brand
-                               bg-brand-subtle hover:bg-surface-raised border border-border
+                            className="w-full px-6 py-3 rounded-2xl font-medium text-mentamind-700
+                               bg-mentamind-50 hover:bg-mentamind-100 border border-mentamind-200
                                transition-all duration-200
-                               focus:outline-none focus:ring-4 focus:ring-brand-subtle min-h-[48px]"
+                               focus:outline-none focus:ring-4 focus:ring-mentamind-200 min-h-[48px]"
                         >
                             Browse all screenings
                         </button>
@@ -81,7 +81,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseAll }
                 </div>
 
                 {/* Trust badges */}
-                <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-text-muted animate-fade-in" style={{ animationDelay: '0.5s' }}>
+                <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 animate-fade-in" style={{ animationDelay: '0.5s' }}>
                     <span className="flex items-center gap-1.5">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -105,7 +105,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onBrowseAll }
 
             {/* Disclaimer footer */}
             <footer className="px-6 pb-6 text-center">
-                <p className="text-xs text-text-muted max-w-md mx-auto">
+                <p className="text-xs text-gray-400 max-w-md mx-auto">
                     This is a screening tool, not a diagnosis. Results help you understand
                     patterns and decide if professional support might be helpful.
                 </p>

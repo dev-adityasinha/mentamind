@@ -107,19 +107,19 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
         <div className="min-h-screen bg-bg flex flex-col">
             <main className="flex-1 px-6 py-8 max-w-lg mx-auto w-full">
                 <div className="text-center mb-8 animate-fade-slide">
-                    <p className="text-sm font-medium text-brand tracking-wide uppercase mb-2">
+                    <p className="text-sm font-medium text-mentamind-600 tracking-wide uppercase mb-2">
                         {testTitle}
                     </p>
-                    <p className="text-xs text-text-muted">
+                    <p className="text-xs text-gray-400">
                         Your responses have been processed
                     </p>
                 </div>
 
                 <div className="animate-scale-in mb-8">
-                    <div className="rounded-3xl p-8 text-center shadow-lg bg-surface border border-border">
+                    <div className="glass-card rounded-3xl p-8 text-center shadow-lg">
                         <div className="relative w-32 h-32 mx-auto mb-5">
                             <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="50" fill="none" stroke="var(--color-border)" strokeWidth="8" />
+                                <circle cx="60" cy="60" r="50" fill="none" stroke="#e5e7eb" strokeWidth="8" />
                                 <circle
                                     cx="60" cy="60" r="50" fill="none"
                                     stroke="url(#scoreGradient)"
@@ -136,34 +136,34 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                                 </defs>
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-3xl font-bold text-text-primary">{result.totalScore}</span>
-                                <span className="text-xs text-text-muted">of {maxScore}</span>
+                                <span className="text-3xl font-bold text-gray-800">{result.totalScore}</span>
+                                <span className="text-xs text-gray-400">of {maxScore}</span>
                             </div>
                         </div>
 
-                        <h2 className="text-2xl font-bold text-text-primary mb-2">{headline}</h2>
-                        <p className="text-text-secondary leading-relaxed text-sm">{description}</p>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">{headline}</h2>
+                        <p className="text-gray-500 leading-relaxed text-sm">{description}</p>
                     </div>
                 </div>
 
                 {result.subscaleScores && Object.keys(result.subscaleScores).length > 0 && (
                     <div className="mb-8 animate-fade-slide" style={{ animationDelay: '0.2s' }}>
-                        <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wide mb-3">
+                        <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
                             Areas Explored
                         </h3>
                         <div className="space-y-2">
                             {Object.entries(result.subscaleScores).map(([name, data]) => (
-                                <div key={name} className="rounded-xl px-4 py-3 bg-surface border border-border">
+                                <div key={name} className="glass-card rounded-xl px-4 py-3">
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="text-sm font-medium text-text-primary capitalize">
+                                        <span className="text-sm font-medium text-gray-700 capitalize">
                                             {name.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')}
                                         </span>
-                                        <span className="text-sm text-text-muted">
+                                        <span className="text-sm text-gray-400">
                                             {(data as any).score}
                                         </span>
                                     </div>
                                     {(data as any).band && (
-                                        <p className="text-xs text-text-muted">{(data as any).band}</p>
+                                        <p className="text-xs text-gray-400">{(data as any).band}</p>
                                     )}
                                 </div>
                             ))}
@@ -172,22 +172,22 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                 )}
 
                 {result.requiresEscalation && (
-                    <div className="mb-8 bg-destructive-subtle border border-destructive-subtle rounded-xl p-5 animate-fade-slide" style={{ animationDelay: '0.3s' }}>
+                    <div className="mb-8 bg-red-50 border border-red-200 rounded-xl p-5 animate-fade-slide" style={{ animationDelay: '0.3s' }}>
                         <div className="flex items-start gap-3">
-                            <svg className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                 <path strokeLinecap="round" strokeLinejoin="round"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                             <div>
-                                <p className="font-semibold text-destructive mb-1">We care about your safety</p>
-                                <p className="text-sm text-destructive leading-relaxed">
+                                <p className="font-semibold text-red-800 mb-1">We care about your safety</p>
+                                <p className="text-sm text-red-700 leading-relaxed">
                                     Some of your responses suggest you may benefit from speaking with someone who can help.
                                     Please consider reaching out to a mental health professional or a helpline.
                                 </p>
                                 {result.escalationReasons.length > 0 && (
                                     <ul className="mt-2 space-y-1">
                                         {result.escalationReasons.map((r, i) => (
-                                            <li key={i} className="text-xs text-destructive-hover">• {r}</li>
+                                            <li key={i} className="text-xs text-red-600">• {r}</li>
                                         ))}
                                     </ul>
                                 )}
@@ -203,13 +203,13 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                 />
 
                 <div className="mb-8 animate-fade-slide" style={{ animationDelay: '0.4s' }}>
-                    <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wide mb-3">
+                    <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">
                         What You Can Do Next
                     </h3>
                     <div className="space-y-2">
                         {actions.length > 0 && actions.map((action, i) => (
-                            <div key={i} className="rounded-xl px-4 py-3 bg-surface border border-border">
-                                <p className="text-sm text-text-secondary">{action}</p>
+                            <div key={i} className="glass-card rounded-xl px-4 py-3">
+                                <p className="text-sm text-gray-600">{action}</p>
                             </div>
                         ))}
 
@@ -217,15 +217,15 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                             href="https://mentamind.in"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block w-full text-left px-4 py-3.5 rounded-xl bg-brand-subtle border border-brand-subtle
-                                       hover:bg-brand-subtle transition-colors group"
+                            className="block w-full text-left px-4 py-3.5 rounded-xl bg-mentamind-50 border border-mentamind-200
+                                       hover:bg-mentamind-100 transition-colors group"
                         >
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-medium text-brand">Talk to a professional</p>
-                                    <p className="text-xs text-brand mt-0.5">Connect with a counsellor on Mentamind</p>
+                                    <p className="font-medium text-mentamind-800">Talk to a professional</p>
+                                    <p className="text-xs text-mentamind-600 mt-0.5">Connect with a counsellor on Mentamind</p>
                                 </div>
-                                <svg className="w-4 h-4 text-brand group-hover:translate-x-0.5 transition-transform"
+                                <svg className="w-4 h-4 text-mentamind-400 group-hover:translate-x-0.5 transition-transform"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
@@ -236,15 +236,15 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                             href="https://mentamind.in"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="block w-full text-left px-4 py-3.5 rounded-xl bg-surface border border-border
-                                       hover:border-brand-hover transition-colors group"
+                            className="block w-full text-left px-4 py-3.5 rounded-xl bg-white border border-gray-200
+                                       hover:border-mentamind-300 transition-colors group"
                         >
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="font-medium text-text-primary">Learn more about this area</p>
-                                    <p className="text-xs text-text-muted mt-0.5">Read educational content on Mentamind</p>
+                                    <p className="font-medium text-gray-700">Learn more about this area</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">Read educational content on Mentamind</p>
                                 </div>
-                                <svg className="w-4 h-4 text-text-muted group-hover:text-brand-hover transition-colors"
+                                <svg className="w-4 h-4 text-gray-300 group-hover:text-mentamind-500 transition-colors"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                 </svg>
@@ -256,27 +256,27 @@ export const GentleResultsPage: React.FC<GentleResultsPageProps> = ({
                 <div className="space-y-3 mb-8 animate-fade-slide" style={{ animationDelay: '0.5s' }}>
                     <button
                         onClick={onHome}
-                        className="w-full px-6 py-3.5 rounded-2xl font-semibold text-brand-foreground
-                               bg-brand hover:bg-brand-hover shadow-lg shadow-brand/20
-                               transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-focus
+                        className="w-full px-6 py-3.5 rounded-2xl font-semibold text-white
+                               bg-mentamind-600 hover:bg-mentamind-700 shadow-lg shadow-mentamind-200/60
+                               transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-mentamind-200
                                active:scale-[0.98]"
                     >
                         Take another screening
                     </button>
                     <button
                         onClick={onRetake}
-                        className="w-full px-6 py-3 rounded-2xl font-medium text-text-secondary
-                               bg-surface border border-border hover:bg-surface-raised
-                               transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-focus"
+                        className="w-full px-6 py-3 rounded-2xl font-medium text-gray-600
+                               bg-white border border-gray-200 hover:bg-gray-50
+                               transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-gray-200"
                     >
                         Retake this screening
                     </button>
                 </div>
 
                 <div className="text-center pb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-                    <div className="bg-surface-raised rounded-xl p-4">
-                        <p className="text-xs text-text-muted leading-relaxed">
-                            <strong className="text-text-secondary">Important:</strong> {disclaimer}
+                    <div className="bg-gray-50 rounded-xl p-4">
+                        <p className="text-xs text-gray-400 leading-relaxed">
+                            <strong className="text-gray-500">Important:</strong> {disclaimer}
                         </p>
                     </div>
                 </div>
