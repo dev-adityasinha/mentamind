@@ -67,8 +67,24 @@ export default function MeditationJourneyPage() {
     );
   }
 
+  // A program day can have several completion rows (one per calendar date it
+  // was worked on). Merge them so a day's meditation/reflection/task flags are
+  // OR-ed together across all its rows, instead of the last row overwriting the
+  // rest — otherwise parts done on different days cancel each other out.
   const compByDay = new Map<number, DailyCompletion>();
-  for (const c of completions) compByDay.set(c.day, c);
+  for (const c of completions) {
+    const prev = compByDay.get(c.day);
+    if (!prev) {
+      compByDay.set(c.day, { ...c });
+    } else {
+      compByDay.set(c.day, {
+        ...prev,
+        meditation: prev.meditation || c.meditation,
+        reflection: prev.reflection || c.reflection,
+        task: prev.task || c.task,
+      });
+    }
+  }
 
   const statusFor = (dayNum: number): Status => {
     const c = compByDay.get(dayNum);
@@ -85,7 +101,7 @@ export default function MeditationJourneyPage() {
     byBlock.set(d.block, arr);
   }
 
-  const overallItems = completions.reduce(
+  const overallItems = Array.from(compByDay.values()).reduce(
     (acc, s) => acc + (s.meditation ? 1 : 0) + (s.task ? 1 : 0) + (s.reflection ? 1 : 0),
     0,
   );
