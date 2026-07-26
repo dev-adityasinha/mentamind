@@ -55,7 +55,7 @@
         "description": "Turn on night mode on all your devices after 8pm. This signals to your brain that the day is winding down.",
         "icon": "brightness_4",
         "duration": 2,
-        "image": "/assets/images/tasks/day01-digital-sunset.svg"
+        "image": "/assets/images/tasks/day-01.png"
       },
       "moodQuestion": "How do you feel right now?"
     },
@@ -85,7 +85,7 @@
         "description": "Drink a cup of tea or water slowly, noticing each sip. Feel the warmth, taste, and sensation.",
         "icon": "emoji_food_beverage",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-02.png"
       },
       "moodQuestion": "How present do you feel?"
     },
@@ -115,7 +115,7 @@
         "description": "Wait 30 minutes before checking your phone after waking. Use this time for yourself.",
         "icon": "smartphone",
         "duration": 30,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-03.png"
       },
       "moodQuestion": "How calm do you feel?"
     },
@@ -145,7 +145,7 @@
         "description": "Take a 3-minute stretch break mid-day. Focus on areas where you hold tension.",
         "icon": "fitness_center",
         "duration": 3,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-04.png"
       },
       "moodQuestion": "How relaxed is your body?"
     },
@@ -175,7 +175,7 @@
         "description": "Take 10 minutes to walk without a destination. Focus on the sensation of your feet touching the ground.",
         "icon": "directions_walk",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-05.png"
       },
       "moodQuestion": "How light do you feel?"
     },
@@ -205,7 +205,7 @@
         "description": "Spend 5 minutes in complete silence. No phone, no music, just you.",
         "icon": "volume_off",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-06.png"
       },
       "moodQuestion": "How centered do you feel?"
     },
@@ -235,7 +235,7 @@
         "description": "Step outside and observe nature for 5 minutes. Notice colors, sounds, movements.",
         "icon": "park",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-07.png"
       },
       "moodQuestion": "How aware do you feel?"
     },
@@ -265,7 +265,7 @@
         "description": "Do one routine task 50% slower than usual. Notice what changes.",
         "icon": "hourglass_empty",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-08.png"
       },
       "moodQuestion": "How patient do you feel?"
     },
@@ -295,7 +295,7 @@
         "description": "Write down 3 things you're grateful for today. Be specific.",
         "icon": "favorite",
         "duration": 3,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-09.png"
       },
       "moodQuestion": "How accepting do you feel?"
     },
@@ -326,7 +326,7 @@
         "description": "Review your mood trends and insights from this week. What worked best?",
         "icon": "insights",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-10.png"
       },
       "moodQuestion": "How has your baseline shifted?"
     },
@@ -356,7 +356,7 @@
         "description": "Disable non-essential app notifications. Keep only what truly matters.",
         "icon": "notifications_off",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-11.png"
       },
       "moodQuestion": "How focused do you feel?"
     },
@@ -386,7 +386,7 @@
         "description": "Spend 10 minutes organizing one area of your space. External order, internal calm.",
         "icon": "cleaning_services",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-12.png"
       },
       "moodQuestion": "How clear is your mind?"
     },
@@ -416,7 +416,7 @@
         "description": "Spend 5 minutes visualizing your best self. How do they move? Speak? Feel?",
         "icon": "visibility",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-13.png"
       },
       "moodQuestion": "How clear is your vision?"
     },
@@ -446,7 +446,7 @@
         "description": "Eat one meal today without any screens. Focus entirely on the food.",
         "icon": "restaurant",
         "duration": 20,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-14.png"
       },
       "moodQuestion": "How connected do you feel to your body?"
     },
@@ -476,7 +476,7 @@
         "description": "Set a 25-minute timer. Work on one task with zero distractions.",
         "icon": "timer",
         "duration": 25,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-15.png"
       },
       "moodQuestion": "How easily can you enter flow?"
     },
@@ -506,7 +506,7 @@
         "description": "Note your energy levels throughout the day. When are you most energized?",
         "icon": "bolt",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-16.png"
       },
       "moodQuestion": "How balanced do you feel?"
     },
@@ -536,7 +536,7 @@
         "description": "End your shower with 30 seconds of cold water. Notice how you adapt.",
         "icon": "ac_unit",
         "duration": 1,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-17.png"
       },
       "moodQuestion": "How resilient do you feel?"
     },
@@ -566,7 +566,7 @@
         "description": "Stand in a power pose for 2 minutes. Arms wide, chest open.",
         "icon": "accessibility_new",
         "duration": 2,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-18.png"
       },
       "moodQuestion": "How strong do you feel inside?"
     },
@@ -596,7 +596,7 @@
         "description": "Write down everything on your mind. Don't filter, just dump.",
         "icon": "edit_note",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-19.png"
       },
       "moodQuestion": "How clear-headed do you feel?"
     },
@@ -626,7 +626,7 @@
         "description": "Do something kind for yourself today. You've come far.",
         "icon": "celebration",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-20.png"
       },
       "moodQuestion": "How deep is your peace?"
     },
@@ -656,7 +656,7 @@
         "description": "If you commute, use it for mindfulness. If not, pick a routine activity.",
         "icon": "commute",
         "duration": 15,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-21.png"
       },
       "moodQuestion": "How present are you in daily activities?"
     },
@@ -686,7 +686,7 @@
         "description": "Make one decision today based purely on intuition.",
         "icon": "psychology_alt",
         "duration": 1,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-22.png"
       },
       "moodQuestion": "How connected are you to your intuition?"
     },
@@ -716,7 +716,7 @@
         "description": "List your top 3 values. Did today's actions reflect them?",
         "icon": "check_circle",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-23.png"
       },
       "moodQuestion": "How aligned do you feel?"
     },
@@ -746,7 +746,7 @@
         "description": "Do one thing today that feels meaningful to you.",
         "icon": "star",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-24.png"
       },
       "moodQuestion": "How purposeful do you feel?"
     },
@@ -776,7 +776,7 @@
         "description": "Write down something you want to release. Then tear it up.",
         "icon": "delete",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-25.png"
       },
       "moodQuestion": "How renewed do you feel?"
     },
@@ -806,7 +806,7 @@
         "description": "Write a letter to your future self. What do you want them to know?",
         "icon": "mail",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-26.png"
       },
       "moodQuestion": "How self-aware are you?"
     },
@@ -836,7 +836,7 @@
         "description": "Try to maintain mindful awareness throughout your entire day.",
         "icon": "all_inclusive",
         "duration": 0,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-27.png"
       },
       "moodQuestion": "How whole do you feel?"
     },
@@ -866,7 +866,7 @@
         "description": "Share one mindfulness technique with someone today.",
         "icon": "groups",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-28.png"
       },
       "moodQuestion": "How confident are you in your practice?"
     },
@@ -897,7 +897,7 @@
         "description": "Treat yourself to something special. You've done the work.",
         "icon": "card_giftcard",
         "duration": 10,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-29.png"
       },
       "moodQuestion": "How accomplished do you feel?"
     },
@@ -928,7 +928,7 @@
         "description": "Set your intention for the next 30 days of your journey.",
         "icon": "rocket_launch",
         "duration": 5,
-        "image": "/assets/images/tasks/placeholder_task.svg"
+        "image": "/assets/images/tasks/day-30.png"
       },
       "moodQuestion": "How ready are you to continue?"
     }

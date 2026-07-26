@@ -29,11 +29,16 @@ export default function MeditationDayPage() {
   // local UI state — faithful to the original's look and feel without
   // inventing a persistence endpoint.
   const [favorite, setFavorite] = useState(false);
+  // Some curriculum tasks point at illustration files that aren't bundled in
+  // the app yet, so the <img> 404s. Track a load failure and fall back to the
+  // icon illustration instead of showing a broken-image placeholder.
+  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setNotFound(false);
+    setImgFailed(false);
     (async () => {
       try {
         const [c, comp] = await Promise.all([
@@ -129,11 +134,12 @@ export default function MeditationDayPage() {
           <div className="relative flex flex-col overflow-hidden rounded-[2rem] bg-white shadow-xl ring-1 ring-black/5 dark:bg-[#151E32] dark:ring-white/10">
             {/* Illustration Section */}
             <div className="relative flex h-64 w-full items-center justify-center overflow-hidden bg-[#F2F7F6] dark:bg-[#0c111c]">
-              {content.task.image ? (
+              {content.task.image && !imgFailed ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={content.task.image}
                   alt={content.task.title}
+                  onError={() => setImgFailed(true)}
                   className="h-full w-full object-cover"
                 />
               ) : (
