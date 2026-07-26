@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies.auth import get_current_user
-from app.models.chat import ChatSession
+from app.models.ai_coach import AiCoachSession
+from app.models.chat import ChatSession, ChatSessionStatus
 from app.models.comment import Comment
 from app.models.meditation import MeditationStats
 from app.models.mood_log import MoodLog
@@ -109,6 +110,27 @@ async def get_dashboard_summary(
         "my_comments": my_comments_res.scalar() or 0,
         "org_posts_this_week": recent_org_posts_res.scalar() or 0,
     }
+
+    # --- Home summary counters (real counts) ---
+    ai_checkins_res = await db.execute(
+        select(func.count(AiCoachSession.id)).where(AiCoachSession.user_id == uid)
+    )
+    ai_checkins = ai_checkins_res.scalar() or 0
+
+    pending_chats_res = await db.execute(
+        select(func.count(ChatSession.id)).where(
+            or_(
+                ChatSession.participant_1_id == uid,
+                ChatSession.participant_2_id == uid,
+            ),
+            ChatSession.status.in_(
+                [ChatSessionStatus.WAITING, ChatSessionStatus.ACTIVE]
+            ),
+        )
+    )
+    pending_chats = pending_chats_res.scalar() or 0
+
+    community_posts = community_activity["my_posts"]
 
     # --- Screening results: latest assessment (real TestScore) ---
     test_res = await db.execute(
@@ -224,6 +246,9 @@ async def get_dashboard_summary(
         )
 
     return {
+        "ai_checkins": ai_checkins,
+        "community_posts": community_posts,
+        "pending_chats": pending_chats,
         "daily_mood": daily_mood,
         "meditation_progress": meditation_progress,
         "community_activity": community_activity,
