@@ -207,7 +207,7 @@ export default function HomePage() {
         className="rounded-2xl border border-border bg-surface p-6 glass-shimmer flex flex-col justify-between text-left hover:bg-surface-raised transition-colors"
       >
         <MessageCircle className="w-5 h-5 text-brand" />
-        <span className="text-sm font-medium text-text-primary">Talk to AI Coach</span>
+        <span className="text-sm font-medium text-text-primary">Talk to AI Companion</span>
       </button>
 
       {/* Anonymous Chat */}
