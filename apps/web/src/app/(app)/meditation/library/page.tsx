@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/context";
 import { useToast } from "@/components/ui/Toast";
 import { Button } from "@/components/ui/Button";
@@ -42,8 +43,15 @@ const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(
   CATEGORIES.map((c) => [c.value, c.label]),
 );
 
-export default function MeditationLibraryPage() {
+function MeditationLibraryInner() {
   const { user, isLoading: authLoading } = useAuth();
+  // Allow deep-linking to a pre-filtered category, e.g. ?category=sleep
+  const searchParams = useSearchParams();
+  const paramCategory = searchParams.get("category");
+  const initialCategory: MeditationCategory | "all" =
+    paramCategory && CATEGORIES.some((c) => c.value === paramCategory)
+      ? (paramCategory as MeditationCategory)
+      : "all";
   const { addToast } = useToast();
 
   const isManager = user?.role === "admin" || user?.role === "hr_manager";
@@ -51,7 +59,7 @@ export default function MeditationLibraryPage() {
   const [tracks, setTracks] = useState<MeditationTrack[]>([]);
   const [stats, setStats] = useState<MeditationStats | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
-  const [category, setCategory] = useState<MeditationCategory | "all">("all");
+  const [category, setCategory] = useState<MeditationCategory | "all">(initialCategory);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [nowPlaying, setNowPlaying] = useState<MeditationTrack | null>(null);
@@ -669,5 +677,13 @@ function Field({
       </label>
       {children}
     </div>
+  );
+}
+
+export default function MeditationLibraryPage() {
+  return (
+    <Suspense fallback={<div className="text-text-muted">Loading…</div>}>
+      <MeditationLibraryInner />
+    </Suspense>
   );
 }

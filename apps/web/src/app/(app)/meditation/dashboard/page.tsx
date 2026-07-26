@@ -98,6 +98,12 @@ export default function MeditationDashboardPage() {
   const compByDay = new Map<number, DailyCompletion>();
   for (const c of completions) compByDay.set(c.day, c);
 
+  // The three parts of each day, in order: meditation, reflection, task.
+  const partsFor = (dayNum: number): boolean[] => {
+    const c = compByDay.get(dayNum);
+    return [!!c?.meditation, !!c?.reflection, !!c?.task];
+  };
+
   const tileClass = (dayNum: number) => {
     const c = compByDay.get(dayNum);
     const done = c ? [c.meditation, c.reflection, c.task].filter(Boolean).length : 0;
@@ -128,6 +134,23 @@ export default function MeditationDashboardPage() {
         </span>
       </Link>
 
+      {/* Browse Programs */}
+      <Link
+        href="/meditation/programs"
+        className="flex items-center justify-between rounded-2xl border border-border bg-surface p-5 transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand">
+            <span className="material-symbols-outlined text-[20px]">grid_view</span>
+          </span>
+          <div>
+            <p className="text-sm font-semibold text-text-primary">Browse Programs</p>
+            <p className="text-xs text-text-muted">Explore guided series</p>
+          </div>
+        </div>
+        <span className="material-symbols-outlined text-text-muted">chevron_right</span>
+      </Link>
+
       {/* Stat tiles */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <StatTile label="Day streak" value={stats.current_streak} />
@@ -138,18 +161,35 @@ export default function MeditationDashboardPage() {
 
       {/* 30-day timeline */}
       <div className="rounded-2xl border border-border bg-surface p-5">
-        <p className="mb-3 text-sm text-text-secondary">Your 30 days</p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-sm text-text-secondary">Your 30 days</p>
+          <p className="text-xs text-text-muted">Dots: meditation · reflection · task</p>
+        </div>
         <div className="grid grid-cols-6 gap-2 sm:grid-cols-10">
-          {Array.from({ length: stats.total_days }, (_, i) => i + 1).map((dayNum) => (
-            <Link
-              key={dayNum}
-              href={`/meditation/day/${dayNum}`}
-              aria-label={`Day ${dayNum}`}
-              className={`flex aspect-square items-center justify-center rounded-lg border text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${tileClass(dayNum)}`}
-            >
-              {dayNum}
-            </Link>
-          ))}
+          {Array.from({ length: stats.total_days }, (_, i) => i + 1).map((dayNum) => {
+            const parts = partsFor(dayNum);
+            const doneCount = parts.filter(Boolean).length;
+            return (
+              <Link
+                key={dayNum}
+                href={`/meditation/day/${dayNum}`}
+                aria-label={`Day ${dayNum}: ${doneCount} of 3 activities complete`}
+                className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${tileClass(dayNum)}`}
+              >
+                <span>{dayNum}</span>
+                <span className="flex items-center gap-0.5" aria-hidden>
+                  {parts.map((done, i) => (
+                    <span
+                      key={i}
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        done ? "bg-current opacity-90" : "bg-current opacity-20"
+                      }`}
+                    />
+                  ))}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

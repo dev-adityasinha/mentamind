@@ -29,16 +29,11 @@ export default function MeditationDayPage() {
   // local UI state — faithful to the original's look and feel without
   // inventing a persistence endpoint.
   const [favorite, setFavorite] = useState(false);
-  // Some curriculum tasks point at illustration files that aren't bundled in
-  // the app yet, so the <img> 404s. Track a load failure and fall back to the
-  // icon illustration instead of showing a broken-image placeholder.
-  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setNotFound(false);
-    setImgFailed(false);
     (async () => {
       try {
         const [c, comp] = await Promise.all([
@@ -96,7 +91,7 @@ export default function MeditationDayPage() {
       <header className="relative z-10 flex items-center justify-between px-6 pt-8 pb-4">
         <button
           type="button"
-          onClick={() => router.push("/meditation/journey")}
+          onClick={() => router.back()}
           className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 transition-all hover:bg-white/80 active:scale-95 dark:bg-white/10 dark:hover:bg-white/20"
           aria-label="Back to journey"
         >
@@ -125,7 +120,7 @@ export default function MeditationDayPage() {
         </button>
       </header>
 
-      <main className="relative z-10 flex flex-1 flex-col items-center px-6 pb-8 pt-2">
+      <main className="relative z-10 flex flex-1 flex-col items-center px-6 pb-8">
         {/* Main Task Card */}
         <div className="group relative w-full max-w-md transform transition-all duration-500 hover:scale-[1.01]">
           {/* Card shadow */}
@@ -134,28 +129,19 @@ export default function MeditationDayPage() {
           <div className="relative flex flex-col overflow-hidden rounded-[2rem] bg-white shadow-xl ring-1 ring-black/5 dark:bg-[#151E32] dark:ring-white/10">
             {/* Illustration Section */}
             <div className="relative flex h-64 w-full items-center justify-center overflow-hidden bg-[#F2F7F6] dark:bg-[#0c111c]">
-              {content.task.image && !imgFailed ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={content.task.image}
-                  alt={content.task.title}
-                  onError={() => setImgFailed(true)}
-                  className="h-full w-full object-cover object-top"
-                />
-              ) : (
-                <>
-                  {/* Decorative circles */}
-                  <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-[#3D6B5B]/10 dark:bg-blue-500/10" />
-                  <div className="absolute bottom-0 left-0 h-40 w-40 -translate-x-10 translate-y-10 rounded-full bg-[#E2B19F]/20 dark:bg-indigo-500/10" />
+              {/* Every day shows the same icon illustration. */}
+              <>
+                {/* Decorative circles */}
+                <div className="absolute right-0 top-0 h-32 w-32 -translate-y-10 translate-x-10 rounded-full bg-[#3D6B5B]/10 dark:bg-blue-500/10" />
+                <div className="absolute bottom-0 left-0 h-40 w-40 -translate-x-10 translate-y-10 rounded-full bg-[#E2B19F]/20 dark:bg-indigo-500/10" />
 
-                  {/* Icon Illustration */}
-                  <div className="relative z-10 flex h-32 w-32 items-center justify-center rounded-full bg-[#3D6B5B]/10 dark:bg-[#3D6B5B]/20">
-                    <span className="material-symbols-outlined text-[64px] text-[#3D6B5B]">
-                      {content.task.icon ?? "self_improvement"}
-                    </span>
-                  </div>
-                </>
-              )}
+                {/* Icon Illustration */}
+                <div className="relative z-10 flex h-32 w-32 items-center justify-center rounded-full bg-[#3D6B5B]/10 dark:bg-[#3D6B5B]/20">
+                  <span className="material-symbols-outlined text-[64px] text-[#3D6B5B]">
+                    rocket_launch
+                  </span>
+                </div>
+              </>
 
               {/* Bottom gradient fade */}
               <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent opacity-80 dark:from-[#151E32]" />
