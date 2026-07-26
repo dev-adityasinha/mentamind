@@ -208,17 +208,17 @@ export default function CoachPage() {
   }
 
   return (
-    <div className="relative mx-auto flex h-[calc(100vh-8rem)] max-w-3xl flex-col">
+    <div className="relative mx-auto flex h-[calc(100vh-8rem)] w-full max-w-3xl flex-col">
       {/* Ambient background glow */}
       <div className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-500/15 blur-[100px]" />
 
       {/* Header */}
-      <div className="mb-4 flex shrink-0 items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30">
+      <div className="mb-4 flex shrink-0 flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30">
             <Sparkles size={20} />
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-2xl font-extrabold tracking-tight text-text-primary">
               AI{" "}
               <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent">
@@ -464,14 +464,14 @@ export default function CoachPage() {
                     }
                   }}
                   placeholder="Type your message..."
-                  className="flex-1 bg-transparent px-2 py-1.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
+                  className="min-w-0 flex-1 bg-transparent px-2 py-1.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none"
                   disabled={sending}
                 />
                 <button
                   type="button"
                   onClick={handleSend}
                   disabled={!input.trim() || sending}
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/25 transition-all hover:shadow-violet-500/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/25 transition-all hover:shadow-violet-500/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                 >
                   {sending ? (
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
