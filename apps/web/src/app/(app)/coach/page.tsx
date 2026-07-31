@@ -245,7 +245,7 @@ export default function CoachPage() {
               />
             </button>
             {sessionsOpen && (
-              <div className="absolute right-0 z-20 mt-2 w-72 overflow-hidden rounded-2xl border border-border bg-surface shadow-xl">
+              <div className="absolute right-0 z-20 mt-2 w-72 overflow-hidden rounded-2xl border border-border bg-bg shadow-xl">
                 <div className="border-b border-border px-4 py-2.5">
                   <p className="text-xs font-semibold uppercase tracking-wider text-text-muted">
                     Your sessions
